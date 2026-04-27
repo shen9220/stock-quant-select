@@ -1,0 +1,10 @@
+{
+  "analysis_date": "2024-04-24",
+  "model": "强度首板战法",
+  "strategy": "连续涨停1天，早盘集合竞价买入，次日收盘前全部卖出",
+  "position": "每次买入50%（五层仓）",
+  "total_stocks": 0,
+  "qualified_count": 0,
+  "all_stocks": [],
+  "top_stocks": []
+}

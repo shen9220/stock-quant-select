@@ -1,0 +1,89 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 虚拟环境
+venv/
+ENV/
+env/
+.venv
+
+# IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 敏感文件
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+credentials.json
+API_KEY.md
+github_upload_config.txt
+
+# 日志文件
+*.log
+logs/
+*.log.*
+
+# 测试结果
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 量化结果
+results/*.json
+output/
+daily_data/
+
+# 缓存
+.cache/
+*.cache
+
+# 备份文件
+*.bak
+*.backup
+*~
+
+# 敏感配置文件
+API_KEY.md
+github_upload_config.txt
+.env

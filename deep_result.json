@@ -1,0 +1,51 @@
+{
+  "mode": "buy_signals",
+  "date": "2026-04-27",
+  "stock_code": "000661",
+  "stock_name": "长春高新",
+  "buy_price": 32.75,
+  "buy_time": "14:50",
+  "ma10": 33.1,
+  "ma10_slope_pct": 1.859,
+  "stop_loss_price": 32.77,
+  "take_profit_price1": 33.4,
+  "take_profit_price2": 34.39,
+  "predicted_next_open": 33.97,
+  "predicted_sell_price": 33.29,
+  "expected_profit_pct": 1.66,
+  "risk_reward_ratio": 0,
+  "volume": 411477,
+  "prev_volume": 500236,
+  "score": 100,
+  "match_type": "strict",
+  "conditions_met": [
+    "收阴线",
+    "历史放量大阳线",
+    "缩量",
+    "回调至10日线",
+    "MA10向上"
+  ],
+  "conditions_detail": [
+    "当日阴线跌幅: -1.68%",
+    "放量大阳线: 涨幅9.92%, 放量2.25倍, 9天前",
+    "缩量比例: 0.82",
+    "距离MA10: -1.05%",
+    "MA10斜率: 1.859%"
+  ],
+  "scan_time": "2026-04-27 03:26:00",
+  "message": "推荐股票: 000661 长春高新",
+  "backup_stock": {
+    "stock_code": "000002",
+    "stock_name": "万科A",
+    "buy_price": 21.76,
+    "predicted_sell_price": 22.27,
+    "expected_profit_pct": 2.36,
+    "score": 80,
+    "conditions_met": [
+      "历史放量大阳线",
+      "缩量",
+      "回调至10日线",
+      "MA10向上"
+    ]
+  }
+}
