@@ -4,7 +4,25 @@ from datetime import datetime, timedelta, time
 import os
 
 def get_previous_trading_day(current_date):
-    """获取前一个交易日（周一到周五）"""
+    """获取前一个中国股市交易日（使用真实交易日历）"""
+    # 使用 akshare 获取中国A股真实交易日历
+    try:
+        trade_cal = ak.tool_trade_date_hist_sina()
+        trade_cal['trade_date'] = pd.to_datetime(trade_cal['trade_date'])
+        
+        # 将当前日期转换为日期格式（去掉时间部分）
+        current_date_only = current_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # 找出所有在当前日期之前的交易日
+        past_trades = trade_cal[trade_cal['trade_date'] < current_date_only]
+        
+        if len(past_trades) > 0:
+            # 返回最后一个交易日
+            return past_trades.iloc[-1]['trade_date'].to_pydatetime()
+    except:
+        pass
+    
+    # 如果获取失败， fallback 到简单的周末排除逻辑
     day = current_date - timedelta(1)
     while day.weekday() >= 5:  # 5=Saturday, 6=Sunday
         day -= timedelta(1)

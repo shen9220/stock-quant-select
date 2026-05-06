@@ -1,0 +1,54 @@
+{
+  "total_tests": 9,
+  "passed": 9,
+  "failed": 0,
+  "pass_rate": "100.0%",
+  "results": [
+    {
+      "name": "智能体初始化",
+      "status": "PASS",
+      "result": "智能体初始化成功"
+    },
+    {
+      "name": "触发词检测",
+      "status": "PASS",
+      "result": "触发词检测正常"
+    },
+    {
+      "name": "智能选股功能",
+      "status": "PASS",
+      "result": "智能选股功能正常"
+    },
+    {
+      "name": "个股分析功能",
+      "status": "PASS",
+      "result": "个股分析功能正常"
+    },
+    {
+      "name": "高股息选股功能",
+      "status": "PASS",
+      "result": "高股息选股功能正常"
+    },
+    {
+      "name": "热门板块分析功能",
+      "status": "PASS",
+      "result": "热门板块分析功能正常"
+    },
+    {
+      "name": "配置文件加载",
+      "status": "PASS",
+      "result": "配置文件加载正常"
+    },
+    {
+      "name": "意图分析",
+      "status": "PASS",
+      "result": "意图分析正常"
+    },
+    {
+      "name": "UTF-8 编码处理",
+      "status": "PASS",
+      "result": "UTF-8 编码处理正常"
+    }
+  ],
+  "errors": []
+}

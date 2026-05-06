@@ -1,0 +1,12 @@
+{
+  "stock_code": "",
+  "stock_name": "",
+  "select_date": "2026-04-27",
+  "buy_price": 0,
+  "buy_time": "",
+  "ma10": 0,
+  "ma10_slope": 0,
+  "conditions_met": [],
+  "score": 0,
+  "signals": "当日无符合条件的股票"
+}

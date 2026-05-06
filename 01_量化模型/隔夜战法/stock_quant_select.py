@@ -323,6 +323,8 @@ def main():
                         help='历史回看天数 (默认: 20)')
     parser.add_argument('--limit-up-threshold', type=float, default=0.095,
                         help='涨停板阈值 (默认: 0.095，即9.5%%)')
+    parser.add_argument('--top-n', type=int, default=None,
+                        help='返回前N只股票（兼容参数）')
 
     args = parser.parse_args()
 

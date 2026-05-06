@@ -1,0 +1,14 @@
+{
+  "name": "smart-stock-picker",
+  "version": "1.0.0",
+  "description": "基于A股市场数据的智能选股工具，支持多维度筛选、估值分析、技术指标评分",
+  "trigger": ["选股", "帮我选股", "股票推荐", "分析股票", "这只股票怎么样"],
+  "category": ["金融"],
+  "tags": ["股票", "选股", "A股", "投资", "估值分析", "技术分析"],
+  "author": "虾叨叨",
+  "license": "MIT",
+  "dependencies": {
+    "python": ["requests", "pandas", "numpy"]
+  },
+  "min_openclaw_version": "0.1.0"
+}

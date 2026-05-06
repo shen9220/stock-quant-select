@@ -1,0 +1,51 @@
+{
+  "mode": "buy_signals",
+  "date": "2026-04-27",
+  "stock_code": "000807",
+  "stock_name": "云铝股份",
+  "buy_price": 35.58,
+  "buy_time": "14:50",
+  "ma10": 35.81,
+  "ma10_slope_pct": 1.814,
+  "stop_loss_price": 35.45,
+  "take_profit_price1": 36.29,
+  "take_profit_price2": 37.36,
+  "predicted_next_open": 36.87,
+  "predicted_sell_price": 36.39,
+  "expected_profit_pct": 2.27,
+  "risk_reward_ratio": 6.45,
+  "volume": 386668,
+  "prev_volume": 453725,
+  "score": 100,
+  "match_type": "strict",
+  "conditions_met": [
+    "收阴线",
+    "历史放量大阳线",
+    "缩量",
+    "回调至10日线",
+    "MA10向上"
+  ],
+  "conditions_detail": [
+    "当日阴线跌幅: -1.82%",
+    "放量大阳线: 涨幅9.29%, 放量1.91倍, 5天前",
+    "缩量比例: 0.85",
+    "距离MA10: -0.65%",
+    "MA10斜率: 1.814%"
+  ],
+  "scan_time": "2026-04-27 09:16:45",
+  "message": "推荐股票: 000807 云铝股份",
+  "backup_stock": {
+    "stock_code": "000001",
+    "stock_name": "平安银行",
+    "buy_price": 31.93,
+    "predicted_sell_price": 32.79,
+    "expected_profit_pct": 2.71,
+    "score": 80,
+    "conditions_met": [
+      "历史放量大阳线",
+      "缩量",
+      "回调至10日线",
+      "MA10向上"
+    ]
+  }
+}
