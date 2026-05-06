@@ -2,12 +2,56 @@ import akshare as ak  # 免费A股数据
 import pandas as pd
 from datetime import datetime, timedelta, time
 import os
+import time as time_mod
+from requests.exceptions import RequestException
+
+def _retry_fetch(description, func, *args, max_attempts=5, base_delay=1.5, **kwargs):
+    """东方财富等接口易出现 TLS 中断（SSLEOFError），退避重试可提高成功率。"""
+    last_err = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return func(*args, **kwargs)
+        except (RequestException, OSError) as e:
+            last_err = e
+            if attempt < max_attempts:
+                wait = base_delay * (2 ** (attempt - 1))
+                print(f"{description} 请求失败（{type(e).__name__}），{wait:.1f} 秒后重试 ({attempt}/{max_attempts})…")
+                time_mod.sleep(wait)
+    raise last_err
+
+
+_ZT_POOL_CACHE = {}
+
+
+def clear_zt_pool_cache():
+    _ZT_POOL_CACHE.clear()
+
+
+def fetch_zt_pool_em(date_str, max_attempts=5):
+    """带重试的涨停池接口；同一日期只请求一次并缓存，避免 N 只股票 × 30 天打爆接口。"""
+    if date_str in _ZT_POOL_CACHE:
+        return _ZT_POOL_CACHE[date_str]
+    df = _retry_fetch(
+        f"涨停池 {date_str}",
+        ak.stock_zt_pool_em,
+        date=date_str,
+        max_attempts=max_attempts,
+        base_delay=1.5,
+    )
+    _ZT_POOL_CACHE[date_str] = df
+    return df
+
 
 def get_previous_trading_day(current_date):
     """获取前一个中国股市交易日（使用真实交易日历）"""
     # 使用 akshare 获取中国A股真实交易日历
     try:
-        trade_cal = ak.tool_trade_date_hist_sina()
+        trade_cal = _retry_fetch(
+            "交易日历",
+            ak.tool_trade_date_hist_sina,
+            max_attempts=3,
+            base_delay=1.0,
+        )
         trade_cal['trade_date'] = pd.to_datetime(trade_cal['trade_date'])
         
         # 将当前日期转换为日期格式（去掉时间部分）
@@ -32,16 +76,14 @@ def get_historical_zt_count(stock_code, days=30):
     """获取过去days天内的涨停次数"""
     try:
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=days)
-        zt_history = ak.stock_zt_pool_em(date=end_date.strftime('%Y%m%d'))
         count = 0
         for i in range(days):
             date_str = (end_date - timedelta(i)).strftime('%Y%m%d')
-            daily_zt = ak.stock_zt_pool_em(date=date_str)
-            if stock_code in daily_zt['代码'].values:
+            daily_zt = fetch_zt_pool_em(date_str, max_attempts=3)
+            if not daily_zt.empty and stock_code in daily_zt['代码'].values:
                 count += 1
         return count
-    except:
+    except Exception:
         return 0
 
 def get_trend_indicator(stock_code):
@@ -78,7 +120,8 @@ def calculate_composite_score(row):
     return zf_score + cj_score + hs_score + gene_score + trend_score
 
 def analyze_zhangting_stocks():
-    print("开始分析涨停股票...")
+    clear_zt_pool_cache()
+    print("开始分析涨停股票...", flush=True)
     
     # 1. 获取前一个交易日
     today = datetime.now()
@@ -97,7 +140,12 @@ def analyze_zhangting_stocks():
     
     print("正在获取涨停股票数据...")
     # 获取前一个交易日涨停板股票
-    zt_df = ak.stock_zt_pool_em(date=query_date_str)
+    try:
+        zt_df = fetch_zt_pool_em(query_date_str)
+    except (RequestException, OSError) as e:
+        print(f"获取涨停数据失败（已多次重试）: {e}")
+        print("请检查网络、代理或稍后重试；若持续失败可尝试: pip install -U certifi akshare requests urllib3")
+        return
     
     if zt_df.empty:
         print(f"{query_date_display} 暂无涨停股票数据。")
@@ -109,7 +157,11 @@ def analyze_zhangting_stocks():
     two_days_ago = get_previous_trading_day(previous_trading_day)
     two_days_ago_str = two_days_ago.strftime('%Y%m%d')
     print(f"筛选首次涨停股票（排除{two_days_ago_str}已涨停的股票）...")
-    two_days_ago_zt = ak.stock_zt_pool_em(date=two_days_ago_str)
+    try:
+        two_days_ago_zt = fetch_zt_pool_em(two_days_ago_str)
+    except (RequestException, OSError) as e:
+        print(f"获取前两日涨停池失败: {e}")
+        return
     
     today_zt_only = zt_df[~zt_df['代码'].isin(two_days_ago_zt['代码'])]
     
@@ -174,15 +226,14 @@ def analyze_zhangting_stocks():
     for line in output_lines:
         print(line)
     
-    # 保存到文件
-    results_dir = "/Users/admin/Downloads/projects_test/filter/results"
+    # 保存到文件（与脚本同目录下的 results，避免硬编码路径）
+    results_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
     os.makedirs(results_dir, exist_ok=True)
     file_name = f"{query_date_str}_recommendations.md"
     file_path = os.path.join(results_dir, file_name)
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(output_lines))
     print(f"\n✅ 结果已保存到: {file_path}")
-    print("🎉 分析完成！")
     print("🎉 分析完成！")
 
 # 运行分析
