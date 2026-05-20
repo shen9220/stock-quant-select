@@ -1,3 +1,11 @@
+import sys
+import os
+
+# 添加用户 site-packages 路径（确保依赖包能被找到）
+user_site_packages = os.path.expanduser('~/.local/lib/python3.13/site-packages')
+if user_site_packages not in sys.path:
+    sys.path.insert(0, user_site_packages)
+
 import pandas as pd
 import numpy as np
 import argparse

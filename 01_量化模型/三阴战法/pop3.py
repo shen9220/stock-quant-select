@@ -5,6 +5,14 @@
 策略：首次涨停后连续3天阴跌不破涨停底部，第三或四天收十字星
 """
 
+import sys
+import os
+
+# 添加用户 site-packages 路径（确保 akshare 能被找到）
+user_site_packages = os.path.expanduser('~/.local/lib/python3.13/site-packages')
+if user_site_packages not in sys.path:
+    sys.path.insert(0, user_site_packages)
+
 import akshare as ak
 import pandas as pd
 import numpy as np
