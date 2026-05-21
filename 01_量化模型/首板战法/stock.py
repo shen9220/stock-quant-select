@@ -1,212 +1,246 @@
-"""
-股票量化选股模型 - 隔夜战法
-使用 akshare 获取实时数据
+'''
 cd /workspace/projects/stock-quant-select/01_量化模型/首板战法
 python3 stock.py
-"""
-import sys
-import os
-
-# 添加用户 site-packages 路径（确保 akshare 能被找到）- 必须放在最前面！
-user_site_packages = os.path.expanduser('~/.local/lib/python3.13/site-packages')
-if user_site_packages not in sys.path:
-    sys.path.insert(0, user_site_packages)
+'''
 
 import akshare as ak  # 免费A股数据
 import pandas as pd
 from datetime import datetime, timedelta, time
+import os
+import time as time_mod
 from requests.exceptions import RequestException
 
+def _retry_fetch(description, func, *args, max_attempts=5, base_delay=1.5, **kwargs):
+    """东方财富等接口易出现 TLS 中断（SSLEOFError），退避重试可提高成功率。"""
+    last_err = None
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return func(*args, **kwargs)
+        except (RequestException, OSError) as e:
+            last_err = e
+            if attempt < max_attempts:
+                wait = base_delay * (2 ** (attempt - 1))
+                print(f"{description} 请求失败（{type(e).__name__}），{wait:.1f} 秒后重试 ({attempt}/{max_attempts})…")
+                time_mod.sleep(wait)
+    raise last_err
+
+
+_ZT_POOL_CACHE = {}
+
+
+def clear_zt_pool_cache():
+    _ZT_POOL_CACHE.clear()
+
+
+def fetch_zt_pool_em(date_str, max_attempts=5):
+    """带重试的涨停池接口；同一日期只请求一次并缓存，避免 N 只股票 × 30 天打爆接口。"""
+    if date_str in _ZT_POOL_CACHE:
+        return _ZT_POOL_CACHE[date_str]
+    df = _retry_fetch(
+        f"涨停池 {date_str}",
+        ak.stock_zt_pool_em,
+        date=date_str,
+        max_attempts=max_attempts,
+        base_delay=1.5,
+    )
+    _ZT_POOL_CACHE[date_str] = df
+    return df
+
+
 def get_previous_trading_day(current_date):
-    """获取前一个中国股市交易日"""
+    """获取前一个中国股市交易日（使用真实交易日历）"""
+    # 使用 akshare 获取中国A股真实交易日历
     try:
-        # 使用 akshare 获取真实交易日历
-        trade_cal = ak.tool_trade_date_hist_sina()
+        trade_cal = _retry_fetch(
+            "交易日历",
+            ak.tool_trade_date_hist_sina,
+            max_attempts=3,
+            base_delay=1.0,
+        )
         trade_cal['trade_date'] = pd.to_datetime(trade_cal['trade_date'])
+        
+        # 将当前日期转换为日期格式（去掉时间部分）
         current_date_only = current_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        
+        # 找出所有在当前日期之前的交易日
         past_trades = trade_cal[trade_cal['trade_date'] < current_date_only]
+        
         if len(past_trades) > 0:
+            # 返回最后一个交易日
             return past_trades.iloc[-1]['trade_date'].to_pydatetime()
     except:
         pass
-    # fallback 到简单的周末排除逻辑
+    
+    # 如果获取失败， fallback 到简单的周末排除逻辑
     day = current_date - timedelta(1)
-    while day.weekday() >= 5:
+    while day.weekday() >= 5:  # 5=Saturday, 6=Sunday
         day -= timedelta(1)
     return day
 
-def get_limit_up_stocks(target_date):
-    """获取涨停股票"""
-    print(f"正在获取涨停股票数据...")
+def get_historical_zt_count(stock_code, days=30):
+    """获取过去days天内的涨停次数"""
     try:
-        # 获取涨停股票池
-        zt_df = ak.stock_zt_pool_em(date=target_date.strftime('%Y%m%d'))
-        if zt_df is None or zt_df.empty:
-            print(f"{target_date.strftime('%Y年%m月%d日')} 暂无涨停股票数据。")
-            return pd.DataFrame()
-        
-        print(f"获取到 {len(zt_df)} 只涨停股票")
-        return zt_df
-    except Exception as e:
-        print(f"获取涨停数据失败: {e}")
-        return pd.DataFrame()
+        end_date = datetime.now()
+        count = 0
+        for i in range(days):
+            date_str = (end_date - timedelta(i)).strftime('%Y%m%d')
+            daily_zt = fetch_zt_pool_em(date_str, max_attempts=3)
+            if not daily_zt.empty and stock_code in daily_zt['代码'].values:
+                count += 1
+        return count
+    except Exception:
+        return 0
 
-def filter_first_limit_up(zt_df, prev_date):
-    """筛选首次涨停股票（排除已连续涨停的）
+def get_trend_indicator(stock_code):
+    """简单趋势指标：5日均线 > 10日均线则为1，否则0"""
+    try:
+        hist = ak.stock_zh_a_hist(symbol=stock_code, period="daily", start_date=(datetime.now() - timedelta(30)).strftime('%Y%m%d'), end_date=datetime.now().strftime('%Y%m%d'))
+        if len(hist) < 10:
+            return 0
+        ma5 = hist['收盘'].tail(5).mean()
+        ma10 = hist['收盘'].tail(10).mean()
+        return 1 if ma5 > ma10 else 0
+    except:
+        return 0
+
+def get_basic_fundamentals(stock_code):
+    """获取基本面数据，如市盈率"""
+    try:
+        fundamentals = ak.stock_a_lg_indicator_cninfo(symbol=stock_code)
+        if not fundamentals.empty:
+            pe = fundamentals.get('市盈率', 0)
+            return pe if pe else 0
+        return 0
+    except:
+        return 0
+
+def calculate_composite_score(row):
+    """计算综合得分"""
+    # 权重：涨幅40%, 成交额20%, 换手率20%, 历史基因10%, 趋势10%
+    zf_score = row['涨跌幅'] * 0.4
+    cj_score = (row['成交额'] / 1e8) * 0.2  # 标准化成交额（亿元）
+    hs_score = row['换手率'] * 0.2
+    gene_score = row.get('历史涨停基因', 0) * 0.1
+    trend_score = row.get('趋势指标', 0) * 0.1
+    return zf_score + cj_score + hs_score + gene_score + trend_score
+
+def analyze_zhangting_stocks():
+    clear_zt_pool_cache()
+    print("开始分析涨停股票...", flush=True)
     
-    参数:
-        zt_df: 涨停股票DataFrame（查询的是prev_date的涨停）
-        prev_date: 当前查询的日期（前一个交易日）
-    """
-    print("正在筛选首次涨停股票...")
+    # 1. 获取前一个交易日
+    today = datetime.now()
+    previous_trading_day = get_previous_trading_day(today)
+    query_date_str = previous_trading_day.strftime('%Y%m%d')
+    query_date_display = previous_trading_day.strftime('%Y年%m月%d日')
+    
+    print(f"查询日期: {query_date_display} (前一个交易日)")
+    
+    # 检查时间窗口：早盘开盘附近（9:30-10:00）
+    # 临时注释掉时间检查以演示输出
+    # current_time = today.time()
+    # if not (time(9, 30) <= current_time <= time(10, 0)):
+    #     print("当前时间不在早盘开盘时间窗口（9:30-10:00）内，无法查询涨停情况。")
+    #     return
+    
+    print("正在获取涨停股票数据...")
+    # 获取前一个交易日涨停板股票
+    try:
+        zt_df = fetch_zt_pool_em(query_date_str)
+    except (RequestException, OSError) as e:
+        print(f"获取涨停数据失败（已多次重试）: {e}")
+        print("请检查网络、代理或稍后重试；若持续失败可尝试: pip install -U certifi akshare requests urllib3")
+        return
     
     if zt_df.empty:
-        return pd.DataFrame()
+        print(f"{query_date_display} 暂无涨停股票数据。")
+        return
     
-    # 获取前一个交易日的前一个交易日（排除这个日期已涨停的）
-    day_before_prev = get_previous_trading_day(prev_date)
-    day_before_prev_str = day_before_prev.strftime('%Y%m%d')
-    print(f"查询前一日数据: {day_before_prev_str}")
+    print(f"获取到 {len(zt_df)} 只涨停股票")
     
+    # 筛选连续1天涨停（前一个交易日涨停，前两天没涨停）
+    two_days_ago = get_previous_trading_day(previous_trading_day)
+    two_days_ago_str = two_days_ago.strftime('%Y%m%d')
+    print(f"筛选首次涨停股票（排除{two_days_ago_str}已涨停的股票）...")
     try:
-        # 获取"前一个交易日的前一个交易日"的涨停股票
-        prev_zt_df = ak.stock_zt_pool_em(date=day_before_prev_str)
-        if prev_zt_df is None or prev_zt_df.empty:
-            print(f"{day_before_prev.strftime('%Y年%m月%d日')} 无涨停股票，跳过筛选")
-            return zt_df
-        
-        # 获取前一个交易日的前一个交易日涨停的股票代码
-        prev_zt_codes = set(prev_zt_df['代码'].astype(str).tolist())
-        print(f"前一日涨停股票数: {len(prev_zt_codes)}")
-        
-        # 排除前一个交易日的前一个交易日已涨停的股票（保留首次涨停）
-        first_zt_df = zt_df[~zt_df['代码'].astype(str).isin(prev_zt_codes)]
-        
-        print(f"筛选后首次涨停股票数: {len(first_zt_df)}")
-        return first_zt_df
-        
-    except Exception as e:
-        print(f"筛选首次涨停失败: {e}")
-        return zt_df
-
-def analyze_stocks(zt_df):
-    """分析涨停股票"""
+        two_days_ago_zt = fetch_zt_pool_em(two_days_ago_str)
+    except (RequestException, OSError) as e:
+        print(f"获取前两日涨停池失败: {e}")
+        return
+    
+    today_zt_only = zt_df[~zt_df['代码'].isin(two_days_ago_zt['代码'])]
+    
+    # 增加筛选条件：排除科创板（688开头）、北交所（92开头）和ST票（名称包含ST或st），主要查询主板和创业板
+    today_zt_only = today_zt_only[~today_zt_only['代码'].str.startswith(('688', '92')) & ~today_zt_only['名称'].str.contains('ST|st', case=False)]
+    
+    if today_zt_only.empty:
+        print(f"{query_date_display} 无符合连续1天涨停条件的股票。")
+        return
+    
+    print(f"筛选后剩余 {len(today_zt_only)} 只股票")
+    
     print("正在计算各项指标...")
+    # 添加额外指标
+    today_zt_only['历史涨停基因'] = today_zt_only['代码'].apply(lambda x: get_historical_zt_count(x, 30))
+    today_zt_only['趋势指标'] = today_zt_only['代码'].apply(get_trend_indicator)
+    today_zt_only['市盈率'] = today_zt_only['代码'].apply(get_basic_fundamentals)
     
-    if zt_df.empty:
-        print("没有涨停股票可供分析")
-        return
+    # 计算综合得分
+    today_zt_only['综合得分'] = today_zt_only.apply(calculate_composite_score, axis=1)
     
-    results = []
+    # 强度排名：按综合得分排序，取前2只
+    sorted_stocks = today_zt_only.sort_values('综合得分', ascending=False)
+    top2 = sorted_stocks.head(2)
     
-    for idx, row in zt_df.iterrows():
-        try:
-            stock_code = str(row['代码']).zfill(6)
-            stock_name = row.get('名称', '未知')
-            change_pct = row.get('涨跌幅', 0)
-            turnover = row.get('成交额', 0)
-            exchange_ratio = row.get('换手率', 0)
-            
-            # 基本评分
-            score = 50  # 基础分
-            
-            # 涨停幅度评分（涨停越好）
-            if change_pct >= 9.9:
-                score += 15
-            elif change_pct >= 9.5:
-                score += 10
-            
-            # 成交额评分（成交活跃度）
-            if turnover > 5:
-                score += 15
-            elif turnover > 2:
-                score += 10
-            elif turnover > 1:
-                score += 5
-            
-            # 换手率评分
-            if exchange_ratio > 10:
-                score += 10
-            elif exchange_ratio > 5:
-                score += 5
-            
-            # 封单强度评分
-            volume = row.get('成交量', 0)
-            if volume > 100000:
-                score += 10
-            
-            results.append({
-                'code': stock_code,
-                'name': stock_name,
-                'change_pct': change_pct,
-                'turnover': turnover,
-                'exchange_ratio': exchange_ratio,
-                'score': min(score, 100)
-            })
-            
-        except Exception as e:
-            continue
+    print("分析完成，正在生成结果...")
+    # 准备输出内容
+    output_lines = []
+    output_lines.append(f"=== {query_date_display} 强度推荐排名（前2只，基于多因子综合得分）===")
+    for idx, row in top2.iterrows():
+        output_lines.append(f"排名 {idx+1}: {row['代码']} - {row['名称']}")
+        output_lines.append(f"  涨停天数: 1天")
+        output_lines.append(f"  涨幅: {row['涨跌幅']}%")
+        output_lines.append(f"  成交额: {row['成交额']}")
+        output_lines.append(f"  换手率: {row['换手率']}%")
+        output_lines.append(f"  历史涨停基因（30天内涨停次数）: {row['历史涨停基因']}")
+        output_lines.append(f"  趋势指标（1=上升，0=其他）: {row['趋势指标']}")
+        output_lines.append(f"  基本面（市盈率）: {row['市盈率']}")
+        output_lines.append(f"  综合得分: {row['综合得分']:.2f}")
+        # 涨停原因分析（假设数据中有此字段）
+        reason = row.get('涨停原因', '数据中未提供具体原因')
+        output_lines.append(f"  涨停原因分析: {reason}")
+        # 连板属性和胜率（简化）
+        lianban = "有连板潜力" if row['历史涨停基因'] > 5 else "连板属性一般"
+        win_rate = "首板胜率较高" if row['趋势指标'] == 1 and row['历史涨停基因'] > 3 else "首板胜率中等"
+        output_lines.append(f"  连板属性: {lianban}")
+        output_lines.append(f"  首板胜率评估: {win_rate}（基于历史数据和趋势）")
+        output_lines.append(f"  买入后第二天卖出建议: 若趋势持续，建议持有观察；否则考虑T+1卖出")
+        output_lines.append("")
     
-    # 按评分排序
-    results.sort(key=lambda x: x['score'], reverse=True)
+    # 其他未入选强度前二原因
+    others = sorted_stocks.iloc[2:]
+    output_lines.append("=== 其他未入选强度前二原因 ===")
+    if not others.empty:
+        output_lines.append("以下股票综合得分较低，未入选前二：")
+        for idx, row in others.iterrows():
+            output_lines.append(f"  {row['代码']} - {row['名称']}: 综合得分 {row['综合得分']:.2f} - 得分低于前二")
+    else:
+        output_lines.append("无其他候选股票。")
     
-    print("\n" + "="*60)
-    print("涨停股票分析结果")
-    print("="*60)
+    # 打印到控制台
+    for line in output_lines:
+        print(line)
     
-    for idx, stock in enumerate(results[:10], 1):
-        print(f"\n【第{idx}名】{stock['code']} {stock['name']}")
-        print(f"  涨停幅度: {stock['change_pct']:.2f}%")
-        print(f"  成交额: {stock['turnover']:.2f}亿")
-        print(f"  换手率: {stock['exchange_ratio']:.2f}%")
-        print(f"  综合评分: {stock['score']}分")
-        
-        # 简单交易建议
-        if stock['score'] >= 80:
-            print(f"  建议: ⭐⭐⭐⭐⭐ 强烈推荐")
-            print(f"  买入: 明日开盘可考虑买入半仓")
-            print(f"  止损: 跌破涨停底部价格立即止损")
-        elif stock['score'] >= 60:
-            print(f"  建议: ⭐⭐⭐⭐ 推荐关注")
-            print(f"  买入: 可轻仓试探")
-        else:
-            print(f"  建议: ⭐⭐⭐ 谨慎关注")
-    
-    print("\n" + "="*60)
-    print("分析完成")
-    print("="*60)
+    # 保存到文件（与脚本同目录下的 results，避免硬编码路径）
+    results_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
+    os.makedirs(results_dir, exist_ok=True)
+    file_name = f"{query_date_str}_recommendations.md"
+    file_path = os.path.join(results_dir, file_name)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(output_lines))
+    print(f"\n✅ 结果已保存到: {file_path}")
+    print("🎉 分析完成！")
 
-def main():
-    """主函数"""
-    print("="*60)
-    print("股票量化选股模型 - 隔夜战法")
-    print("="*60)
-    print()
-    
-    # 获取当前日期
-    current_date = datetime.now()
-    
-    # 如果是周末，自动使用上一个交易日
-    if current_date.weekday() >= 5:  # 5=Saturday, 6=Sunday
-        current_date = get_previous_trading_day(current_date)
-    
-    prev_date = get_previous_trading_day(current_date)
-    print(f"分析日期: {current_date.strftime('%Y年%m月%d日 %H:%M')}")
-    print(f"查询日期: {prev_date.strftime('%Y年%m月%d日')} (前一个交易日)")
-    print()
-    
-    # 获取涨停股票
-    zt_df = get_limit_up_stocks(prev_date)
-    
-    if zt_df.empty:
-        print("\n没有找到涨停股票")
-        return
-    
-    # 筛选首次涨停（排除连续涨停的）
-    first_zt_df = filter_first_limit_up(zt_df, prev_date)
-    
-    # 分析股票
-    analyze_stocks(first_zt_df)
-
+# 运行分析
 if __name__ == "__main__":
-    main()
+    analyze_zhangting_stocks()
