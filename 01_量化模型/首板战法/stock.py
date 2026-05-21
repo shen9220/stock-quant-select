@@ -1,6 +1,8 @@
 """
 股票量化选股模型 - 隔夜战法
 使用 akshare 获取实时数据
+cd /workspace/projects/stock-quant-select/01_量化模型/首板战法
+python3 stock.py
 """
 import sys
 import os
@@ -49,31 +51,35 @@ def get_limit_up_stocks(target_date):
         print(f"获取涨停数据失败: {e}")
         return pd.DataFrame()
 
-def filter_first_limit_up(zt_df, current_date):
-    """筛选首次涨停股票（排除已连续涨停的）"""
+def filter_first_limit_up(zt_df, prev_date):
+    """筛选首次涨停股票（排除已连续涨停的）
+    
+    参数:
+        zt_df: 涨停股票DataFrame（查询的是prev_date的涨停）
+        prev_date: 当前查询的日期（前一个交易日）
+    """
     print("正在筛选首次涨停股票...")
     
     if zt_df.empty:
         return pd.DataFrame()
     
-    # 获取前一个交易日
-    prev_date = get_previous_trading_day(current_date)
-    prev_date_str = prev_date.strftime('%Y%m%d')
-    print(f"查询前一日数据: {prev_date_str}")
+    # 获取前一个交易日的前一个交易日（排除这个日期已涨停的）
+    day_before_prev = get_previous_trading_day(prev_date)
+    day_before_prev_str = day_before_prev.strftime('%Y%m%d')
+    print(f"查询前一日数据: {day_before_prev_str}")
     
     try:
-        # 获取前一日的涨停股票
-        prev_zt_df = ak.stock_zt_pool_em(date=prev_date_str)
+        # 获取"前一个交易日的前一个交易日"的涨停股票
+        prev_zt_df = ak.stock_zt_pool_em(date=day_before_prev_str)
         if prev_zt_df is None or prev_zt_df.empty:
-            print(f"{prev_date.strftime('%Y年%m月%d日')} 无涨停股票")
+            print(f"{day_before_prev.strftime('%Y年%m月%d日')} 无涨停股票，跳过筛选")
             return zt_df
         
-        # 获取前一日涨停的股票代码
+        # 获取前一个交易日的前一个交易日涨停的股票代码
         prev_zt_codes = set(prev_zt_df['代码'].astype(str).tolist())
         print(f"前一日涨停股票数: {len(prev_zt_codes)}")
         
-        # 排除前一日已涨停的股票（保留首次涨停）
-        current_zt_codes = zt_df['代码'].astype(str).tolist()
+        # 排除前一个交易日的前一个交易日已涨停的股票（保留首次涨停）
         first_zt_df = zt_df[~zt_df['代码'].astype(str).isin(prev_zt_codes)]
         
         print(f"筛选后首次涨停股票数: {len(first_zt_df)}")
@@ -196,8 +202,8 @@ def main():
         print("\n没有找到涨停股票")
         return
     
-    # 筛选首次涨停
-    first_zt_df = filter_first_limit_up(zt_df, current_date)
+    # 筛选首次涨停（排除连续涨停的）
+    first_zt_df = filter_first_limit_up(zt_df, prev_date)
     
     # 分析股票
     analyze_stocks(first_zt_df)
