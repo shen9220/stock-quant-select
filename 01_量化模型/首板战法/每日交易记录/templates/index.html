@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>交易数据记录 · 首板战法</title>
+  <style>
+    :root {
+      --sky: #3b82f6;
+      --sky-soft: #dbeafe;
+      --sky-bar: #60a5fa;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --head: #e5e7eb;
+      --profit: #dc2626;
+      --loss: #16a34a;
+      --red-deep: #b91c1c;
+      --red-light: #fecaca;
+      --yellow-light: #fef08a;
+      --yellow-deep: #eab308;
+      --shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .topbar {
+      background: linear-gradient(120deg, #93c5fd 0%, #60a5fa 45%, #3b82f6 100%);
+      color: #fff;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(59,130,246,.28);
+    }
+    .topbar h1 { margin: 0; font-size: 18px; font-weight: 700; text-shadow: 0 1px 0 rgba(0,0,0,.08); }
+    .topbar .hint { font-size: 12px; opacity: .92; margin-top: 4px; }
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .top-actions select, .top-actions a, .top-actions button {
+      border: 1px solid rgba(255,255,255,.45);
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: transform .15s, background .15s;
+    }
+    .top-actions select option { color: #111; }
+    .top-actions a { text-decoration: none; }
+    .top-actions a:hover, .top-actions button:hover, .top-actions select:hover {
+      background: rgba(255,255,255,.32);
+      transform: translateY(-1px);
+    }
+
+    .wrap { padding: 16px 20px 40px; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 14px; }
+    .tab {
+      border: 1px solid #dbeafe;
+      background: #fff;
+      color: var(--muted);
+      padding: 10px 24px;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,.04);
+      transition: .18s transform, .18s box-shadow, .18s background;
+    }
+    .tab:hover { transform: translateY(-2px); }
+    .tab.active {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 10px 20px rgba(59,130,246,.35);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid #eff6ff;
+      text-align: center;
+      transition: transform .18s, box-shadow .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat::before {
+      content: "";
+      position: absolute; left: 0; right: 0; top: 0; height: 3px;
+      background: var(--accent, var(--sky));
+    }
+    .stat:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 14px 28px rgba(59,130,246,.18);
+    }
+    .stat .icon {
+      width: 38px; height: 38px; border-radius: 12px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; margin: 0 auto 8px;
+      background: var(--icon-bg, var(--sky-soft));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .stat .value { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+    .stat .value.pos { color: var(--profit); }
+    .stat .value.neg { color: var(--loss); }
+    .stat .label { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-bottom: 14px; background: #fff; border-radius: 16px;
+      padding: 12px 14px; box-shadow: var(--shadow); border: 1px solid #eff6ff;
+    }
+    .search-box { flex: 1; min-width: 200px; position: relative; }
+    .search-box input {
+      width: 100%; padding: 9px 12px 9px 34px;
+      border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #f9fafb;
+    }
+    .search-box::before {
+      content: "⌕"; position: absolute; left: 11px; top: 50%;
+      transform: translateY(-50%); color: var(--muted);
+    }
+    select, .toolbar button {
+      font: inherit; border-radius: 10px; border: 1px solid var(--line);
+      padding: 8px 12px; background: #fff; color: var(--text); cursor: pointer;
+    }
+    .toolbar button.primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      border: 1px solid #1d4ed8 !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.35);
+    }
+    .toolbar button.primary:hover {
+      filter: brightness(1.06);
+      color: #ffffff !important;
+    }
+
+    .table-card {
+      background: #fff; border-radius: 16px; box-shadow: var(--shadow);
+      border: 1px solid #eff6ff; overflow: hidden;
+    }
+    .table-wrap { overflow: auto; max-height: calc(100vh - 360px); }
+    table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 12.5px; }
+    th, td {
+      padding: 9px 10px; white-space: nowrap; text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      position: sticky; top: 0; z-index: 3;
+      background: var(--head); color: #374151;
+      font-weight: 700; font-size: 12px;
+      user-select: none;
+    }
+    th.sortable { cursor: pointer; }
+    th.sortable:hover { background: #dbeafe; }
+    th .sort-ind { font-size: 10px; margin-left: 2px; color: #9ca3af; }
+    th.sorted .sort-ind { color: var(--sky); }
+    tbody tr:nth-child(even) td { background: #f9fafb; }
+    tbody tr:hover td { background: #eff6ff !important; }
+    tr.sum-row td {
+      background: #f0f9ff !important;
+      font-weight: 700;
+      border-top: 2px solid #93c5fd;
+      position: sticky; top: 36px; z-index: 2;
+    }
+    td.left { text-align: left; font-weight: 650; }
+    .code { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+    .pnl-red-deep { background: #fca5a5 !important; color: #7f1d1d; font-weight: 700; }
+    .pnl-red-light { background: #fecaca !important; color: #991b1b; font-weight: 700; }
+    .pnl-yellow-light { background: #fef08a !important; color: #854d0e; font-weight: 700; }
+    .pnl-yellow-deep { background: #facc15 !important; color: #713f12; font-weight: 800; }
+
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+    .badge-yes { background: #dcfce7; color: #15803d; }
+    .badge-no { background: #f3f4f6; color: #6b7280; }
+    .badge-hold { background: #fef3c7; color: #b45309; }
+    .badge-no-buy { background: #6b7280; color: #f9fafb; font-weight: 700; }
+    .prog-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .prog-tab {
+      border: 2px solid transparent;
+      background: #fff;
+      color: var(--muted);
+      padding: 10px 28px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,.04);
+      transition: .18s transform, .18s box-shadow, .18s background, .18s border-color;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .prog-tab:hover { transform: translateY(-2px); }
+    .prog-tab.active {
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: #fff;
+      border-color: #6366f1;
+      box-shadow: 0 10px 20px rgba(99, 102, 241, .35);
+    }
+    .prog-tab.prog-stock.active {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      border-color: #2563eb;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, .35);
+    }
+    .prog-tab.prog-slow.active {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      border-color: #d97706;
+      box-shadow: 0 10px 20px rgba(245, 158, 11, .35);
+    }
+    .prog-tab.prog-up.active {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border-color: #059669;
+      box-shadow: 0 10px 20px rgba(16, 185, 129, .35);
+    }
+
+    .ops { display: inline-flex; gap: 6px; justify-content: center; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 9px; border: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+      transition: transform .12s, box-shadow .12s;
+    }
+    .icon-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,.1); }
+    .icon-btn.edit { background: #dbeafe; color: #1d4ed8; }
+    .icon-btn.price { background: #cffafe; color: #0e7490; }
+    .icon-btn.del { background: #fee2e2; color: #dc2626; }
+
+    .empty { padding: 56px 20px; text-align: center; color: var(--muted); }
+    .pager {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .pager button {
+      border: 1px solid var(--line); background: #fff; border-radius: 8px;
+      padding: 5px 10px; cursor: pointer;
+    }
+    .pager button:disabled { opacity: .4; cursor: not-allowed; }
+
+    .modal-mask {
+      display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4);
+      z-index: 50; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+      background: #fff; width: min(740px, 100%); max-height: 90vh; overflow: auto;
+      border-radius: 18px; padding: 20px; box-shadow: 0 24px 60px rgba(37,99,235,.25);
+    }
+    .modal h2 { margin: 0 0 14px; font-size: 18px; color: #1d4ed8; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+    .form-grid input, .form-grid select {
+      font: inherit; font-size: 14px; color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+    }
+    .form-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-primary {
+      background: linear-gradient(135deg,#60a5fa,#3b82f6); border: none; color: #fff;
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font: inherit; font-weight: 700;
+    }
+    .btn-ghost {
+      background: #fff; border: 1px solid var(--line); color: var(--text);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font: inherit;
+    }
+    .hint-inline { font-size: 11px; color: #94a3b8; }
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; background: #1e3a8a; color: #fff;
+      padding: 11px 16px; border-radius: 10px; opacity: 0; transition: .2s; z-index: 99;
+    }
+    .toast.show { opacity: 1; }
+    .loading-mask {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, .45);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; backdrop-filter: blur(2px);
+    }
+    .loading-mask.show { display: flex; }
+    .loading-box {
+      background: #fff; border-radius: 14px; padding: 22px 28px; min-width: 220px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.2); text-align: center; color: #0f172a;
+    }
+    .loading-box .spin {
+      width: 28px; height: 28px; margin: 0 auto 12px;
+      border: 3px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toolbar button:disabled, .top-actions button:disabled {
+      opacity: .55; cursor: not-allowed;
+    }
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>交易数据记录 · 首板战法</h1>
+      <div class="hint">D0涨停 → D1开盘买入（一字买不进仍记档、不写价）→ D2 9:35/13:15 卖出（涨停/跌停卖不出则滚D3）</div>
+      <div class="hint" id="closeJobStatus" style="margin-top:6px;font-weight:600">收盘补全状态加载中…</div>
+    </div>
+    <div class="top-actions">
+      <select id="monthFilter" title="月份切换"></select>
+      <a id="exportLink" href="/api/export/csv">导出 CSV</a>
+      <button type="button" id="btnCloseJob" onclick="runCloseJob()">收盘补全</button>
+      <button type="button" id="btnFillEmpty" onclick="refreshPrices(false)">补全空值</button>
+      <button type="button" id="btnForcePull" onclick="refreshPrices(true)">强制重拉</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="prog-tabs">
+      <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setProgram('stock')">📈 Stock</button>
+      <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setProgram('slow')">🐢 Slow</button>
+      <button class="prog-tab prog-up" id="progUp" type="button" onclick="setProgram('up')">🚀 Up</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab1" type="button" onclick="setRank(1)">🥇 第一名</button>
+      <button class="tab" id="tab2" type="button" onclick="setRank(2)">🥈 第二名</button>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
+      <select id="dateFilter"><option value="">全部日期</option></select>
+      <button type="button" id="btnRefresh" onclick="refreshView()">刷新</button>
+      <button class="primary" type="button" onclick="openCreate()">+ 新增交易</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr id="theadRow"></tr>
+            <tr class="sum-row" id="sumRow"></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="empty" style="display:none">当前 Tab / 月份暂无记录</div>
+      </div>
+      <div class="pager">
+        <div>
+          <span id="pageInfo">0 条记录</span>
+          <select id="pageSize" style="margin-left:8px">
+            <option value="40" selected>40条</option>
+            <option value="20">20条</option>
+            <option value="50">50条</option>
+            <option value="100">100条</option>
+          </select>
+        </div>
+        <div class="pages">
+          <button type="button" id="btnFirst" onclick="goPage(1)">首页</button>
+          <button type="button" id="btnPrev" onclick="goPage(page-1)">上一页</button>
+          <button type="button" id="btnNext" onclick="goPage(page+1)">下一页</button>
+          <button type="button" id="btnLast" onclick="goPage(totalPages)">末页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <h2 id="modalTitle">新增交易</h2>
+      <div class="form-grid" id="form"></div>
+      <div class="form-actions">
+        <button class="btn-ghost" type="button" onclick="closeModal()">取消</button>
+        <button class="btn-primary" type="button" onclick="saveTrade()">保存</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="loading-mask" id="loadingMask">
+    <div class="loading-box">
+      <div class="spin"></div>
+      <div id="loadingText">处理中…</div>
+    </div>
+  </div>
+
+  <script>
+    let trades = [];
+    let editingId = null;
+    let page = 1;
+    let pageSize = 40;
+    let totalPages = 1;
+    let currentProgram = "stock";
+    let currentRank = 1;
+    let currentMonth = "";
+    let sortKey = "date";
+    let sortDir = "desc";
+
+    // 表头：按需求排序。末尾两个「半仓盈亏」对应 早/午 全仓盈亏的一半列
+    const COLS = [
+      { key: "id", label: "ID", sum: false },
+      { key: "date", label: "买入日期", sum: false, sortable: true },
+      { key: "stock_code", label: "代码", sum: false },
+      { key: "stock_name", label: "名称", sum: false },
+      { key: "buy_price", label: "买入价", sum: false },
+      { key: "sell_price_935", label: "早盘卖出价", sum: false },
+      { key: "pnl_morning", label: "早盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_1315", label: "午盘卖出价", sum: false },
+      { key: "pnl_afternoon", label: "午盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_half_935", label: "早盘半仓价", sum: false },
+      { key: "pnl_batch_morning", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_half_1315", label: "午盘半仓价", sum: false },
+      { key: "pnl_batch_afternoon", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_batch_avg", label: "分批总价", sum: false },
+      { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
+      { key: "hold_days", label: "持有天数", sum: false },
+      { key: "is_second_board", label: "二板", sum: false },
+      { key: "pnl_batch_total_half", label: "分批半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_morning_half", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_afternoon_half", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "_ops", label: "操作", sum: false },
+    ];
+
+    const STAT_META = [
+      { key: "total", label: "总笔数", icon: "📊", accent: "#3b82f6", bg: "#dbeafe" },
+      { key: "completed", label: "已有卖价", icon: "✅", accent: "#16a34a", bg: "#dcfce7" },
+      { key: "holding", label: "待补全", icon: "📌", accent: "#f59e0b", bg: "#fef3c7" },
+      { key: "win_rate_batch", label: "分批胜率", icon: "🎯", accent: "#8b5cf6", bg: "#f3e8ff", suffix: "%" },
+      { key: "month_pnl_morning_half", label: "早盘盈亏累计", icon: "🌅", accent: "#f97316", bg: "#ffedd5", pnl: true, suffix: "%" },
+      { key: "month_pnl_afternoon_half", label: "午盘盈亏累计", icon: "☀️", accent: "#0ea5e9", bg: "#e0f2fe", pnl: true, suffix: "%" },
+      { key: "month_pnl_batch_half", label: "分批盈亏累计", icon: "💰", accent: "#e11d48", bg: "#ffe4e6", pnl: true, suffix: "%" },
+      { key: "max_win_streak", label: "最大连赢", icon: "🔥", accent: "#ef4444", bg: "#fee2e2" },
+      { key: "max_loss_streak", label: "最大连亏", icon: "❄️", accent: "#64748b", bg: "#f1f5f9" },
+    ];
+
+    const FIELDS = [
+      { key: "date", label: "买入日期", type: "date", required: true },
+      { key: "stock_name", label: "股票名称", type: "text", required: true },
+      { key: "stock_code", label: "代码（可空，名称自动填充）", type: "text" },
+      { key: "buy_price", label: "买入价(开盘)", type: "number" },
+      { key: "sell_price_935", label: "早盘卖出价", type: "number" },
+      { key: "sell_price_1315", label: "午盘卖出价", type: "number" },
+      { key: "sell_price_half_935", label: "早盘半仓价", type: "number" },
+      { key: "sell_price_half_1315", label: "午盘半仓价", type: "number" },
+      { key: "sell_date", label: "卖出日期", type: "date" },
+      { key: "is_second_board", label: "二板", type: "select", options: [
+        { v: "", t: "未知/自动" }, { v: "true", t: "是" }, { v: "false", t: "否" }
+      ]},
+      { key: "rank", label: "排名(1/2)", type: "number" },
+      { key: "notes", label: "备注", type: "text" },
+    ];
+
+    let busy = false;
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2800);
+    }
+    function setLoading(on, text) {
+      const mask = document.getElementById("loadingMask");
+      const label = document.getElementById("loadingText");
+      if (text) label.textContent = text;
+      mask.classList.toggle("show", !!on);
+      busy = !!on;
+      ["btnCloseJob","btnFillEmpty","btnForcePull","btnRefresh"].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.disabled = !!on;
+      });
+    }
+    function fmt(v) { return (v === null || v === undefined || v === "") ? "—" : v; }
+
+    /** 盈亏色阶：≥10深红，≥5浅红，(-5,5)无色，≤-5浅黄，≤-10深黄 */
+    function pnlClass(v) {
+      if (v === null || v === undefined || v === "") return "";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "";
+      if (n >= 10) return "pnl-red-deep";
+      if (n >= 5) return "pnl-red-light";
+      if (n <= -10) return "pnl-yellow-deep";
+      if (n <= -5) return "pnl-yellow-light";
+      return "";
+    }
+
+    async function api(url, opts) {
+      const res = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opts });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "请求失败");
+      return json.data;
+    }
+
+    function setProgram(p) {
+      currentProgram = p;
+      document.getElementById("progStock").classList.toggle("active", p === "stock");
+      document.getElementById("progSlow").classList.toggle("active", p === "slow");
+      document.getElementById("progUp").classList.toggle("active", p === "up");
+      page = 1;
+      loadAll();
+    }
+
+    function setRank(r) {
+      currentRank = r;
+      document.getElementById("tab1").classList.toggle("active", r === 1);
+      document.getElementById("tab2").classList.toggle("active", r === 2);
+      page = 1;
+      loadAll();
+    }
+
+    function qsBase() {
+      const qs = new URLSearchParams();
+      qs.set("program", currentProgram);
+      qs.set("rank", String(currentRank));
+      if (currentMonth) qs.set("month", currentMonth);
+      const kw = document.getElementById("keyword").value.trim();
+      const date = document.getElementById("dateFilter").value;
+      if (kw) qs.set("keyword", kw);
+      if (date) qs.set("date", date);
+      return qs;
+    }
+
+    function toggleSort(key) {
+      if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+      else { sortKey = key; sortDir = "desc"; }
+      renderAll();
+    }
+
+    function sortedTrades() {
+      const arr = [...trades];
+      arr.sort((a, b) => {
+        let va = a[sortKey], vb = b[sortKey];
+        if (va == null) va = sortDir === "asc" ? Infinity : -Infinity;
+        if (vb == null) vb = sortDir === "asc" ? Infinity : -Infinity;
+        if (typeof va === "string") {
+          const cmp = String(va).localeCompare(String(vb), "zh");
+          return sortDir === "asc" ? cmp : -cmp;
+        }
+        return sortDir === "asc" ? (va - vb) : (vb - va);
+      });
+      return arr;
+    }
+
+    async function loadMonths() {
+      const months = await api("/api/months");
+      const sel = document.getElementById("monthFilter");
+      if (!currentMonth) {
+        currentMonth = months.includes("2026-07") ? "2026-07" : (months[0] || new Date().toISOString().slice(0, 7));
+      }
+      sel.innerHTML = months.map(m =>
+        `<option value="${m}" ${m === currentMonth ? "selected" : ""}>${m.replace("-", "年")}月</option>`
+      ).join("");
+    }
+
+    async function loadCloseJobStatus() {
+      const el = document.getElementById("closeJobStatus");
+      if (!el) return;
+      try {
+        const s = await api("/api/jobs/after-close/status");
+        const done = s.last_close_run_date || "";
+        const fin = (s.last_close_run && s.last_close_run.finished_at) || (s.last_run && s.last_run.finished_at) || "";
+        const buy = (s.last_run && s.last_run.buy_enriched) ?? "-";
+        const sell = (s.last_run && s.last_run.sell_enriched) ?? "-";
+        const today = new Date().toISOString().slice(0, 10);
+        if (done === today) {
+          el.textContent = `✓ 今日收盘补全已完成 ${fin} ｜ 补买 ${buy} / 补卖 ${sell}`;
+        } else if (done) {
+          el.textContent = `⚠ 最近收盘补全：${done} ${fin}（今天 ${today} 尚未完成，15:00 后自动跑）`;
+        } else {
+          el.textContent = `⚠ 尚无收盘补全记录（交易日 15:00 后自动执行）`;
+        }
+      } catch (e) {
+        el.textContent = "收盘补全状态读取失败";
+      }
+    }
+
+    async function loadAll() {
+      try {
+        if (!currentMonth) await loadMonths();
+        const qs = qsBase();
+        trades = await api("/api/trades?" + qs.toString());
+        renderAll();
+        const stats = await api("/api/stats?" + qs.toString());
+        renderStats(stats);
+        const dates = await api("/api/dates");
+        renderDates(dates.filter(d => !currentMonth || d.startsWith(currentMonth)));
+        document.getElementById("exportLink").href = "/api/export/csv?" + qs.toString();
+        await loadCloseJobStatus();
+        return true;
+      } catch (e) {
+        toast(e.message || "刷新失败");
+        return false;
+      }
+    }
+
+    async function refreshView() {
+      if (busy) return;
+      setLoading(true, "刷新中…");
+      try {
+        const ok = await loadAll();
+        if (ok) toast("已刷新");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderDates(dates) {
+      const sel = document.getElementById("dateFilter");
+      const cur = sel.value;
+      sel.innerHTML = `<option value="">全部日期</option>` + dates.map(d =>
+        `<option value="${d}" ${d === cur ? "selected" : ""}>${d}</option>`
+      ).join("");
+    }
+
+    function renderStats(s) {
+      document.getElementById("stats").innerHTML = STAT_META.map(m => {
+        let val = s[m.key];
+        if (val === null || val === undefined) val = 0;
+        let cls = "";
+        if (m.pnl) {
+          if (Number(val) > 0) cls = "pos";
+          else if (Number(val) < 0) cls = "neg";
+        }
+        return `<div class="stat" style="--accent:${m.accent};--icon-bg:${m.bg}">
+          <div class="icon">${m.icon}</div>
+          <div class="value ${cls}">${val}${m.suffix || ""}</div>
+          <div class="label">${m.label}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderHead() {
+      document.getElementById("theadRow").innerHTML = COLS.map(c => {
+        if (!c.sortable) return `<th>${c.label}</th>`;
+        const active = sortKey === c.key ? "sorted" : "";
+        const arrow = sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : "↕";
+        return `<th class="sortable ${active}" onclick="toggleSort('${c.key}')">${c.label}<span class="sort-ind">${arrow}</span></th>`;
+      }).join("");
+    }
+
+    function renderSum(list) {
+      document.getElementById("sumRow").innerHTML = COLS.map((c, idx) => {
+        if (idx === 0) return `<td>合计</td>`;
+        if (!c.sum) return `<td>—</td>`;
+        const vals = list.map(t => t[c.key]).filter(v => v != null && v !== "");
+        if (!vals.length) return `<td>—</td>`;
+        const s = round2(vals.reduce((a, b) => a + Number(b), 0));
+        return `<td class="${pnlClass(s)}">${(s > 0 ? "+" : "") + s}%</td>`;
+      }).join("");
+    }
+
+    function round2(n) { return Math.round(n * 100) / 100; }
+
+    function cellHtml(t, c) {
+      if (c.key === "_ops") {
+        return `<div class="ops">
+          <button class="icon-btn edit" title="编辑" onclick="openEdit(${t.id})">✎</button>
+          <button class="icon-btn price" title="补空值/遗漏" onclick="refreshOne(${t.id})">↻</button>
+          <button class="icon-btn del" title="删除" onclick="removeTrade(${t.id})">✕</button>
+        </div>`;
+      }
+      if (c.key === "is_second_board") {
+        return t.is_second_board === true ? `<span class="badge badge-yes">是</span>`
+          : (t.is_second_board === false ? `<span class="badge badge-no">否</span>` : "—");
+      }
+      if (c.key === "stock_code") return `<span class="code">${t.stock_code || ""}</span>`;
+      if (c.key === "stock_name") return t.stock_name || "—";
+      if (c.key === "sell_price_935" && t.sell_price_935 == null && t.sell_price_1315 == null) {
+        if (t.skip_reason && t.skip_reason.includes("买不进")) {
+          return `<span class="badge badge-no-buy">没买</span>`;
+        }
+        return `<span class="badge badge-hold">持仓中</span>`;
+      }
+      const v = t[c.key];
+      if (c.pnl) {
+        if (v == null || v === "") return "—";
+        return `<span>${(Number(v) > 0 ? "+" : "") + v}%</span>`;
+      }
+      return fmt(v);
+    }
+
+    function goPage(p) {
+      page = Math.max(1, Math.min(totalPages, p));
+      renderTableBody();
+    }
+
+    function renderAll() {
+      renderHead();
+      const list = sortedTrades();
+      renderSum(list);
+      renderTableBody(list);
+    }
+
+    function renderTableBody(list) {
+      list = list || sortedTrades();
+      const tb = document.getElementById("tbody");
+      const empty = document.getElementById("empty");
+      pageSize = Number(document.getElementById("pageSize").value) || 40;
+      totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      if (page > totalPages) page = totalPages;
+      document.getElementById("pageInfo").textContent =
+        `${list.length} 条记录  第 ${list.length ? page : 0}/${list.length ? totalPages : 0} 页 · ${currentRank === 1 ? "第一名" : "第二名"}`;
+      ["btnFirst","btnPrev"].forEach(id => document.getElementById(id).disabled = page <= 1);
+      ["btnNext","btnLast"].forEach(id => document.getElementById(id).disabled = page >= totalPages || !list.length);
+
+      if (!list.length) {
+        tb.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+      const slice = list.slice((page - 1) * pageSize, page * pageSize);
+      tb.innerHTML = slice.map(t => {
+        return `<tr>` + COLS.map(c => {
+          const cls = [
+            c.key === "stock_name" ? "left" : "",
+            c.pnl ? pnlClass(t[c.key]) : "",
+          ].filter(Boolean).join(" ");
+          return `<td class="${cls}">${cellHtml(t, c)}</td>`;
+        }).join("") + `</tr>`;
+      }).join("");
+    }
+
+    function openCreate() {
+      editingId = null;
+      document.getElementById("modalTitle").textContent = `新增交易 (${currentProgram})`;
+      buildForm({ rank: currentRank, program: currentProgram });
+      document.getElementById("modal").classList.add("show");
+      bindNameLookup();
+    }
+    function openEdit(id) {
+      const t = trades.find(x => x.id === id);
+      if (!t) return;
+      editingId = id;
+      document.getElementById("modalTitle").textContent = `编辑 #${id}`;
+      buildForm(t);
+      document.getElementById("modal").classList.add("show");
+      bindNameLookup();
+    }
+    function buildForm(t) {
+      document.getElementById("form").innerHTML = FIELDS.map(f => {
+        let val = t[f.key];
+        if (f.key === "is_second_board") val = val === true ? "true" : (val === false ? "false" : "");
+        if (f.type === "select") {
+          return `<label>${f.label}<select name="${f.key}">
+            ${f.options.map(o => `<option value="${o.v}" ${String(val)===o.v?"selected":""}>${o.t}</option>`).join("")}
+          </select></label>`;
+        }
+        const extra = f.key === "stock_code" ? `<span class="hint-inline" id="codeHint"></span>` : "";
+        return `<label>${f.label}${extra}
+          <input name="${f.key}" type="${f.type}" value="${val ?? ""}" ${f.required?"required":""} step="0.01" />
+        </label>`;
+      }).join("");
+    }
+    function bindNameLookup() {
+      const nameInput = document.querySelector('#form [name="stock_name"]');
+      const codeInput = document.querySelector('#form [name="stock_code"]');
+      if (!nameInput || !codeInput) return;
+      let timer = null;
+      nameInput.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+          const name = nameInput.value.trim();
+          if (name.length < 2) return;
+          try {
+            const r = await api("/api/stock/lookup?name=" + encodeURIComponent(name));
+            if (r.code) {
+              codeInput.value = r.code;
+              const hint = document.getElementById("codeHint");
+              if (hint) hint.textContent = ` → ${r.code}`;
+            }
+          } catch (_) {}
+        }, 350);
+      });
+    }
+    function closeModal() { document.getElementById("modal").classList.remove("show"); }
+    function formData() {
+      const data = {};
+      FIELDS.forEach(f => {
+        const el = document.querySelector(`#form [name="${f.key}"]`);
+        if (!el) return;
+        let v = el.value;
+        if (v === "") { data[f.key] = null; return; }
+        if (f.key === "is_second_board") data[f.key] = v === "true" ? true : (v === "false" ? false : null);
+        else if (f.type === "number") data[f.key] = Number(v);
+        else data[f.key] = v;
+      });
+      if (data.stock_code) data.stock_code = String(data.stock_code).padStart(6, "0");
+      if (data.rank == null) data.rank = currentRank;
+      data.program = currentProgram;
+      return data;
+    }
+    async function saveTrade() {
+      const data = formData();
+      if (!data.date || (!data.stock_name && !data.stock_code)) {
+        toast("请填写买入日期，以及股票名称或代码");
+        return;
+      }
+      try {
+        setLoading(true, editingId == null ? "新增保存中…" : "编辑保存中…");
+        if (editingId == null) {
+          data.auto_fill = true;
+          data.program = currentProgram;
+          await api("/api/trades", { method: "POST", body: JSON.stringify(data) });
+          toast("已新增，价格后台补全中");
+        } else {
+          data.auto_fill = true;
+          data.program = currentProgram;
+          await api(`/api/trades/${editingId}`, { method: "PUT", body: JSON.stringify(data) });
+          toast("已保存，空价将后台补全");
+        }
+        closeModal();
+        await loadAll();
+        // 稍等后台补价后再刷一次
+        setTimeout(() => { loadAll(); }, 2500);
+      } catch (e) { toast(e.message); }
+      finally { setLoading(false); }
+    }
+    async function removeTrade(id) {
+      if (!confirm(`确认删除 #${id}？`)) return;
+      try {
+        await api(`/api/trades/${id}?program=${currentProgram}`, { method: "DELETE" });
+        toast("已删除");
+        await loadAll();
+      } catch (e) { toast(e.message); }
+    }
+    async function refreshPrices(force) {
+      if (busy) return;
+      try {
+        setLoading(true, force ? "强制重拉中（当前月）…" : "补全空值中（当前月）…");
+        const body = { force, program: currentProgram };
+        if (currentMonth) body.month = currentMonth;
+        const date = document.getElementById("dateFilter").value;
+        if (date) body.date = date;
+        const r = await api("/api/trades/refresh-prices", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        const uf = (r.unfilled_open_limit || []).length;
+        toast(`补全完成：更新 ${r.updated} 条` + (uf ? `，一字留档 ${uf} 条` : ""));
+        await loadAll();
+      } catch (e) { toast(e.message || "补全失败"); }
+      finally { setLoading(false); }
+    }
+    async function refreshOne(id) {
+      if (busy) return;
+      try {
+        setLoading(true, `补价 #${id}…`);
+        const r = await api("/api/trades/refresh-prices", {
+          method: "POST",
+          body: JSON.stringify({ force: false, ids: [id], program: currentProgram }),
+        });
+        if ((r.unfilled_open_limit || []).length) toast("一字/开盘涨停：已留档，不写买卖价");
+        else toast("已补全");
+        await loadAll();
+      } catch (e) { toast(e.message); }
+      finally { setLoading(false); }
+    }
+
+    async function runCloseJob() {
+      if (busy) return;
+      try {
+        setLoading(true, `收盘补全执行中 (${currentProgram})…`);
+        const r = await api("/api/jobs/after-close", {
+          method: "POST",
+          body: JSON.stringify({ force: false, program: currentProgram }),
+        });
+        if (r.skipped) toast(`已跳过：${r.reason || "非交易日"}`);
+        else toast(`收盘补全完成：买入同步${(r.buy_sync&&r.buy_sync.synced)||0}，补买${r.buy_enriched||0}，补卖${r.sell_enriched||0}`);
+        await loadAll();
+      } catch (e) { toast(e.message || "收盘补全失败"); }
+      finally { setLoading(false); }
+    }
+
+    document.getElementById("keyword").addEventListener("keydown", e => { if (e.key === "Enter") loadAll(); });
+    document.getElementById("dateFilter").addEventListener("change", loadAll);
+    document.getElementById("pageSize").addEventListener("change", () => { page = 1; renderTableBody(); });
+    document.getElementById("monthFilter").addEventListener("change", e => {
+      currentMonth = e.target.value; page = 1; loadAll();
+    });
+
+    (async () => { await loadMonths(); await loadAll(); })();
+  </script>
+</body>
+</html>

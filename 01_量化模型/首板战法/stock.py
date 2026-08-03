@@ -11,6 +11,7 @@ import akshare as ak  # 免费A股数据
 import pandas as pd
 from datetime import datetime, timedelta, time
 import os
+import sys
 import time as time_mod
 from requests.exceptions import RequestException
 
@@ -31,9 +32,29 @@ def _retry_fetch(description, func, *args, max_attempts=5, base_delay=1.5, **kwa
 
 _ZT_POOL_CACHE = {}
 
+# akshare 无数据时返回 (0,0) 且无列名，后续访问「代码」会 KeyError
+_ZT_POOL_COLUMNS = (
+    "序号", "代码", "名称", "涨跌幅", "最新价", "成交额",
+    "流通市值", "总市值", "换手率", "封板资金", "首次封板时间",
+    "最后封板时间", "炸板次数", "涨停统计", "连板数", "所属行业",
+)
+
 
 def clear_zt_pool_cache():
     _ZT_POOL_CACHE.clear()
+
+
+def _normalize_zt_pool(df):
+    """空涨停池统一为带标准列名的空表，避免 KeyError。"""
+    if df is None or (getattr(df, "empty", True) and "代码" not in getattr(df, "columns", [])):
+        return pd.DataFrame(columns=list(_ZT_POOL_COLUMNS))
+    return df
+
+
+def _zt_pool_codes(df):
+    if df is None or df.empty or "代码" not in df.columns:
+        return set()
+    return set(df["代码"].astype(str))
 
 
 def fetch_zt_pool_em(date_str, max_attempts=5):
@@ -47,6 +68,7 @@ def fetch_zt_pool_em(date_str, max_attempts=5):
         max_attempts=max_attempts,
         base_delay=1.5,
     )
+    df = _normalize_zt_pool(df)
     _ZT_POOL_CACHE[date_str] = df
     return df
 
@@ -81,6 +103,61 @@ def get_previous_trading_day(current_date):
         day -= timedelta(1)
     return day
 
+
+def get_next_trading_day(current_date):
+    """获取严格晚于 current_date 的下一个交易日。"""
+    try:
+        trade_cal = _retry_fetch(
+            "交易日历",
+            ak.tool_trade_date_hist_sina,
+            max_attempts=3,
+            base_delay=1.0,
+        )
+        trade_cal['trade_date'] = pd.to_datetime(trade_cal['trade_date'])
+        current_date_only = current_date.replace(hour=0, minute=0, second=0, microsecond=0)
+        future = trade_cal[trade_cal['trade_date'] > current_date_only]
+        if len(future) > 0:
+            return future.iloc[0]['trade_date'].to_pydatetime()
+    except Exception:
+        pass
+    day = current_date + timedelta(1)
+    while day.weekday() >= 5:
+        day += timedelta(1)
+    return day
+
+
+def sync_trades_to_ui(top2_df, buy_date_str):
+    """
+    将 Top2 基础信息写入「每日交易记录」。
+    D0=涨停日，D1=买入日(buy_date_str)，卖出价等由 UI 自动补全。
+    """
+    records_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "每日交易记录")
+    if records_dir not in sys.path:
+        sys.path.insert(0, records_dir)
+    try:
+        from stock_UI import upsert_from_stock_py
+    except Exception as e:
+        print(f"⚠️ 无法加载每日交易记录模块: {e}")
+        return
+
+    records = []
+    # 按综合得分已排序；排名用 1..n
+    for rank, (_, row) in enumerate(top2_df.iterrows(), start=1):
+        records.append({
+            "date": buy_date_str,
+            "stock_code": str(row["代码"]).zfill(6),
+            "stock_name": str(row["名称"]),
+            "rank": rank,
+        })
+    try:
+        result = upsert_from_stock_py(records)
+        print(
+            f"✅ 已同步到每日交易记录: 新建 {result.get('created', 0)} / "
+            f"更新 {result.get('updated', 0)} → {os.path.join(records_dir, 'trades', buy_date_str + '.json')}"
+        )
+    except Exception as e:
+        print(f"⚠️ 同步每日交易记录失败: {e}")
+
 def get_historical_zt_count(stock_code, days=30):
     """获取过去days天内的涨停次数"""
     try:
@@ -89,7 +166,7 @@ def get_historical_zt_count(stock_code, days=30):
         for i in range(days):
             date_str = (end_date - timedelta(i)).strftime('%Y%m%d')
             daily_zt = fetch_zt_pool_em(date_str, max_attempts=3)
-            if not daily_zt.empty and stock_code in daily_zt['代码'].values:
+            if not daily_zt.empty and "代码" in daily_zt.columns and stock_code in daily_zt["代码"].values:
                 count += 1
         return count
     except Exception:
@@ -156,8 +233,8 @@ def analyze_zhangting_stocks():
         print("请检查网络、代理或稍后重试；若持续失败可尝试: pip install -U certifi akshare requests urllib3")
         return
     
-    if zt_df.empty:
-        print(f"{query_date_display} 暂无涨停股票数据。")
+    if zt_df.empty or "代码" not in zt_df.columns:
+        print(f"{query_date_display} 暂无涨停股票数据（接口返回空或格式异常）。")
         return
     
     print(f"获取到 {len(zt_df)} 只涨停股票")
@@ -172,7 +249,11 @@ def analyze_zhangting_stocks():
         print(f"获取前两日涨停池失败: {e}")
         return
     
-    today_zt_only = zt_df[~zt_df['代码'].isin(two_days_ago_zt['代码'])]
+    prev_zt_codes = _zt_pool_codes(two_days_ago_zt)
+    if not prev_zt_codes:
+        print(f"{two_days_ago_str} 无涨停数据，视为全部为首板候选")
+    
+    today_zt_only = zt_df[~zt_df["代码"].isin(prev_zt_codes)]
     
     # 增加筛选条件：排除科创板（688开头）、北交所（92开头）和ST票（名称包含ST或st），主要查询主板和创业板
     today_zt_only = today_zt_only[~today_zt_only['代码'].str.startswith(('688', '92')) & ~today_zt_only['名称'].str.contains('ST|st', case=False)]
@@ -195,13 +276,20 @@ def analyze_zhangting_stocks():
     # 强度排名：按综合得分排序，取前2只
     sorted_stocks = today_zt_only.sort_values('综合得分', ascending=False)
     top2 = sorted_stocks.head(2)
+
+    # D0=涨停日(previous_trading_day)，D1=买入日=D0下一交易日
+    buy_day = get_next_trading_day(previous_trading_day)
+    buy_date_str = buy_day.strftime('%Y-%m-%d')
+    print(f"买入日(D1): {buy_date_str}（涨停日 D0={query_date_display}）")
+    sync_trades_to_ui(top2, buy_date_str)
     
     print("分析完成，正在生成结果...")
     # 准备输出内容
     output_lines = []
     output_lines.append(f"=== {query_date_display} 强度推荐排名（前2只，基于多因子综合得分）===")
-    for idx, row in top2.iterrows():
-        output_lines.append(f"排名 {idx+1}: {row['代码']} - {row['名称']}")
+    output_lines.append(f"买入日(D1): {buy_date_str} | 卖出日(D2): 下一交易日 9:35/13:15")
+    for rank, (idx, row) in enumerate(top2.iterrows(), start=1):
+        output_lines.append(f"排名 {rank}: {row['代码']} - {row['名称']}")
         output_lines.append(f"  涨停天数: 1天")
         output_lines.append(f"  涨幅: {row['涨跌幅']}%")
         output_lines.append(f"  成交额: {row['成交额']}")
@@ -244,6 +332,7 @@ def analyze_zhangting_stocks():
         f.write('\n'.join(output_lines))
     print(f"\n✅ 结果已保存到: {file_path}")
     print("🎉 分析完成！")
+    print(f"📊 交易记录 UI: cd 每日交易记录 && python3 stock_UI.py")
 
 # 运行分析
 if __name__ == "__main__":

@@ -1027,11 +1027,58 @@ def main():
     
     with open(args.output, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
-    
+
+    # 同时保存每日推荐 Markdown（与 stock.py/slow.py 格式对齐）
+    _save_up_recommendations_md(result, args.date)
+
     print(f"\n{'='*70}")
     print(f"✅ 结果已保存到: {args.output}")
     print(f"🎉 分析完成！")
     print(f"{'='*70}")
+
+
+def _save_up_recommendations_md(result, date_str):
+    """保存与 stock.py/slow.py 格式对齐的推荐 Markdown。"""
+    results_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
+    os.makedirs(results_dir, exist_ok=True)
+    if date_str is None:
+        date_str = datetime.now().strftime('%Y-%m-%d')
+    date8 = date_str.replace('-', '')
+    display = date_str[:4] + '年' + date_str[5:7] + '月' + date_str[8:10] + '日'
+
+    lines = []
+    lines.append(f"=== {display} 强度首板推荐（前2只，基于多因子综合得分）===")
+    lines.append("交易时序: D0首板复盘选出 → D1开盘集合竞价买入 → D2收盘前卖出")
+    lines.append("数据: 东财涨停池；选股偏好: 非ST非688首板强度排序")
+    lines.append("")
+    top_stocks = result.get('top_stocks', [])
+    for rank, stock in enumerate(top_stocks, 1):
+        lines.append(f"排名 {rank}: {stock['stock_code']} - {stock['stock_name']}")
+        lines.append(f"  最新价: {stock.get('current_price', '-')}")
+        lines.append(f"  涨幅: {stock.get('turnover', '-')}%")
+        lines.append(f"  成交额: {stock.get('amount', '-')}")
+        lines.append(f"  综合得分: {stock['score']:.2f}")
+        reason = stock.get('zt_reason', '数据中未提供具体原因')
+        lines.append(f"  涨停原因分析: {reason}")
+        lines.append("  【操作计划】")
+        lines.append("    买入: 下一交易日(D1)早盘集合竞价附近")
+        lines.append("    卖出: 再下一交易日(D2)收盘前")
+        lines.append("")
+
+    all_stocks = result.get('all_stocks', [])
+    others = [s for s in all_stocks if not s.get('not_qualified', False) and s.get('stock_code') not in {t['stock_code'] for t in top_stocks}]
+    lines.append("=== 其他未入选前二原因 ===")
+    if others:
+        lines.append("以下股票综合得分较低，未入选前二：")
+        for s in others:
+            lines.append(f"  {s['stock_code']} - {s['stock_name']}: 综合得分 {s['score']:.2f}")
+    else:
+        lines.append("无其他候选股票。")
+
+    md_path = os.path.join(results_dir, f"{date8}_up_recommendations.md")
+    with open(md_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(lines))
+    print(f"📄 推荐 Markdown 已保存到: {md_path}")
 
 
 if __name__ == "__main__":

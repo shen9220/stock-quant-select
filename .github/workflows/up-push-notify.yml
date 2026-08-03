@@ -1,0 +1,33 @@
+name: 🚀 Up 强度首板推送
+
+on:
+  schedule:
+    # 交易日 9:00 UTC+8 = 01:00 UTC（北京时间早上9点）
+    - cron: "0 1 * * 1-5"
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: |
+          pip install akshare pandas requests baostock flask
+
+      - name: 发送 Up 推送
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          PUSHPLUS_TOPIC: ${{ secrets.PUSHPLUS_TOPIC }}
+        run: |
+          cd "01_量化模型/首板战法/每日交易记录"
+          python3 send_push_notify.py --program up
