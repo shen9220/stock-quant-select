@@ -1,9 +1,7 @@
 name: 🚀 Up 强度首板推送
 
+# 定时推送已停用：由本机 crontab 负责（06:55 跑 up.py → 09:00 PushPlus）
 on:
-  schedule:
-    # 交易日 9:00 UTC+8 = 01:00 UTC（北京时间早上9点）
-    - cron: "0 1 * * 1-5"
   workflow_dispatch:
 
 jobs:
@@ -30,4 +28,5 @@ jobs:
           PUSHPLUS_TOPIC: ${{ secrets.PUSHPLUS_TOPIC }}
         run: |
           cd "01_量化模型/首板战法/每日交易记录"
+          python3 send_push_notify.py --program up --sync-only || true
           python3 send_push_notify.py --program up

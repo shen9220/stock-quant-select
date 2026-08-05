@@ -1,20 +1,9 @@
 name: 📈 Stock 选股推送
 
+# 定时推送已停用：由本机 crontab 负责（08:50 跑 stock.py → 09:05 PushPlus）
+# 保留 workflow_dispatch 供手动补发
 on:
-  schedule:
-    # 交易日 9:00 UTC+8 = 01:00 UTC（北京时间早上9点）
-    - cron: "0 1 * * 1-5"
   workflow_dispatch:
-    inputs:
-      program:
-        description: "推送程序"
-        required: true
-        default: "stock"
-        type: choice
-        options:
-          - stock
-          - slow
-          - up
 
 jobs:
   notify:

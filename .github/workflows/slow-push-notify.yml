@@ -1,9 +1,7 @@
 name: 🐢 Slow 低价一进二推送
 
+# 定时推送已停用：由本机 crontab 负责（08:50 跑 slow.py → 09:10 PushPlus）
 on:
-  schedule:
-    # 交易日 9:00 UTC+8 = 01:00 UTC（北京时间早上9点，与 stock 同时）
-    - cron: "0 1 * * 1-5"
   workflow_dispatch:
 
 jobs:
@@ -30,4 +28,5 @@ jobs:
           PUSHPLUS_TOPIC: ${{ secrets.PUSHPLUS_TOPIC }}
         run: |
           cd "01_量化模型/首板战法/每日交易记录"
+          python3 send_push_notify.py --program slow --sync-only || true
           python3 send_push_notify.py --program slow
