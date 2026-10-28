@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>交易数据记录 · 首板战法</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M12 42 L22 34 L30 38 L42 22 L52 28' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='19' y='30' width='6' height='12' rx='1.2' fill='%23bfdbfe'/%3E%3Crect x='27' y='34' width='6' height='10' rx='1.2' fill='%23eff6ff'/%3E%3Crect x='39' y='18' width='6' height='16' rx='1.2' fill='%23fecaca'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M12 42 L22 34 L30 38 L42 22 L52 28' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='19' y='30' width='6' height='12' rx='1.2' fill='%23bfdbfe'/%3E%3Crect x='27' y='34' width='6' height='10' rx='1.2' fill='%23eff6ff'/%3E%3Crect x='39' y='18' width='6' height='16' rx='1.2' fill='%23fecaca'/%3E%3C/svg%3E" />
   <style>
     :root {
       --sky: #3b82f6;
@@ -545,25 +547,50 @@
     html.pages-mode #btnAuth:hover { background: #1d4ed8; }
     .auth-modal {
       position: fixed; inset: 0; background: rgba(15,23,42,.45);
-      display: none; align-items: center; justify-content: center; z-index: 300;
+      display: none; align-items: flex-start; justify-content: center;
+      z-index: 300; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 12vh 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
     }
     .auth-modal.show { display: flex; }
     .auth-card {
       background: #fff; border-radius: 14px; padding: 22px 24px; width: min(360px, 92vw);
       box-shadow: 0 20px 40px rgba(0,0,0,.2); color: #0f172a;
+      margin: 0 auto;
     }
     .auth-card h3 { margin: 0 0 14px; font-size: 18px; }
     .auth-card label { display: block; font-size: 12px; color: #64748b; margin: 10px 0 4px; }
     .auth-card input {
-      width: 100%; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 14px;
+      width: 100%; padding: 12px 12px; border: 1px solid #e2e8f0; border-radius: 10px;
+      font-size: 16px; /* 避免 iOS 聚焦自动放大 */
+      -webkit-appearance: none; appearance: none;
     }
     .auth-err { min-height: 18px; color: #dc2626; font-size: 12px; margin-top: 8px; }
     .auth-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
     .auth-actions button {
       border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px;
-      padding: 8px 14px; cursor: pointer; font-weight: 600;
+      padding: 12px 18px; cursor: pointer; font-weight: 600;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
     }
     .auth-actions #authOk { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .auth-actions button:disabled { opacity: .6; cursor: not-allowed; }
+    .auth-transit {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, .55);
+      display: none; align-items: center; justify-content: center;
+      z-index: 400; padding: 16px;
+    }
+    .auth-transit.show { display: flex; }
+    .auth-transit-card {
+      background: #fff; border-radius: 14px; padding: 22px 26px; min-width: 220px;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,.25); color: #0f172a;
+    }
+    .auth-spinner {
+      width: 28px; height: 28px; margin: 0 auto 12px;
+      border: 3px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .auth-transit-msg { font-size: 14px; font-weight: 600; color: #334155; }
     .pages-boot {
       position: fixed; inset: 0; background: rgba(243,244,246,.92); z-index: 280;
       display: none; align-items: center; justify-content: center; font-size: 14px; color: #334155;
@@ -762,8 +789,14 @@
       <div class="auth-err" id="authErr"></div>
       <div class="auth-actions">
         <button type="button" id="authCancel">取消</button>
-        <button type="button" id="authOk">登录</button>
+        <button type="button" id="authOk" onclick="__pagesDoLogin()">登录</button>
       </div>
+    </div>
+  </div>
+  <div class="auth-transit" id="authTransit" aria-live="polite">
+    <div class="auth-transit-card">
+      <div class="auth-spinner"></div>
+      <div class="auth-transit-msg" id="authTransitMsg">登录中…</div>
     </div>
   </div>
 
@@ -2278,42 +2311,102 @@
       btn.textContent = window.__PAGES_FULL__ ? "退出" : "登录";
     }
 
+    function __pagesShowTransit(msg) {
+      const el = document.getElementById("authTransit");
+      const text = document.getElementById("authTransitMsg");
+      if (text) text.textContent = msg || "处理中…";
+      if (el) el.classList.add("show");
+    }
+
+    function __pagesHideTransit() {
+      document.getElementById("authTransit")?.classList.remove("show");
+    }
+
+    function __pagesSetLoginBusy(busy) {
+      const ok = document.getElementById("authOk");
+      const cancel = document.getElementById("authCancel");
+      const user = document.getElementById("authUser");
+      const pass = document.getElementById("authPass");
+      if (ok) {
+        ok.disabled = !!busy;
+        ok.textContent = busy ? "登录中…" : "登录";
+      }
+      if (cancel) cancel.disabled = !!busy;
+      if (user) user.disabled = !!busy;
+      if (pass) pass.disabled = !!busy;
+    }
+
+    async function __pagesPaint() {
+      // 重活前强制刷一帧，避免手机端「点了没反应」
+      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    }
+
     function __pagesToggleAuth() {
+      if (window.__pagesLoginLock) return;
       if (window.__PAGES_FULL__) {
-        window.__PAGES_FULL__ = null;
-        window.__PAGES_SNAPSHOT__ = window.__PAGES_MASKED__;
-        sessionStorage.removeItem("trade_ui_authed");
-        __pagesUpdateAuthUi();
-        loadAll();
-        toast("已退出，当前为脱敏公开视图");
+        __pagesShowTransit("正在退出，切回脱敏视图…");
+        setTimeout(() => {
+          window.__PAGES_FULL__ = null;
+          window.__PAGES_SNAPSHOT__ = window.__PAGES_MASKED__;
+          sessionStorage.removeItem("trade_ui_authed");
+          __pagesUpdateAuthUi();
+          loadAll().finally(() => {
+            __pagesHideTransit();
+            toast("已退出，当前为脱敏公开视图");
+          });
+        }, 40);
         return;
       }
       document.getElementById("authModal").classList.add("show");
       document.getElementById("authUser").value = "stock";
       document.getElementById("authPass").value = "";
       document.getElementById("authErr").textContent = "";
+      __pagesSetLoginBusy(false);
       setTimeout(() => document.getElementById("authPass")?.focus(), 40);
     }
 
     async function __pagesDoLogin() {
-      const user = (document.getElementById("authUser").value || "").trim();
+      if (window.__pagesLoginLock) return;
+      const user = (document.getElementById("authUser").value || "").trim().toLowerCase();
       const pass = document.getElementById("authPass").value || "";
       const err = document.getElementById("authErr");
       if (user !== "stock") { err.textContent = "账号或密码错误"; return; }
       if (!pass) { err.textContent = "请输入密码"; return; }
+      if (!window.crypto || !window.crypto.subtle) {
+        err.textContent = "当前浏览器不支持安全解密，请升级系统浏览器后重试";
+        return;
+      }
       err.textContent = "";
+      window.__pagesLoginLock = true;
+      __pagesSetLoginBusy(true);
+      __pagesShowTransit("正在校验并解密数据，手机端可能需几秒…");
+      await __pagesPaint();
       try {
         const enc = await __pagesFetchJson("data/encrypted.json");
+        __pagesShowTransit("正在解密完整数据…");
+        await __pagesPaint();
         const full = await __pagesDecrypt(enc, pass);
+        document.getElementById("authModal").classList.remove("show");
+        __pagesShowTransit("登录成功，正在加载看板…");
+        await __pagesPaint();
         window.__PAGES_FULL__ = full;
         window.__PAGES_SNAPSHOT__ = full;
         sessionStorage.setItem("trade_ui_authed", "1");
-        document.getElementById("authModal").classList.remove("show");
         __pagesUpdateAuthUi();
         await loadAll();
         toast("登录成功 · 已显示完整数据");
       } catch (e) {
-        err.textContent = "密码错误，请重试";
+        const msg = (e && e.message) ? String(e.message) : "";
+        if (/加载失败|Failed to fetch|NetworkError/i.test(msg)) {
+          err.textContent = "网络异常，请检查网络后重试";
+        } else {
+          err.textContent = "密码错误或解密失败，请重试";
+        }
+        toast(err.textContent);
+      } finally {
+        window.__pagesLoginLock = false;
+        __pagesSetLoginBusy(false);
+        __pagesHideTransit();
       }
     }
 
@@ -2332,11 +2425,19 @@
           await window.__PAGES_BOOT__;
           document.getElementById("btnAuth")?.addEventListener("click", __pagesToggleAuth);
           document.getElementById("authCancel")?.addEventListener("click", () => {
+            if (window.__pagesLoginLock) return;
             document.getElementById("authModal").classList.remove("show");
           });
-          document.getElementById("authOk")?.addEventListener("click", __pagesDoLogin);
+          // onclick 已绑 __pagesDoLogin；此处再绑一次无妨（有 loginLock）
+          document.getElementById("authOk")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            __pagesDoLogin();
+          });
           document.getElementById("authPass")?.addEventListener("keydown", (e) => {
             if (e.key === "Enter") __pagesDoLogin();
+          });
+          document.getElementById("authUser")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") document.getElementById("authPass")?.focus();
           });
         } catch (e) {
           const el = document.getElementById("pagesBootMask");
