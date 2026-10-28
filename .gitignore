@@ -9,8 +9,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+# 仅忽略仓库根虚拟环境 lib/；业务包内 lib/（如每日交易记录/lib）需纳入版本库
+/lib/
+/lib64/
 parts/
 sdist/
 var/
