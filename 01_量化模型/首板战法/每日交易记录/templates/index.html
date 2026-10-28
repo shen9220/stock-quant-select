@@ -531,13 +531,18 @@
     html.pages-mode .ops,
     html.pages-mode #closeJobStatus { display: none !important; }
     html.pages-mode .auth-badge {
-      font-size: 12px; color: var(--muted); margin-right: 6px;
-      padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px;
+      font-size: 12px; color: #1e3a8a; margin-right: 8px;
+      padding: 6px 12px; border: 1px solid #93c5fd; border-radius: 999px;
+      background: #eff6ff; font-weight: 600;
     }
     html.pages-mode #btnAuth {
-      border: 1px solid var(--line); background: #fff; border-radius: 10px;
-      padding: 8px 12px; cursor: pointer; font-weight: 600;
+      display: inline-flex !important; align-items: center; justify-content: center;
+      border: none; background: #2563eb; color: #fff !important;
+      border-radius: 10px; padding: 10px 18px; cursor: pointer;
+      font-weight: 700; font-size: 14px; line-height: 1.2;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
     }
+    html.pages-mode #btnAuth:hover { background: #1d4ed8; }
     .auth-modal {
       position: fixed; inset: 0; background: rgba(15,23,42,.45);
       display: none; align-items: center; justify-content: center; z-index: 300;
@@ -2284,7 +2289,7 @@
         return;
       }
       document.getElementById("authModal").classList.add("show");
-      document.getElementById("authUser").value = "admin";
+      document.getElementById("authUser").value = "stock";
       document.getElementById("authPass").value = "";
       document.getElementById("authErr").textContent = "";
       setTimeout(() => document.getElementById("authPass")?.focus(), 40);
@@ -2294,7 +2299,7 @@
       const user = (document.getElementById("authUser").value || "").trim();
       const pass = document.getElementById("authPass").value || "";
       const err = document.getElementById("authErr");
-      if (user !== "admin") { err.textContent = "账号或密码错误"; return; }
+      if (user !== "stock") { err.textContent = "账号或密码错误"; return; }
       if (!pass) { err.textContent = "请输入密码"; return; }
       err.textContent = "";
       try {

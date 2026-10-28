@@ -35,6 +35,6 @@ python3 jobs/board_buy_orchestrator.py --help
 ## GitHub Pages（只读镜像）
 
 - 地址：https://shen9220.github.io/stock-quant-select/trade-ui/
-- 未登录：脱敏；登录 `admin` / 内部口令后看全量
+- 未登录：脱敏；登录 `stock` / `stock123` 后看全量
 - Pages **隐藏**「收盘补全 / 补全空值 / 强制重拉」（仅本机 Flask 可用）
 - 本地交易落盘后防抖同步：`jobs/sync_trade_ui_pages.py`（`TRADE_UI_PAGES_SYNC=0` 可关）
