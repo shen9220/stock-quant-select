@@ -179,7 +179,7 @@
     }
 
     .wrap { padding: 16px 20px 40px; }
-    .tabs { display: flex; gap: 10px; margin-bottom: 14px; justify-content: center; }
+    .tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     .tab {
       border: 1px solid #dbeafe;
       background: #fff;
@@ -347,86 +347,95 @@
     .board-cyb { background: #ede9fe; color: #6d28d9; }
     .board-zb { background: #dbeafe; color: #1d4ed8; }
     .board-other { background: #f3f4f6; color: #4b5563; }
-    .prog-tabs { display: flex; gap: 8px; margin-bottom: 12px; justify-content: center; }
+    /* ── 四层导航 ── */
+    .nav-stack {
+      display: flex; flex-direction: column; gap: 10px;
+      margin: 0 0 14px; padding: 14px 14px 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e2e8f0; border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+    }
+    .nav-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center; }
+    .nav-row-label {
+      font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: .08em;
+      text-transform: uppercase; margin-right: 4px; min-width: 2.5em;
+    }
+    .prog-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     .prog-tab {
-      border: 2px solid transparent;
+      border: 1.5px solid #e2e8f0;
       background: #fff;
-      color: var(--muted);
-      padding: 10px 28px;
-      border-radius: 999px;
+      color: #64748b;
+      padding: 10px 18px;
+      border-radius: 12px;
       font: inherit;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,.04);
-      transition: .18s transform, .18s box-shadow, .18s background, .18s border-color;
-      text-transform: uppercase;
-      letter-spacing: .04em;
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+      transition: .18s transform, .18s box-shadow, .18s background, .18s border-color, .18s color;
+      letter-spacing: .02em;
     }
-    .prog-tab:hover { transform: translateY(-2px); }
-    .prog-tab.active {
-      background: linear-gradient(135deg, #8b5cf6, #6366f1);
-      color: #fff;
-      border-color: #6366f1;
-      box-shadow: 0 10px 20px rgba(99, 102, 241, .35);
-    }
+    .prog-tab:hover { transform: translateY(-1px); border-color: #cbd5e1; color: #334155; }
+    .prog-tab.active { color: #fff; border-color: transparent; }
     .prog-tab.prog-stock.active {
-      background: linear-gradient(135deg, #3b82f6, #2563eb);
-      border-color: #2563eb;
-      box-shadow: 0 10px 20px rgba(37, 99, 235, .35);
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 8px 18px rgba(37, 99, 235, .28);
     }
     .prog-tab.prog-slow.active {
       background: linear-gradient(135deg, #f59e0b, #d97706);
-      border-color: #d97706;
-      box-shadow: 0 10px 20px rgba(245, 158, 11, .35);
+      box-shadow: 0 8px 18px rgba(245, 158, 11, .28);
     }
     .prog-tab.prog-up.active {
       background: linear-gradient(135deg, #10b981, #059669);
-      border-color: #059669;
-      box-shadow: 0 10px 20px rgba(16, 185, 129, .35);
+      box-shadow: 0 8px 18px rgba(16, 185, 129, .28);
     }
     .prog-tab.prog-stock_updata.active {
       background: linear-gradient(135deg, #14b8a6, #0f766e);
-      border-color: #0f766e;
-      box-shadow: 0 10px 20px rgba(15, 118, 110, .35);
+      box-shadow: 0 8px 18px rgba(15, 118, 110, .28);
     }
     .prog-tab.prog-stock_v2.active {
-      background: linear-gradient(135deg, #f43f5e, #e11d48);
-      border-color: #e11d48;
-      box-shadow: 0 10px 20px rgba(225, 29, 72, .35);
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      box-shadow: 0 8px 18px rgba(225, 29, 72, .28);
     }
-    .prog-tab.prog-main.active {
-      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      border-color: #1d4ed8;
-      box-shadow: 0 10px 20px rgba(29, 78, 216, .35);
+    .sub-tabs {
+      display: none; gap: 8px; justify-content: center; flex-wrap: wrap;
+      padding-top: 2px;
     }
-    .prog-tab.prog-cyb.active {
-      background: linear-gradient(135deg, #a78bfa, #7c3aed);
-      border-color: #7c3aed;
-      box-shadow: 0 10px 20px rgba(124, 58, 237, .35);
+    .sub-tabs.show { display: flex; }
+    .sub-tab {
+      border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b;
+      padding: 7px 14px; border-radius: 999px; font: inherit; font-size: 12px;
+      font-weight: 700; cursor: pointer; transition: .15s background, .15s color, .15s border-color;
     }
+    .sub-tab:hover { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+    .sub-tab.active {
+      background: #eff6ff; border-color: #3b82f6; color: #1d4ed8;
+      box-shadow: inset 0 0 0 1px rgba(59,130,246,.15);
+    }
+    .sub-tab.sub-v2a.active { background: #fff1f2; border-color: #fb7185; color: #be123c; }
+    .sub-tab.sub-v2b.active { background: #ecfdf5; border-color: #34d399; color: #047857; }
     a.name-link {
       color: inherit;
       text-decoration: none;
       border-bottom: 1px dashed #93c5fd;
     }
     a.name-link:hover { color: #2563eb; border-bottom-color: #2563eb; }
-    body.view-board .prog-tab { font-size: 17px; font-weight: 800; padding: 12px 34px; }
+    body.view-board .prog-tab { font-size: 14px; font-weight: 800; padding: 11px 20px; }
 
     .view-nav {
-      display: flex; gap: 10px; margin-bottom: 14px; justify-content: center; flex-wrap: wrap;
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+      padding: 4px; background: #f1f5f9; border-radius: 12px;
     }
     .view-nav-btn {
-      border: 1px solid #dbeafe; background: #fff; color: var(--muted);
-      padding: 9px 20px; border-radius: 999px; font: inherit; font-weight: 700;
-      font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.04);
-      transition: .18s transform, .18s box-shadow, .18s background;
+      border: none; background: transparent; color: #64748b;
+      padding: 8px 16px; border-radius: 10px; font: inherit; font-weight: 700;
+      font-size: 13px; cursor: pointer;
+      transition: .15s background, .15s color, .15s box-shadow;
     }
-    .view-nav-btn:hover { transform: translateY(-1px); }
+    .view-nav-btn:hover { color: #334155; background: rgba(255,255,255,.7); }
     .view-nav-btn.active {
-      background: linear-gradient(135deg, #60a5fa, #3b82f6);
-      color: #fff; border-color: transparent;
-      box-shadow: 0 8px 18px rgba(59,130,246,.3);
+      background: #fff; color: #1d4ed8;
+      box-shadow: 0 2px 8px rgba(15,23,42,.08);
     }
 
     .filter-sep { color: var(--muted); font-size: 13px; padding: 0 2px; }
@@ -648,23 +657,36 @@
   </div>
 
   <div class="wrap">
-    <div class="prog-tabs">
-      <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setLane('stock')">📈 Stock</button>
-      <button class="prog-tab prog-stock_v2" id="progStockV2" type="button" onclick="setLane('stock_v2')">⚡ StockV2</button>
-      <button class="prog-tab prog-stock_updata" id="progStockUpdata" type="button" onclick="setLane('stock_updata')">📉 水下</button>
-      <button class="prog-tab prog-main" id="progMain" type="button" onclick="setLane('main')">🔵 主板</button>
-      <button class="prog-tab prog-cyb" id="progCyb" type="button" onclick="setLane('cyb')">🟣 创业板</button>
-      <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setLane('slow')">🐢 Slow</button>
-      <button class="prog-tab prog-up" id="progUp" type="button" onclick="setLane('up')">🚀 Up</button>
-    </div>
-    <div class="view-nav">
-      <button type="button" class="view-nav-btn active" id="btnViewTrades" onclick="setViewMode('trades')">区分明细看板</button>
-      <button type="button" class="view-nav-btn" id="btnViewMerge" onclick="setViewMode('merge')">月度合计看板</button>
-      <button type="button" class="view-nav-btn" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
-    </div>
-    <div class="tabs" id="rankTabs">
-      <button class="tab active" id="tab1" type="button" onclick="setRank(1)">🥇 第一名</button>
-      <button class="tab" id="tab2" type="button" onclick="setRank(2)">🥈 第二名</button>
+    <div class="nav-stack" id="navStack">
+      <div class="nav-row">
+        <span class="nav-row-label">策略</span>
+        <div class="prog-tabs" id="familyTabs">
+          <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setFamily('stock_v1')">Stock-V1</button>
+          <button class="prog-tab prog-stock_v2" id="progStockV2" type="button" onclick="setFamily('stock_v2')">Stock-V2</button>
+          <button class="prog-tab prog-stock_updata" id="progStockUpdata" type="button" onclick="setFamily('stock_updata')">Stock-V1（水下）</button>
+          <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setFamily('slow')">Stock（低价）</button>
+          <button class="prog-tab prog-up" id="progUp" type="button" onclick="setFamily('up')">Up</button>
+        </div>
+      </div>
+      <div class="nav-row" id="subTabsRow" style="display:none">
+        <span class="nav-row-label">分层</span>
+        <div class="sub-tabs show" id="subTabs"></div>
+      </div>
+      <div class="nav-row">
+        <span class="nav-row-label">看板</span>
+        <div class="view-nav" id="viewNav">
+          <button type="button" class="view-nav-btn active" id="btnViewTrades" onclick="setViewMode('trades')">明细看板</button>
+          <button type="button" class="view-nav-btn" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
+          <button type="button" class="view-nav-btn" id="btnViewMerge" onclick="setViewMode('merge')">合计看板</button>
+        </div>
+      </div>
+      <div class="nav-row" id="rankTabsRow">
+        <span class="nav-row-label">名次</span>
+        <div class="tabs" id="rankTabs">
+          <button class="tab active" id="tab1" type="button" onclick="setRank(1)">🥇 第一名</button>
+          <button class="tab" id="tab2" type="button" onclick="setRank(2)">🥈 第二名</button>
+        </div>
+      </div>
     </div>
     <div class="stats" id="stats"></div>
     <div id="mainView">
@@ -818,20 +840,46 @@
     let totalPages = 1;
     // 真实数据程序（定时任务/收盘补全仍只用这些，与展示 lane 解耦）
     const PROGRAMS = ["stock", "stock_v2", "slow", "up", "stock_updata"];
-    const PROGRAM_LABEL = { stock: "Stock", stock_v2: "StockV2", slow: "Slow", up: "Up", stock_updata: "水下" };
-    // 顶栏 lane：主板/创业板是展示过滤，数据仍读 stock；StockV2 独立 program
+    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）", up: "Up", stock_updata: "Stock-V1（水下）" };
+    // 四层导航：L1 family → L2 sub → L3 viewMode → L4 rank
+    const FAMILIES = {
+      stock_v1: {
+        program: "stock", label: "Stock-V1", tabClass: "prog-stock",
+        subs: [
+          { key: "all", label: "Stock-V1（默认原）", board: "" },
+          { key: "main", label: "Stock-V1（主板）", board: "主板" },
+          { key: "cyb", label: "Stock-V1（创业板）", board: "创业板" },
+        ],
+        defaultSub: "all",
+      },
+      stock_v2: {
+        program: "stock_v2", label: "Stock-V2", tabClass: "prog-stock_v2",
+        subs: [
+          { key: "A", label: "Stock-V2（一进二）", path: "A", cls: "sub-v2a" },
+          { key: "B", label: "Stock-V2（稳定版）", path: "B", cls: "sub-v2b" },
+        ],
+        defaultSub: "A",
+      },
+      stock_updata: { program: "stock_updata", label: "Stock-V1（水下）", tabClass: "prog-stock_updata", subs: [], defaultSub: "" },
+      slow: { program: "slow", label: "Stock（低价）", tabClass: "prog-slow", subs: [], defaultSub: "" },
+      up: { program: "up", label: "Up", tabClass: "prog-up", subs: [], defaultSub: "" },
+    };
+    // 兼容旧 lane 名
     const LANES = {
-      stock: { program: "stock", board: "", label: "Stock" },
-      stock_v2: { program: "stock_v2", board: "", label: "StockV2" },
-      stock_updata: { program: "stock_updata", board: "", label: "水下" },
-      main: { program: "stock", board: "主板", label: "主板" },
-      cyb: { program: "stock", board: "创业板", label: "创业板" },
-      slow: { program: "slow", board: "", label: "Slow" },
+      stock: { program: "stock", board: "", label: "Stock-V1" },
+      stock_v2: { program: "stock_v2", board: "", label: "Stock-V2" },
+      stock_updata: { program: "stock_updata", board: "", label: "Stock-V1（水下）" },
+      main: { program: "stock", board: "主板", label: "Stock-V1（主板）" },
+      cyb: { program: "stock", board: "创业板", label: "Stock-V1（创业板）" },
+      slow: { program: "slow", board: "", label: "Stock（低价）" },
       up: { program: "up", board: "", label: "Up" },
     };
+    let currentFamily = "stock_v1";
+    let currentSub = "all";
     let currentLane = "stock";
     let currentProgram = "stock";
     let currentBoard = ""; // "" | "主板" | "创业板"
+    let currentPath = ""; // "" | "A" | "B"
     let currentRank = 1;
     let currentMonth = "";
     let loadSeq = 0;
@@ -879,10 +927,10 @@
     function getActiveCols() {
       if (viewMode === "merge") {
         const cols = [...COLS_BASE];
-        // 板块 lane 的合并看板用 board_rank；普通程序用全局 rank
-        const rankCol = currentBoard
-          ? { key: "board_rank", label: "名次", sum: false, sortable: true }
-          : COL_RANK;
+        // V1 板块用 board_rank；V2 路径用 path_rank；其余用全局 rank
+        let rankCol = COL_RANK;
+        if (currentBoard) rankCol = { key: "board_rank", label: "名次", sum: false, sortable: true };
+        else if (currentPath) rankCol = { key: "path_rank", label: "名次", sum: false, sortable: true };
         cols.splice(2, 0, rankCol);
         return cols;
       }
@@ -890,7 +938,87 @@
     }
 
     function laneLabel() {
-      return (LANES[currentLane] && LANES[currentLane].label) || currentProgram;
+      const fam = FAMILIES[currentFamily];
+      if (!fam) return (LANES[currentLane] && LANES[currentLane].label) || currentProgram;
+      const sub = (fam.subs || []).find(s => s.key === currentSub);
+      return (sub && sub.label) || fam.label;
+    }
+
+    function deriveLaneFromNav() {
+      if (currentFamily === "stock_v1") {
+        if (currentSub === "main") return "main";
+        if (currentSub === "cyb") return "cyb";
+        return "stock";
+      }
+      if (currentFamily === "stock_v2") return "stock_v2";
+      if (currentFamily === "stock_updata") return "stock_updata";
+      if (currentFamily === "slow") return "slow";
+      if (currentFamily === "up") return "up";
+      return "stock";
+    }
+
+    function renderSubTabs() {
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      const row = document.getElementById("subTabsRow");
+      const box = document.getElementById("subTabs");
+      if (!fam.subs || !fam.subs.length) {
+        row.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
+      row.style.display = "";
+      box.innerHTML = fam.subs.map(s => {
+        const cls = ["sub-tab", s.cls || "", s.key === currentSub ? "active" : ""].filter(Boolean).join(" ");
+        return `<button type="button" class="${cls}" data-sub="${s.key}" onclick="setSub('${s.key}')">${s.label}</button>`;
+      }).join("");
+    }
+
+    function syncNavState() {
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      currentProgram = fam.program;
+      currentBoard = "";
+      currentPath = "";
+      const sub = (fam.subs || []).find(s => s.key === currentSub);
+      if (sub) {
+        if ("board" in sub) currentBoard = sub.board || "";
+        if (sub.path) currentPath = sub.path;
+      }
+      currentLane = deriveLaneFromNav();
+      document.getElementById("progStock").classList.toggle("active", currentFamily === "stock_v1");
+      document.getElementById("progSlow").classList.toggle("active", currentFamily === "slow");
+      document.getElementById("progUp").classList.toggle("active", currentFamily === "up");
+      const elUpdata = document.getElementById("progStockUpdata");
+      if (elUpdata) elUpdata.classList.toggle("active", currentFamily === "stock_updata");
+      const elV2 = document.getElementById("progStockV2");
+      if (elV2) elV2.classList.toggle("active", currentFamily === "stock_v2");
+      renderSubTabs();
+      const rankRow = document.getElementById("rankTabsRow");
+      if (rankRow) rankRow.style.display = viewMode === "trades" ? "" : "none";
+    }
+
+    function setFamily(key) {
+      syncMonthFromDom();
+      if (!(key in FAMILIES)) key = "stock_v1";
+      currentFamily = key;
+      currentSub = FAMILIES[key].defaultSub || "";
+      if (viewMode === "main" || viewMode === "cyb") viewMode = "trades";
+      syncNavState();
+      applyViewMode();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      reloadCurrentView();
+    }
+
+    function setSub(key) {
+      syncMonthFromDom();
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      if (!(fam.subs || []).some(s => s.key === key)) return;
+      currentSub = key;
+      syncNavState();
+      applyViewMode();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      reloadCurrentView();
     }
 
     const STAT_META = [
@@ -1530,8 +1658,8 @@
       applyLaneState("stock");
       if (viewMode !== "trades") {
         viewMode = "trades";
-        applyViewMode();
       }
+      applyViewMode();
       currentRank = 1;
       document.getElementById("tab1").classList.add("active");
       document.getElementById("tab2").classList.remove("active");
@@ -1544,7 +1672,7 @@
       page = 1;
       closeMonthPicker();
       loadAll();
-      toast(`已回到 ${now.replace("-", "年")}月 · Stock 第一名`);
+      toast(`已回到 ${now.replace("-", "年")}月 · Stock-V1 第一名`);
     }
 
     function monthPickerPage(delta) {
@@ -1577,29 +1705,25 @@
     }
 
     function applyLaneState(lane) {
-      const cfg = LANES[lane] || LANES.stock;
-      currentLane = lane in LANES ? lane : "stock";
-      currentProgram = cfg.program;
-      currentBoard = cfg.board || "";
-      document.getElementById("progStock").classList.toggle("active", currentLane === "stock");
-      document.getElementById("progSlow").classList.toggle("active", currentLane === "slow");
-      document.getElementById("progUp").classList.toggle("active", currentLane === "up");
-      const elUpdata = document.getElementById("progStockUpdata");
-      if (elUpdata) elUpdata.classList.toggle("active", currentLane === "stock_updata");
-      const elV2 = document.getElementById("progStockV2");
-      if (elV2) elV2.classList.toggle("active", currentLane === "stock_v2");
-      const elMain = document.getElementById("progMain");
-      if (elMain) elMain.classList.toggle("active", currentLane === "main");
-      const elCyb = document.getElementById("progCyb");
-      if (elCyb) elCyb.classList.toggle("active", currentLane === "cyb");
+      // 兼容旧 lane → 四层导航
+      if (lane === "main") { currentFamily = "stock_v1"; currentSub = "main"; }
+      else if (lane === "cyb") { currentFamily = "stock_v1"; currentSub = "cyb"; }
+      else if (lane === "stock") { currentFamily = "stock_v1"; currentSub = "all"; }
+      else if (lane === "stock_v2") { currentFamily = "stock_v2"; currentSub = "A"; }
+      else if (lane === "stock_updata") { currentFamily = "stock_updata"; currentSub = ""; }
+      else if (lane === "slow") { currentFamily = "slow"; currentSub = ""; }
+      else if (lane === "up") { currentFamily = "up"; currentSub = ""; }
+      else { currentFamily = "stock_v1"; currentSub = "all"; }
+      syncNavState();
     }
 
     function setLane(lane) {
       syncMonthFromDom();
       applyLaneState(lane);
-      // 主板/创业板不再占用 viewMode；切 lane 时若停在旧 main/cyb 则回明细
       if (viewMode === "main" || viewMode === "cyb") {
         viewMode = "trades";
+        applyViewMode();
+      } else {
         applyViewMode();
       }
       clearDateFilterIfMonthMismatch();
@@ -1654,16 +1778,22 @@
       document.getElementById("mainView").style.display = isDetail ? "" : "none";
       document.getElementById("boardView").style.display = isBoard ? "" : "none";
       document.getElementById("stats").style.display = isDetail ? "" : "none";
-      document.getElementById("rankTabs").style.display = viewMode === "trades" ? "" : "none";
+      const showRank = viewMode === "trades";
+      document.getElementById("rankTabs").style.display = showRank ? "" : "none";
+      const rankRow = document.getElementById("rankTabsRow");
+      if (rankRow) rankRow.style.display = showRank ? "" : "none";
       document.getElementById("topActionsDetail").style.display = isDetail ? "" : "none";
       document.getElementById("topActionsBoard").style.display = isBoard ? "" : "none";
       document.getElementById("btnViewTrades").classList.toggle("active", viewMode === "trades");
       document.getElementById("btnViewBoard").classList.toggle("active", viewMode === "board");
       document.getElementById("btnViewMerge").classList.toggle("active", viewMode === "merge");
       const label = laneLabel();
-      let hint = `${label} · 左🥇第一名 / 右🥈第二名 · 点击月份跳转区分明细 · 本页合计仅统计当前页`;
+      let hint = `${label} · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板 · 本页合计仅统计当前页`;
       if (currentBoard) {
-        hint = `${label} · 仅统计该板块 Top2（board_rank）· 左🥇第一名 / 右🥈第二名 · 点击月份跳转区分明细`;
+        hint = `${label} · 仅统计该板块 Top2（board_rank）· 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板`;
+      } else if (currentPath) {
+        const pathName = currentPath === "A" ? "一进二" : "稳定版";
+        hint = `${label} · 路径${currentPath}（${pathName}）path_rank · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板`;
       }
       document.getElementById("boardHint").textContent = hint;
     }
@@ -1681,11 +1811,14 @@
       const month = syncMonthFromDom();
       const qs = new URLSearchParams();
       qs.set("program", currentProgram);
-      if (currentBoard) {
-        // 主板 / 创业板 lane：读 stock 里带 board_rank 的板块 Top2
+      if (currentPath) {
+        // Stock-V2：path=A/B，名次用 path_rank（勿再传全局 rank）
+        qs.set("path", currentPath);
+        if (viewMode === "trades") qs.set("path_rank", String(currentRank));
+      } else if (currentBoard) {
+        // 主板 / 创业板：读 stock 里带 board_rank 的板块 Top2
         qs.set("board", currentBoard);
         if (viewMode === "trades") qs.set("board_rank", String(currentRank));
-        // merge：不过滤 board_rank，一次看该板块一二名合计
       } else if (viewMode === "trades") {
         qs.set("rank", String(currentRank));
       }
@@ -1707,7 +1840,7 @@
       const arr = [...trades];
       arr.sort((a, b) => {
         let va = a[sortKey], vb = b[sortKey];
-        if (sortKey === "rank" || sortKey === "board_rank") {
+        if (sortKey === "rank" || sortKey === "board_rank" || sortKey === "path_rank") {
           va = int(a[sortKey], 99); vb = int(b[sortKey], 99);
         }
         if (va == null) va = sortDir === "asc" ? Infinity : -Infinity;
@@ -1975,6 +2108,7 @@
           page_size: String(pageSize),
         });
         if (currentBoard) qs.set("board", currentBoard);
+        if (currentPath) qs.set("path", currentPath);
         if (boardFilterYear) qs.set("year", boardFilterYear);
         if (boardFilterFrom) qs.set("month_from", boardFilterFrom);
         if (boardFilterTo) qs.set("month_to", boardFilterTo);
@@ -2070,7 +2204,9 @@
       pageSize = Number(document.getElementById("pageSize").value) || 40;
       totalPages = Math.max(1, Math.ceil(list.length / pageSize));
       if (page > totalPages) page = totalPages;
-      const scope = currentBoard ? `${currentBoard} · ` : "";
+      const scope = currentBoard
+        ? `${currentBoard} · `
+        : (currentPath ? `路径${currentPath} · ` : "");
       document.getElementById("pageInfo").textContent =
         `${list.length} 条记录  第 ${list.length ? page : 0}/${list.length ? totalPages : 0} 页 · ` +
         scope + (viewMode === "merge" ? "第一名+第二名合计" : (currentRank === 1 ? "第一名" : "第二名"));
