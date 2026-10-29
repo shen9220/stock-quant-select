@@ -1308,7 +1308,10 @@
       if (p === "A" || p === "B") return p;
       const slot = String(t.slot || "").trim().toUpperCase();
       if (slot.slice(0, 1) === "A" || slot.slice(0, 1) === "B") return slot.slice(0, 1);
-      const m = String(t.notes || "").match(/V2\s*([AB])/i);
+      const notes = String(t.notes || "");
+      let m = notes.match(/path\s*=\s*([AB])/i);
+      if (m) return m[1].toUpperCase();
+      m = notes.match(/V2\s*([AB])\b/i);
       return m ? m[1].toUpperCase() : "";
     }
 
