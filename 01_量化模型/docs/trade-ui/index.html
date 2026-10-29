@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>交易数据记录 · 首板战法</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M12 42 L22 34 L30 38 L42 22 L52 28' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='19' y='30' width='6' height='12' rx='1.2' fill='%23bfdbfe'/%3E%3Crect x='27' y='34' width='6' height='10' rx='1.2' fill='%23eff6ff'/%3E%3Crect x='39' y='18' width='6' height='16' rx='1.2' fill='%23fecaca'/%3E%3C/svg%3E" />
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cpath d='M12 42 L22 34 L30 38 L42 22 L52 28' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='19' y='30' width='6' height='12' rx='1.2' fill='%23bfdbfe'/%3E%3Crect x='27' y='34' width='6' height='10' rx='1.2' fill='%23eff6ff'/%3E%3Crect x='39' y='18' width='6' height='16' rx='1.2' fill='%23fecaca'/%3E%3C/svg%3E" />
+  <style>
+    :root {
+      --sky: #3b82f6;
+      --sky-soft: #dbeafe;
+      --sky-bar: #60a5fa;
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --head: #e5e7eb;
+      --profit: #dc2626;
+      --loss: #16a34a;
+      --red-deep: #b91c1c;
+      --red-light: #fecaca;
+      --yellow-light: #fef08a;
+      --yellow-deep: #eab308;
+      --shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .topbar {
+      background: linear-gradient(120deg, #93c5fd 0%, #60a5fa 45%, #3b82f6 100%);
+      color: #fff;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(59,130,246,.28);
+    }
+    .topbar h1 { margin: 0; font-size: 18px; font-weight: 700; text-shadow: 0 1px 0 rgba(0,0,0,.08); }
+    .topbar .hint { font-size: 12px; opacity: .92; margin-top: 4px; }
+    .top-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .top-actions select, .top-actions a, .top-actions button {
+      border: 1px solid rgba(255,255,255,.45);
+      background: rgba(255,255,255,.2);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      transition: transform .15s, background .15s;
+    }
+    .top-actions select option { color: #111; }
+    .top-actions a { text-decoration: none; }
+
+    /* ── 12 宫格月份选择器 ─────────────────────────────────
+       顶部年份（默认今年）→ 点开后下方年份也是 12 宫格（左上角第一个 = 今年）
+       → 选中年份 → 跳到该年 12 宫格月份。 */
+    .mpicker { position: relative; display: inline-block; }
+    .mpicker-trigger {
+      display: inline-flex !important; align-items: center; gap: 6px;
+      min-width: 116px; justify-content: space-between !important;
+    }
+    .mpicker-caret { font-size: 10px; opacity: .85; }
+    .mpicker-panel {
+      display: none; position: absolute; top: calc(100% + 6px); right: 0;
+      width: 300px; padding: 12px; z-index: 60;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0,0,0,.16);
+    }
+    .mpicker-panel.show { display: block; }
+    /* 顶部年份行 */
+    .mpicker-years {
+      display: flex; align-items: center; gap: 8px; flex-wrap: nowrap;
+      padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line);
+    }
+    .top-actions .mpicker-year {
+      border: 1px solid var(--line); background: #fff; color: var(--muted);
+      border-radius: 999px; padding: 5px 14px; font: inherit; font-size: 12px;
+      cursor: pointer; transition: .15s; white-space: nowrap;
+    }
+    .top-actions .mpicker-year:hover { border-color: #93c5fd; color: #1d4ed8; }
+    .top-actions .mpicker-year.active {
+      background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600;
+    }
+    /* 年份行右侧：回到当前月 */
+    .mpicker-years-right { margin-left: auto; display: flex; align-items: center; }
+    .top-actions .mpicker-now {
+      border: 1px solid #bfdbfe; background: #eff6ff; color: #1d4ed8;
+      border-radius: 999px; padding: 5px 12px; font: inherit; font-size: 12px;
+      cursor: pointer; white-space: nowrap; transition: .15s;
+    }
+    .top-actions .mpicker-now:hover { background: #dbeafe; border-color: #60a5fa; }
+    /* 12 宫格：3 列 × 4 行 */
+    .mpicker-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+    .top-actions .mpicker-cell {
+      border: 1px solid var(--line); background: #fff; color: #111;
+      border-radius: 9px; padding: 10px 4px; font: inherit; font-size: 13px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      transition: transform .12s, border-color .15s, background .15s;
+    }
+    .top-actions .mpicker-cell:hover:not(:disabled) {
+      border-color: #60a5fa; background: #eff6ff; transform: translateY(-1px);
+    }
+    .mpicker-cell .m-mm { font-size: 15px; font-weight: 600; line-height: 1.2; color: #111; }
+    .mpicker-cell .m-cn { font-size: 11px; color: var(--muted); line-height: 1.2; }
+    .mpicker-cell.active {
+      background: #2563eb; border-color: #2563eb; color: #fff;
+      box-shadow: 0 4px 10px rgba(37,99,235,.28);
+    }
+    .mpicker-cell.active .m-cn { color: rgba(255,255,255,.85); }
+    .mpicker-cell:disabled {
+      background: #f8fafc; color: #cbd5e1; cursor: not-allowed;
+      border-style: dashed; opacity: .75;
+    }
+    .mpicker-cell:disabled .m-cn { color: #cbd5e1; }
+    .mpicker-cell.empty .m-mm { color: #94a3b8; font-weight: 500; }
+    .mpicker-cell.empty:hover { background: #f8fafc; border-color: var(--line); }
+    .mpicker-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);
+    }
+    .top-actions .mpicker-nav {
+      border: 1px solid var(--line); background: #fff; color: var(--muted);
+      border-radius: 8px; padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer;
+    }
+    .top-actions .mpicker-nav:hover:not(:disabled) { border-color: #93c5fd; color: #1d4ed8; }
+    .top-actions .mpicker-nav:disabled { opacity: .4; cursor: not-allowed; }
+    .mpicker-pageinfo { font-size: 11px; color: var(--muted); }
+    .top-actions .view-toggle.active {
+      background: rgba(255,255,255,.95);
+      color: #1d4ed8;
+      font-weight: 700;
+      border-color: #fff;
+    }
+    .board-hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #eff6ff;
+      box-shadow: var(--shadow);
+    }
+    .board-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .board-panel {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid #eff6ff;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .board-panel-title {
+      padding: 14px 16px;
+      font-weight: 800;
+      font-size: 17px;
+      text-align: center;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-bottom: 1px solid #dbeafe;
+      color: #1e40af;
+      letter-spacing: .04em;
+    }
+    .board-panel .table-wrap { border-radius: 0; box-shadow: none; }
+    @media (max-width: 960px) {
+      .board-split { grid-template-columns: 1fr; }
+    }
+
+    .wrap { padding: 16px 20px 40px; }
+    .tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .tab {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #64748b;
+      padding: 9px 22px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+      transition: .18s transform, .18s box-shadow, .18s background, .18s color;
+    }
+    .tab:hover { transform: translateY(-1px); border-color: #bfdbfe; color: #1d4ed8; }
+    .tab.active {
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 8px 16px rgba(59,130,246,.28);
+    }
+    @media (max-width: 860px) {
+      .nav-row { padding: 26px 8px 8px; }
+      .nav-row-label {
+        left: 50%; top: 6px; transform: translateX(-50%);
+        font-size: 10px;
+      }
+      .prog-tab { padding: 8px 12px; font-size: 12px; }
+      .nav-stack { padding: 10px; gap: 8px; }
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .stat {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 16px 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid #eff6ff;
+      text-align: center;
+      transition: transform .18s, box-shadow .18s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat::before {
+      content: "";
+      position: absolute; left: 0; right: 0; top: 0; height: 3px;
+      background: var(--accent, var(--sky));
+    }
+    .stat:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 14px 28px rgba(59,130,246,.18);
+    }
+    .stat .icon {
+      width: 38px; height: 38px; border-radius: 12px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 18px; margin: 0 auto 8px;
+      background: var(--icon-bg, var(--sky-soft));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+    .stat .value { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+    .stat .value.pos { color: var(--profit); }
+    .stat .value.neg { color: var(--loss); }
+    .stat .label { margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      margin-bottom: 14px; background: #fff; border-radius: 16px;
+      padding: 12px 14px; box-shadow: var(--shadow); border: 1px solid #eff6ff;
+    }
+    .search-box { flex: 1; min-width: 200px; position: relative; }
+    .search-box input {
+      width: 100%; padding: 9px 12px 9px 34px;
+      border: 1px solid var(--line); border-radius: 10px; font: inherit; background: #f9fafb;
+    }
+    .search-box::before {
+      content: "⌕"; position: absolute; left: 11px; top: 50%;
+      transform: translateY(-50%); color: var(--muted);
+    }
+    select, .toolbar button {
+      font: inherit; border-radius: 10px; border: 1px solid var(--line);
+      padding: 8px 12px; background: #fff; color: var(--text); cursor: pointer;
+    }
+    .toolbar button.primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      border: 1px solid #1d4ed8 !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.35);
+    }
+    .toolbar button.primary:hover {
+      filter: brightness(1.06);
+      color: #ffffff !important;
+    }
+
+    .table-card {
+      background: #fff; border-radius: 16px; box-shadow: var(--shadow);
+      border: 1px solid #eff6ff; overflow: hidden;
+    }
+    .table-wrap { overflow: auto; max-height: calc(100vh - 360px); }
+    table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: 12.5px; }
+    th, td {
+      padding: 9px 10px; white-space: nowrap; text-align: center;
+      border-bottom: 1px solid var(--line);
+    }
+    th {
+      position: sticky; top: 0; z-index: 3;
+      background: var(--head); color: #374151;
+      font-weight: 700; font-size: 12px;
+      user-select: none;
+    }
+    th.sortable { cursor: pointer; }
+    th.sortable:hover { background: #dbeafe; }
+    th .sort-ind { font-size: 10px; margin-left: 2px; color: #9ca3af; }
+    th.sorted .sort-ind { color: var(--sky); }
+    tbody tr:nth-child(even) td { background: #f9fafb; }
+    tbody tr:hover td { background: #eff6ff !important; }
+    tr.sum-row td {
+      background: #f0f9ff !important;
+      font-weight: 700;
+      border-top: 2px solid #93c5fd;
+      position: sticky; top: 36px; z-index: 2;
+    }
+    td.left { text-align: left; font-weight: 650; }
+    .code { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .weekday { color: #475569; font-weight: 650; }
+
+    .pnl-red-deep { background: #fca5a5 !important; color: #7f1d1d; font-weight: 700; }
+    .pnl-red-light { background: #fecaca !important; color: #991b1b; font-weight: 700; }
+    .pnl-yellow-light { background: #fef08a !important; color: #854d0e; font-weight: 700; }
+    .pnl-yellow-deep { background: #facc15 !important; color: #713f12; font-weight: 800; }
+
+    /* 历史看板盈亏背景色阶（数据行） */
+    .bp-deep-green { background: #4ade80 !important; color: #111 !important; }
+    .bp-light-green { background: #86efac !important; color: #111 !important; }
+    .bp-pale-green { background: #dcfce7 !important; color: #111 !important; }
+    .bp-pale-red { background: #fee2e2 !important; color: #111 !important; }
+    .bp-light-red { background: #fca5a5 !important; color: #111 !important; }
+    .bp-deep-red { background: #ef4444 !important; color: #111 !important; font-weight: 700; }
+    /* 本页合计字体色阶 */
+    .bs-t-g0 { color: #15803d !important; font-weight: 700; background: #f0f9ff !important; }
+    .bs-t-g1 { color: #16a34a !important; font-weight: 700; background: #f0f9ff !important; }
+    .bs-t-g2 { color: #22c55e !important; background: #f0f9ff !important; }
+    .bs-t-g3 { color: #4ade80 !important; background: #f0f9ff !important; }
+    .bs-t-r0 { color: #fca5a5 !important; background: #f0f9ff !important; }
+    .bs-t-r1 { color: #f87171 !important; background: #f0f9ff !important; }
+    .bs-t-r2 { color: #ef4444 !important; background: #f0f9ff !important; }
+    .bs-t-r3 { color: #dc2626 !important; font-weight: 700; background: #f0f9ff !important; }
+    .month-profit { color: #dc2626; font-weight: 700; }
+    .month-loss { color: #16a34a; font-weight: 600; }
+    .month-link { cursor: pointer; color: #1d4ed8; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+    .month-link:hover { color: #1e40af; }
+    .rank-tag {
+      display: inline-block; text-align: center; font-weight: 800;
+      font-size: 15px; letter-spacing: .02em;
+    }
+    .rank-tag.rank-1 { color: #c2410c; }
+    .rank-tag.rank-2 { color: #475569; }
+
+    .badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700;
+    }
+    .badge-yes { background: #dcfce7; color: #15803d; }
+    .badge-no { background: #f3f4f6; color: #6b7280; }
+    .badge-hold { background: #fef3c7; color: #b45309; }
+    .badge-no-buy { background: #6b7280; color: #f9fafb; font-weight: 700; }
+    .board-tag {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;
+      white-space: nowrap;
+    }
+    .board-cyb { background: #ede9fe; color: #6d28d9; }
+    .board-zb { background: #dbeafe; color: #1d4ed8; }
+    .board-other { background: #f3f4f6; color: #4b5563; }
+    /* ── 四层导航：每层底色 / 形状 / 选中色分开 ── */
+    .nav-stack {
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 0 0 14px; padding: 12px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+    }
+    .nav-row {
+      position: relative;
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;
+      padding: 10px 72px; border-radius: 14px; min-height: 54px;
+    }
+    .nav-row-label {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; font-weight: 800; letter-spacing: .12em;
+      pointer-events: none;
+    }
+    .nav-l1 { background: #eef2ff; border: 1px solid #c7d2fe; }
+    .nav-l1 .nav-row-label { color: #3730a3; }
+    .nav-l2 { background: #f5f3ff; border: 1px solid #ddd6fe; }
+    .nav-l2 .nav-row-label { color: #6d28d9; }
+    .nav-l3 { background: #fff7ed; border: 1px solid #fed7aa; }
+    .nav-l3 .nav-row-label { color: #c2410c; }
+    .nav-l4 { background: #fffbeb; border: 1px solid #fde68a; }
+    .nav-l4 .nav-row-label { color: #a16207; }
+    .prog-tabs { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .prog-tab {
+      border: 1.5px solid transparent;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .16s transform, .16s box-shadow, .16s background, .16s color;
+      letter-spacing: .02em;
+    }
+    .prog-tab:hover { transform: translateY(-1px); filter: brightness(.97); }
+    .prog-tab.prog-stock { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+    .prog-tab.prog-stock_v2 { background: #ffe4e6; color: #be123c; border-color: #fda4af; }
+    .prog-tab.prog-stock_updata { background: #ccfbf1; color: #0f766e; border-color: #5eead4; }
+    .prog-tab.prog-slow { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
+    .prog-tab.prog-up { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
+    .prog-tab.active { color: #fff; border-color: transparent; }
+    .prog-tab.prog-stock.active {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, .32);
+    }
+    .prog-tab.prog-slow.active {
+      background: linear-gradient(135deg, #fb923c, #ea580c);
+      box-shadow: 0 8px 16px rgba(234, 88, 12, .32);
+    }
+    .prog-tab.prog-up.active {
+      background: linear-gradient(135deg, #34d399, #059669);
+      box-shadow: 0 8px 16px rgba(5, 150, 105, .32);
+    }
+    .prog-tab.prog-stock_updata.active {
+      background: linear-gradient(135deg, #2dd4bf, #0f766e);
+      box-shadow: 0 8px 16px rgba(15, 118, 110, .32);
+    }
+    .prog-tab.prog-stock_v2.active {
+      background: linear-gradient(135deg, #fb7185, #be123c);
+      box-shadow: 0 8px 16px rgba(190, 18, 60, .32);
+    }
+    .sub-tabs {
+      display: none; gap: 10px; justify-content: center; flex-wrap: wrap;
+    }
+    .sub-tabs.show { display: flex; }
+    .sub-tab {
+      border: 1px dashed #c4b5fd; background: #fff; color: #6d28d9;
+      padding: 8px 16px; border-radius: 8px; font: inherit; font-size: 13px;
+      font-weight: 700; cursor: pointer;
+      transition: .15s background, .15s color, .15s border-color, .15s box-shadow;
+    }
+    .sub-tab:hover { transform: translateY(-1px); }
+    .sub-tab.sub-all { border-style: solid; border-color: #a5b4fc; color: #4338ca; background: #eef2ff; }
+    .sub-tab.sub-main { border-style: solid; border-color: #93c5fd; color: #1d4ed8; background: #eff6ff; }
+    .sub-tab.sub-cyb { border-style: solid; border-color: #d8b4fe; color: #7e22ce; background: #faf5ff; }
+    .sub-tab.sub-v2a { border-style: solid; border-color: #fda4af; color: #be123c; background: #fff1f2; }
+    .sub-tab.sub-v2b { border-style: solid; border-color: #6ee7b7; color: #047857; background: #ecfdf5; }
+    .sub-tab.sub-all.active { background: #4f46e5; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(79,70,229,.28); }
+    .sub-tab.sub-main.active { background: #2563eb; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(37,99,235,.28); }
+    .sub-tab.sub-cyb.active { background: #9333ea; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(147,51,234,.28); }
+    .sub-tab.sub-v2a.active { background: #e11d48; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(225,29,72,.28); }
+    .sub-tab.sub-v2b.active { background: #059669; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(5,150,105,.28); }
+    a.name-link {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px dashed #93c5fd;
+    }
+    a.name-link:hover { color: #2563eb; border-bottom-color: #2563eb; }
+    body.view-board .prog-tab { font-size: 14px; font-weight: 800; padding: 11px 20px; }
+
+    .view-nav {
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      padding: 0; background: transparent; border-radius: 0;
+    }
+    .view-nav-btn {
+      border: 1px solid transparent; background: rgba(255,255,255,.72); color: #9a3412;
+      padding: 8px 18px; border-radius: 999px; font: inherit; font-weight: 700;
+      font-size: 13px; cursor: pointer;
+      transition: .15s background, .15s color, .15s box-shadow, .15s border-color;
+    }
+    .view-nav-btn:hover { filter: brightness(.97); }
+    .view-nav-btn.view-trades { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
+    .view-nav-btn.view-board { color: #6d28d9; border-color: #ddd6fe; background: #f5f3ff; }
+    .view-nav-btn.view-merge { color: #c2410c; border-color: #fed7aa; background: #fff7ed; }
+    .view-nav-btn.view-trades.active {
+      background: #1d4ed8; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(29,78,216,.28);
+    }
+    .view-nav-btn.view-board.active {
+      background: #7c3aed; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(124,58,237,.28);
+    }
+    .view-nav-btn.view-merge.active {
+      background: #ea580c; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(234,88,12,.28);
+    }
+    #rankTabs .tab { background: #fff; }
+    #rankTabs #tab1 { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    #rankTabs #tab2 { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    #rankTabs #tab1.active {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 8px 16px rgba(217, 119, 6, .32);
+    }
+    #rankTabs #tab2.active {
+      background: linear-gradient(135deg, #94a3b8, #475569);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 8px 16px rgba(71, 85, 105, .28);
+    }
+
+    .filter-sep { color: var(--muted); font-size: 13px; padding: 0 2px; }
+
+    .dropdown { position: relative; display: inline-block; }
+    .dropdown-menu {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; min-width: 120px;
+      background: #fff; border: 1px solid var(--line); border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.12); z-index: 50; overflow: hidden;
+    }
+    .dropdown-menu.show { display: block; }
+    .dropdown-menu button {
+      display: block; width: 100%; text-align: left; border: none; background: #fff;
+      padding: 9px 14px; font: inherit; cursor: pointer;
+    }
+    .dropdown-menu button:hover { background: #eff6ff; }
+
+    .ops { display: inline-flex; gap: 6px; justify-content: center; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 9px; border: none;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.06);
+      transition: transform .12s, box-shadow .12s;
+    }
+    .icon-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,.1); }
+    .icon-btn.edit { background: #dbeafe; color: #1d4ed8; }
+    .icon-btn.price { background: #cffafe; color: #0e7490; }
+    .icon-btn.del { background: #fee2e2; color: #dc2626; }
+
+    .empty { padding: 56px 20px; text-align: center; color: var(--muted); }
+    .pager {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
+      flex-wrap: wrap; gap: 8px;
+    }
+    .pager button {
+      border: 1px solid var(--line); background: #fff; border-radius: 8px;
+      padding: 5px 10px; cursor: pointer;
+    }
+    .pager button:disabled { opacity: .4; cursor: not-allowed; }
+
+    .modal-mask {
+      display: none; position: fixed; inset: 0; background: rgba(15,23,42,.4);
+      z-index: 50; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-mask.show { display: flex; }
+    .modal {
+      background: #fff; width: min(740px, 100%); max-height: 90vh; overflow: auto;
+      border-radius: 18px; padding: 20px; box-shadow: 0 24px 60px rgba(37,99,235,.25);
+    }
+    .modal h2 { margin: 0 0 14px; font-size: 18px; color: #1d4ed8; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-grid label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+    .form-grid input, .form-grid select {
+      font: inherit; font-size: 14px; color: var(--text);
+      border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+    }
+    .form-actions { margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end; }
+    .btn-primary {
+      background: linear-gradient(135deg,#60a5fa,#3b82f6); border: none; color: #fff;
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font: inherit; font-weight: 700;
+    }
+    .btn-ghost {
+      background: #fff; border: 1px solid var(--line); color: var(--text);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer; font: inherit;
+    }
+    .hint-inline { font-size: 11px; color: #94a3b8; }
+    .toast {
+      position: fixed; right: 18px; bottom: 18px; background: #1e3a8a; color: #fff;
+      padding: 11px 16px; border-radius: 10px; opacity: 0; transition: .2s; z-index: 99;
+    }
+    .toast.show { opacity: 1; }
+    .loading-mask {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, .45);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; backdrop-filter: blur(2px);
+    }
+    .loading-mask.show { display: flex; }
+    .loading-box {
+      background: #fff; border-radius: 14px; padding: 22px 28px; min-width: 220px;
+      box-shadow: 0 20px 40px rgba(0,0,0,.2); text-align: center; color: #0f172a;
+    }
+    .loading-box .spin {
+      width: 28px; height: 28px; margin: 0 auto 12px;
+      border: 3px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toolbar button:disabled, .top-actions button:disabled {
+      opacity: .55; cursor: not-allowed;
+    }
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+    }
+    /* GitHub Pages：隐藏本机专属操作（即使已登录也不显示） */
+    html.pages-mode #btnCloseJob,
+    html.pages-mode #btnFillEmpty,
+    html.pages-mode #btnForcePull,
+    html.pages-mode #exportLink,
+    html.pages-mode #btnRefresh,
+    html.pages-mode button.primary,
+    html.pages-mode .ops,
+    html.pages-mode #closeJobStatus { display: none !important; }
+    html.pages-mode .auth-badge {
+      font-size: 12px; color: #1e3a8a; margin-right: 8px;
+      padding: 6px 12px; border: 1px solid #93c5fd; border-radius: 999px;
+      background: #eff6ff; font-weight: 600;
+    }
+    html.pages-mode #btnAuth {
+      display: inline-flex !important; align-items: center; justify-content: center;
+      border: none; background: #2563eb; color: #fff !important;
+      border-radius: 10px; padding: 10px 18px; cursor: pointer;
+      font-weight: 700; font-size: 14px; line-height: 1.2;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+    html.pages-mode #btnAuth:hover { background: #1d4ed8; }
+    .auth-modal {
+      position: fixed; inset: 0; background: rgba(15,23,42,.45);
+      display: none; align-items: flex-start; justify-content: center;
+      z-index: 300; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 12vh 12px calc(12px + env(safe-area-inset-bottom, 0px));
+      box-sizing: border-box;
+    }
+    .auth-modal.show { display: flex; }
+    .auth-card {
+      background: #fff; border-radius: 14px; padding: 22px 24px; width: min(360px, 92vw);
+      box-shadow: 0 20px 40px rgba(0,0,0,.2); color: #0f172a;
+      margin: 0 auto;
+    }
+    .auth-card h3 { margin: 0 0 14px; font-size: 18px; }
+    .auth-card label { display: block; font-size: 12px; color: #64748b; margin: 10px 0 4px; }
+    .auth-card input {
+      width: 100%; padding: 12px 12px; border: 1px solid #e2e8f0; border-radius: 10px;
+      font-size: 16px; /* 避免 iOS 聚焦自动放大 */
+      -webkit-appearance: none; appearance: none;
+    }
+    .auth-err { min-height: 18px; color: #dc2626; font-size: 12px; margin-top: 8px; }
+    .auth-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    .auth-actions button {
+      border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 10px;
+      padding: 12px 18px; cursor: pointer; font-weight: 600;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
+    }
+    .auth-actions #authOk { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .auth-actions button:disabled { opacity: .6; cursor: not-allowed; }
+    .auth-transit {
+      position: fixed; inset: 0; background: rgba(15, 23, 42, .55);
+      display: none; align-items: center; justify-content: center;
+      z-index: 400; padding: 16px;
+    }
+    .auth-transit.show { display: flex; }
+    .auth-transit-card {
+      background: #fff; border-radius: 14px; padding: 22px 26px; min-width: 220px;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,.25); color: #0f172a;
+    }
+    .auth-spinner {
+      width: 28px; height: 28px; margin: 0 auto 12px;
+      border: 3px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .auth-transit-msg { font-size: 14px; font-weight: 600; color: #334155; }
+    .pages-boot {
+      position: fixed; inset: 0; background: rgba(243,244,246,.92); z-index: 280;
+      display: none; align-items: center; justify-content: center; font-size: 14px; color: #334155;
+    }
+    html.pages-mode .pages-boot { display: flex; }
+    html.pages-mode .pages-boot.done { display: none; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>交易数据记录 · 首板战法</h1>
+      <div class="hint">D0涨停 → D1开盘买入（一字买不进仍记档、不写价）→ D2 9:35/13:15 卖出（涨停/跌停卖不出则滚D3）</div>
+      <div class="hint" id="closeJobStatus" style="margin-top:6px;font-weight:600">收盘补全状态加载中…</div>
+    </div>
+    <div class="top-actions" id="topActionsDetail">
+      <span class="auth-badge" id="authBadge" style="display:none">公开·脱敏</span>
+      <button type="button" id="btnAuth" style="display:none" title="登录后查看完整数据">登录</button>
+      <div class="mpicker" id="monthPicker">
+        <button type="button" class="mpicker-trigger" id="monthPickerTrigger"
+                onclick="toggleMonthPicker(event)" title="选择月份（12 宫格）">
+          <span id="monthPickerLabel">月份</span><span class="mpicker-caret">▾</span>
+        </button>
+        <div class="mpicker-panel" id="monthPickerPanel" onclick="event.stopPropagation()">
+          <div class="mpicker-years">
+            <button type="button" class="mpicker-year" id="monthPickerYearBtn"
+                    onclick="toggleYearGrid(event)" title="点击展开年份（12 宫格）">
+              <span id="monthPickerYearLabel">年份</span><span class="mpicker-caret">▾</span>
+            </button>
+            <div class="mpicker-years-right">
+              <button type="button" class="mpicker-now" id="monthPickerNowBtn"
+                      onclick="monthPickerGoNow(event)" title="回到当前月份数据（stock 第一名 · 区分明细看板）">
+                ↩ 回到当前月
+              </button>
+            </div>
+          </div>
+          <div class="mpicker-grid" id="monthPickerYearGrid" style="display:none"></div>
+          <div class="mpicker-grid" id="monthPickerGrid"></div>
+          <div class="mpicker-foot">
+            <button type="button" class="mpicker-nav" id="monthPickerPrev" onclick="monthPickerPage(-1)">‹ 更早</button>
+            <span class="mpicker-pageinfo" id="monthPickerPageInfo"></span>
+            <button type="button" class="mpicker-nav" id="monthPickerNext" onclick="monthPickerPage(1)">更新 ›</button>
+          </div>
+        </div>
+      </div>
+      <select id="monthFilter" title="月份切换" style="display:none"></select>
+      <a id="exportLink" href="/api/export/csv">导出 CSV</a>
+      <button type="button" id="btnCloseJob" onclick="runCloseJob()">收盘补全</button>
+      <button type="button" id="btnFillEmpty" onclick="refreshPrices(false)">补全空值</button>
+      <button type="button" id="btnForcePull" onclick="refreshPrices(true)">强制重拉</button>
+    </div>
+    <div class="top-actions" id="topActionsBoard" style="display:none">
+      <button type="button" class="view-toggle active" id="btnBackDetail" onclick="setViewMode('trades')">↩ 返回明细</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="nav-stack" id="navStack">
+      <div class="nav-row nav-l1">
+        <span class="nav-row-label">策略</span>
+        <div class="prog-tabs" id="familyTabs">
+          <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setFamily('stock_v1')">Stock-V1</button>
+          <button class="prog-tab prog-stock_v2" id="progStockV2" type="button" onclick="setFamily('stock_v2')">Stock-V2</button>
+          <button class="prog-tab prog-stock_updata" id="progStockUpdata" type="button" onclick="setFamily('stock_updata')">Stock-V1（水下）</button>
+          <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setFamily('slow')">Stock（低价）</button>
+          <button class="prog-tab prog-up" id="progUp" type="button" onclick="setFamily('up')">Up</button>
+        </div>
+      </div>
+      <div class="nav-row nav-l2" id="subTabsRow" style="display:none">
+        <span class="nav-row-label">分层</span>
+        <div class="sub-tabs show" id="subTabs"></div>
+      </div>
+      <div class="nav-row nav-l3">
+        <span class="nav-row-label">看板</span>
+        <div class="view-nav" id="viewNav">
+          <button type="button" class="view-nav-btn view-trades active" id="btnViewTrades" onclick="setViewMode('trades')">明细看板</button>
+          <button type="button" class="view-nav-btn view-board" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
+          <button type="button" class="view-nav-btn view-merge" id="btnViewMerge" onclick="setViewMode('merge')">合计看板</button>
+        </div>
+      </div>
+      <div class="nav-row nav-l4" id="rankTabsRow">
+        <span class="nav-row-label">名次</span>
+        <div class="tabs" id="rankTabs">
+          <button class="tab active" id="tab1" type="button" onclick="setRank(1)">🥇 第一名</button>
+          <button class="tab" id="tab2" type="button" onclick="setRank(2)">🥈 第二名</button>
+        </div>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div id="mainView">
+    <div class="toolbar">
+      <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
+      <select id="dateFilter"><option value="">全部日期</option></select>
+      <div class="dropdown" id="monthOps">
+        <button type="button" id="btnMonthOps" onclick="toggleMonthOps(event)">操作 ▾</button>
+        <div class="dropdown-menu" id="monthOpsMenu">
+          <button type="button" onclick="goPrevMonth()">上一月</button>
+          <button type="button" onclick="goNextMonth()">下一月</button>
+        </div>
+      </div>
+      <button type="button" onclick="resetAllFilters()">重置</button>
+      <button type="button" id="btnRefresh" onclick="refreshView()">刷新</button>
+      <button class="primary" type="button" onclick="openCreate()">+ 新增交易</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr id="theadRow"></tr>
+            <tr class="sum-row" id="sumRow"></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="empty" style="display:none">当前月份暂无记录</div>
+      </div>
+    </div>
+    </div>
+
+    <div id="boardView" style="display:none">
+      <div class="toolbar" id="boardFilters">
+        <select id="boardYearFilter" title="年份">
+          <option value="">全部年份</option>
+        </select>
+        <select id="boardMonthFrom" title="开始月份">
+          <option value="">开始月份</option>
+        </select>
+        <span class="filter-sep">—</span>
+        <select id="boardMonthTo" title="结束月份">
+          <option value="">结束月份</option>
+        </select>
+        <button type="button" class="primary" onclick="searchBoard()">搜索</button>
+        <button type="button" onclick="resetBoardFilters()">重置</button>
+      </div>
+      <div class="board-hint" id="boardHint">按月份汇总 · 左第一名 / 右第二名 · 点击月份跳转明细</div>
+      <div class="board-split">
+        <div class="board-panel">
+          <div class="board-panel-title">🥇 第一名</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr id="boardHeadRank1"></tr>
+                <tr class="sum-row" id="boardSumRank1"></tr>
+              </thead>
+              <tbody id="boardTbodyRank1"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="board-panel">
+          <div class="board-panel-title">🥈 第二名</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr id="boardHeadRank2"></tr>
+                <tr class="sum-row" id="boardSumRank2"></tr>
+              </thead>
+              <tbody id="boardTbodyRank2"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="empty" id="boardEmpty" style="display:none;margin-top:12px">当前模型暂无历史月份数据</div>
+    </div>
+
+    <div class="pager" id="sharedPager">
+        <div>
+          <span id="pageInfo">0 条记录</span>
+          <select id="pageSize" style="margin-left:8px">
+            <option value="40" selected>40条</option>
+            <option value="20">20条</option>
+            <option value="50">50条</option>
+            <option value="100">100条</option>
+          </select>
+        </div>
+        <div class="pages">
+          <button type="button" id="btnFirst" onclick="goPage(1)">首页</button>
+          <button type="button" id="btnPrev" onclick="goPage(page-1)">上一页</button>
+          <button type="button" id="btnNext" onclick="goPage(page+1)">下一页</button>
+          <button type="button" id="btnLast" onclick="goPage(totalPages)">末页</button>
+        </div>
+      </div>
+  </div>
+
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <h2 id="modalTitle">新增交易</h2>
+      <div class="form-grid" id="form"></div>
+      <div class="form-actions">
+        <button class="btn-ghost" type="button" onclick="closeModal()">取消</button>
+        <button class="btn-primary" type="button" onclick="saveTrade()">保存</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div class="loading-mask" id="loadingMask">
+    <div class="loading-box">
+      <div class="spin"></div>
+      <div id="loadingText">处理中…</div>
+    </div>
+  </div>
+  <div class="pages-boot" id="pagesBootMask">正在加载脱敏看板…</div>
+  <div class="auth-modal" id="authModal">
+    <div class="auth-card">
+      <h3>登录查看完整数据</h3>
+      <label>账号</label>
+      <input id="authUser" autocomplete="username" />
+      <label>密码</label>
+      <input id="authPass" type="password" autocomplete="current-password" />
+      <div class="auth-err" id="authErr"></div>
+      <div class="auth-actions">
+        <button type="button" id="authCancel">取消</button>
+        <button type="button" id="authOk" onclick="__pagesDoLogin()">登录</button>
+      </div>
+    </div>
+  </div>
+  <div class="auth-transit" id="authTransit" aria-live="polite">
+    <div class="auth-transit-card">
+      <div class="auth-spinner"></div>
+      <div class="auth-transit-msg" id="authTransitMsg">登录中…</div>
+    </div>
+  </div>
+
+  <script>
+    // GitHub Pages：静态脱敏 + 登录解密；本机 Flask（localhost）不走此模式
+    window.__PAGES_MODE__ = /github\.io$/i.test(location.hostname)
+      || /(?:\?|&)pages=1(?:&|$)/.test(location.search)
+      || /\/stock-quant-select\/trade-ui\/?/.test(location.pathname);
+    if (window.__PAGES_MODE__) document.documentElement.classList.add("pages-mode");
+    window.__PAGES_FULL__ = null;
+    window.__PAGES_SNAPSHOT__ = null;
+    window.__PAGES_MASKED__ = null;
+    window.__PAGES_BOOT__ = null;
+
+    let trades = [];
+    let editingId = null;
+    let page = 1;
+    let pageSize = 40;
+    let totalPages = 1;
+    // 真实数据程序（定时任务/收盘补全仍只用这些，与展示 lane 解耦）
+    const PROGRAMS = ["stock", "stock_v2", "slow", "up", "stock_updata"];
+    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）", up: "Up", stock_updata: "Stock-V1（水下）" };
+    // 四层导航：L1 family → L2 sub → L3 viewMode → L4 rank
+    const FAMILIES = {
+      stock_v1: {
+        program: "stock", label: "Stock-V1", tabClass: "prog-stock",
+        subs: [
+          { key: "all", label: "Stock-V1（默认原）", board: "", cls: "sub-all" },
+          { key: "main", label: "Stock-V1（主板）", board: "主板", cls: "sub-main" },
+          { key: "cyb", label: "Stock-V1（创业板）", board: "创业板", cls: "sub-cyb" },
+        ],
+        defaultSub: "all",
+      },
+      stock_v2: {
+        program: "stock_v2", label: "Stock-V2", tabClass: "prog-stock_v2",
+        subs: [
+          { key: "A", label: "Stock-V2（一进二）", path: "A", cls: "sub-v2a" },
+          { key: "B", label: "Stock-V2（稳定版）", path: "B", cls: "sub-v2b" },
+        ],
+        defaultSub: "A",
+      },
+      stock_updata: { program: "stock_updata", label: "Stock-V1（水下）", tabClass: "prog-stock_updata", subs: [], defaultSub: "" },
+      slow: { program: "slow", label: "Stock（低价）", tabClass: "prog-slow", subs: [], defaultSub: "" },
+      up: { program: "up", label: "Up", tabClass: "prog-up", subs: [], defaultSub: "" },
+    };
+    // 兼容旧 lane 名
+    const LANES = {
+      stock: { program: "stock", board: "", label: "Stock-V1" },
+      stock_v2: { program: "stock_v2", board: "", label: "Stock-V2" },
+      stock_updata: { program: "stock_updata", board: "", label: "Stock-V1（水下）" },
+      main: { program: "stock", board: "主板", label: "Stock-V1（主板）" },
+      cyb: { program: "stock", board: "创业板", label: "Stock-V1（创业板）" },
+      slow: { program: "slow", board: "", label: "Stock（低价）" },
+      up: { program: "up", board: "", label: "Up" },
+    };
+    let currentFamily = "stock_v1";
+    let currentSub = "all";
+    let currentLane = "stock";
+    let currentProgram = "stock";
+    let currentBoard = ""; // "" | "主板" | "创业板"
+    let currentPath = ""; // "" | "A" | "B"
+    let currentRank = 1;
+    let currentMonth = "";
+    let loadSeq = 0;
+    const MONTH_STORAGE_KEY = "sqs_selected_month";
+    let viewMode = "trades"; // trades | merge | board（主板/创业板是 lane，不是 viewMode）
+    let boardRows = [];
+    let boardTotal = 0;
+    let availableMonths = [];
+    const monthsCache = {};
+    let boardFilterYear = "";
+    let boardFilterFrom = "";
+    let boardFilterTo = "";
+    let sortKey = "date";
+    let sortDir = "desc";
+
+    // 表头：按需求排序。末尾两个「半仓盈亏」对应 早/午 全仓盈亏的一半列
+    const COLS_BASE = [
+      { key: "id", label: "ID", sum: false },
+      { key: "date", label: "买入日期", sum: false, sortable: true },
+      { key: "weekday", label: "星期", sum: false },
+      { key: "stock_code", label: "代码", sum: false },
+      { key: "stock_name", label: "名称", sum: false },
+      { key: "board", label: "板块", sum: false },
+      { key: "buy_price", label: "买入价", sum: false },
+      { key: "sell_price_935", label: "早盘卖出价", sum: false },
+      { key: "pnl_morning", label: "早盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_1315", label: "午盘卖出价", sum: false },
+      { key: "pnl_afternoon", label: "午盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_half_935", label: "早盘半仓价", sum: false },
+      { key: "pnl_batch_morning", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_half_1315", label: "午盘半仓价", sum: false },
+      { key: "pnl_batch_afternoon", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_batch_avg", label: "分批总价", sum: false },
+      { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
+      { key: "hold_days", label: "持有天数", sum: false },
+      { key: "is_second_board", label: "二板", sum: false },
+      { key: "pnl_batch_total_half", label: "分批半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_morning_half", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_afternoon_half", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "_ops", label: "操作", sum: false },
+    ];
+
+    const COL_RANK = { key: "rank", label: "名次", sum: false, sortable: true };
+
+    function getActiveCols() {
+      if (viewMode === "merge") {
+        const cols = [...COLS_BASE];
+        // V1 板块用 board_rank；V2 路径用 path_rank；其余用全局 rank
+        let rankCol = COL_RANK;
+        if (currentBoard) rankCol = { key: "board_rank", label: "名次", sum: false, sortable: true };
+        else if (currentPath) rankCol = { key: "path_rank", label: "名次", sum: false, sortable: true };
+        cols.splice(3, 0, rankCol);
+        return cols;
+      }
+      return COLS_BASE;
+    }
+
+    function laneLabel() {
+      const fam = FAMILIES[currentFamily];
+      if (!fam) return (LANES[currentLane] && LANES[currentLane].label) || currentProgram;
+      const sub = (fam.subs || []).find(s => s.key === currentSub);
+      return (sub && sub.label) || fam.label;
+    }
+
+    function deriveLaneFromNav() {
+      if (currentFamily === "stock_v1") {
+        if (currentSub === "main") return "main";
+        if (currentSub === "cyb") return "cyb";
+        return "stock";
+      }
+      if (currentFamily === "stock_v2") return "stock_v2";
+      if (currentFamily === "stock_updata") return "stock_updata";
+      if (currentFamily === "slow") return "slow";
+      if (currentFamily === "up") return "up";
+      return "stock";
+    }
+
+    function renderSubTabs() {
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      const row = document.getElementById("subTabsRow");
+      const box = document.getElementById("subTabs");
+      if (!fam.subs || !fam.subs.length) {
+        row.style.display = "none";
+        box.innerHTML = "";
+        return;
+      }
+      row.style.display = "";
+      box.innerHTML = fam.subs.map(s => {
+        const cls = ["sub-tab", s.cls || "", s.key === currentSub ? "active" : ""].filter(Boolean).join(" ");
+        return `<button type="button" class="${cls}" data-sub="${s.key}" onclick="setSub('${s.key}')">${s.label}</button>`;
+      }).join("");
+    }
+
+    function syncNavState() {
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      currentProgram = fam.program;
+      currentBoard = "";
+      currentPath = "";
+      const sub = (fam.subs || []).find(s => s.key === currentSub);
+      if (sub) {
+        if ("board" in sub) currentBoard = sub.board || "";
+        if (sub.path) currentPath = sub.path;
+      }
+      currentLane = deriveLaneFromNav();
+      document.getElementById("progStock").classList.toggle("active", currentFamily === "stock_v1");
+      document.getElementById("progSlow").classList.toggle("active", currentFamily === "slow");
+      document.getElementById("progUp").classList.toggle("active", currentFamily === "up");
+      const elUpdata = document.getElementById("progStockUpdata");
+      if (elUpdata) elUpdata.classList.toggle("active", currentFamily === "stock_updata");
+      const elV2 = document.getElementById("progStockV2");
+      if (elV2) elV2.classList.toggle("active", currentFamily === "stock_v2");
+      renderSubTabs();
+      const rankRow = document.getElementById("rankTabsRow");
+      if (rankRow) rankRow.style.display = viewMode === "trades" ? "" : "none";
+    }
+
+    function setFamily(key) {
+      syncMonthFromDom();
+      if (!(key in FAMILIES)) key = "stock_v1";
+      currentFamily = key;
+      currentSub = FAMILIES[key].defaultSub || "";
+      if (viewMode === "main" || viewMode === "cyb") viewMode = "trades";
+      syncNavState();
+      applyViewMode();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      reloadCurrentView();
+    }
+
+    function setSub(key) {
+      syncMonthFromDom();
+      const fam = FAMILIES[currentFamily] || FAMILIES.stock_v1;
+      if (!(fam.subs || []).some(s => s.key === key)) return;
+      currentSub = key;
+      syncNavState();
+      applyViewMode();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      reloadCurrentView();
+    }
+
+    const STAT_META = [
+      { key: "total", label: "总笔数", icon: "📊", accent: "#3b82f6", bg: "#dbeafe" },
+      { key: "completed", label: "已有卖价", icon: "✅", accent: "#16a34a", bg: "#dcfce7" },
+      { key: "holding", label: "待补全", icon: "📌", accent: "#f59e0b", bg: "#fef3c7" },
+      { key: "board_cyb_count", label: "创业板数量", icon: "🟣", accent: "#8b5cf6", bg: "#f3e8ff" },
+      { key: "board_zb_count", label: "主板数量", icon: "🔵", accent: "#2563eb", bg: "#dbeafe" },
+      { key: "month_pnl_morning_half", label: "早盘盈亏累计", icon: "🌅", accent: "#f97316", bg: "#ffedd5", pnl: true, suffix: "%" },
+      { key: "month_pnl_afternoon_half", label: "午盘盈亏累计", icon: "☀️", accent: "#0ea5e9", bg: "#e0f2fe", pnl: true, suffix: "%" },
+      { key: "month_pnl_batch_half", label: "分批盈亏累计", icon: "💰", accent: "#e11d48", bg: "#ffe4e6", pnl: true, suffix: "%" },
+      { key: "max_win_streak", label: "最大连赢", icon: "🔥", accent: "#ef4444", bg: "#fee2e2" },
+      { key: "max_loss_streak", label: "最大连亏", icon: "❄️", accent: "#64748b", bg: "#f1f5f9" },
+    ];
+
+    const FIELDS = [
+      { key: "date", label: "买入日期", type: "date", required: true },
+      { key: "stock_name", label: "股票名称", type: "text", required: true },
+      { key: "stock_code", label: "代码（可空，名称自动填充）", type: "text" },
+      { key: "buy_price", label: "买入价(开盘)", type: "number" },
+      { key: "sell_price_935", label: "早盘卖出价", type: "number" },
+      { key: "sell_price_1315", label: "午盘卖出价", type: "number" },
+      { key: "sell_price_half_935", label: "早盘半仓价", type: "number" },
+      { key: "sell_price_half_1315", label: "午盘半仓价", type: "number" },
+      { key: "sell_date", label: "卖出日期", type: "date" },
+      { key: "is_second_board", label: "二板", type: "select", options: [
+        { v: "", t: "未知/自动" }, { v: "true", t: "是" }, { v: "false", t: "否" }
+      ]},
+      { key: "rank", label: "排名(1/2)", type: "number" },
+      { key: "notes", label: "备注", type: "text" },
+    ];
+
+    let busy = false;
+
+    function toast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2800);
+    }
+    function setLoading(on, text) {
+      const mask = document.getElementById("loadingMask");
+      const label = document.getElementById("loadingText");
+      if (text) label.textContent = text;
+      mask.classList.toggle("show", !!on);
+      busy = !!on;
+      ["btnCloseJob","btnFillEmpty","btnForcePull","btnRefresh"].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.disabled = !!on;
+      });
+    }
+    function fmt(v) { return (v === null || v === undefined || v === "") ? "—" : v; }
+
+    /** 盈亏色阶：≥10深红，≥5浅红，(-5,5)无色，≤-5浅黄，≤-10深黄 */
+    function pnlClass(v) {
+      if (v === null || v === undefined || v === "") return "";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "";
+      if (n >= 10) return "pnl-red-deep";
+      if (n >= 5) return "pnl-red-light";
+      if (n <= -10) return "pnl-yellow-deep";
+      if (n <= -5) return "pnl-yellow-light";
+      return "";
+    }
+
+    /** 历史看板盈亏背景色阶 */
+    function boardPnlClass(v) {
+      if (v === null || v === undefined || v === "") return "";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "";
+      if (n >= 20) return "bp-deep-red";
+      if (n >= 10) return "bp-light-red";
+      if (n > 0) return "bp-pale-red";
+      if (n > -10) return "bp-pale-green";
+      if (n > -20) return "bp-light-green";
+      return "bp-deep-green";
+    }
+
+    /** 本页合计字体色阶 */
+    function boardSumTextClass(v) {
+      if (v === null || v === undefined || v === "") return "";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "";
+      if (n <= -100) return "bs-t-g0";
+      if (n <= -60) return "bs-t-g1";
+      if (n <= -30) return "bs-t-g2";
+      if (n < 0) return "bs-t-g3";
+      if (n <= 30) return "bs-t-r0";
+      if (n <= 60) return "bs-t-r1";
+      if (n <= 100) return "bs-t-r2";
+      return "bs-t-r3";
+    }
+
+    function openMonthPicker(id) { /* 已改用 select 下拉 */ }
+
+    function monthResultHtml(v) {
+      if (v == null || v === "") return "—";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "—";
+      if (n >= 0) return '<span class="month-profit">盈利</span>';
+      return '<span class="month-loss">亏损</span>';
+    }
+
+    function toggleMonthOps(ev) {
+      ev.stopPropagation();
+      document.getElementById("monthOpsMenu").classList.toggle("show");
+    }
+
+    document.addEventListener("click", () => {
+      const menu = document.getElementById("monthOpsMenu");
+      if (menu) menu.classList.remove("show");
+      closeMonthPicker();
+    });
+    // ESC 关闭九宫格
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeMonthPicker();
+    });
+
+    function shiftMonth(delta) {
+      syncMonthFromDom();
+      const cur = syncMonthFromDom();
+      if (!availableMonths.length) {
+        toast("暂无月份数据");
+        return;
+      }
+      const idx = availableMonths.indexOf(cur);
+      const targetIdx = idx >= 0 ? idx - delta : (delta > 0 ? availableMonths.length - 1 : 0);
+      if (targetIdx < 0 || targetIdx >= availableMonths.length) {
+        if (delta > 0) toast("已是最新月份");
+        else toast("已是最早月份");
+        return;
+      }
+      const target = availableMonths[targetIdx];
+      persistMonth(target);
+      applyMonthToSelect();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      loadAll();
+    }
+
+    function goPrevMonth() {
+      document.getElementById("monthOpsMenu").classList.remove("show");
+      shiftMonth(-1);
+    }
+
+    function goNextMonth() {
+      document.getElementById("monthOpsMenu").classList.remove("show");
+      shiftMonth(1);
+    }
+
+    function resetAllFilters() {
+      document.getElementById("keyword").value = "";
+      document.getElementById("dateFilter").value = "";
+      currentRank = 1;
+      document.getElementById("tab1").classList.add("active");
+      document.getElementById("tab2").classList.remove("active");
+      persistMonth(beijingMonth());
+      applyMonthToSelect();
+      page = 1;
+      loadAll();
+      toast("已重置筛选项");
+    }
+
+    function goDetailFromBoard(month, rank) {
+      if (!month) return;
+      currentRank = rank || 1;
+      document.getElementById("tab1").classList.toggle("active", currentRank === 1);
+      document.getElementById("tab2").classList.toggle("active", currentRank === 2);
+      persistMonth(month);
+      applyMonthToSelect();
+      document.getElementById("keyword").value = "";
+      document.getElementById("dateFilter").value = "";
+      page = 1;
+      setViewMode("trades");
+    }
+
+    function populateBoardMonthSelects(months) {
+      const fromSel = document.getElementById("boardMonthFrom");
+      const toSel = document.getElementById("boardMonthTo");
+      if (!fromSel || !toSel) return;
+      const curFrom = fromSel.value;
+      const curTo = toSel.value;
+      const opts = (months || []).map(m =>
+        `<option value="${m}">${m.replace("-", "年")}月</option>`
+      ).join("");
+      fromSel.innerHTML = `<option value="">开始月份</option>${opts}`;
+      toSel.innerHTML = `<option value="">结束月份</option>${opts}`;
+      if (curFrom) fromSel.value = curFrom;
+      if (curTo) toSel.value = curTo;
+    }
+
+    function searchBoard() {
+      boardFilterYear = document.getElementById("boardYearFilter").value || "";
+      boardFilterFrom = document.getElementById("boardMonthFrom").value || "";
+      boardFilterTo = document.getElementById("boardMonthTo").value || "";
+      page = 1;
+      loadBoard();
+    }
+
+    function resetBoardFilters() {
+      boardFilterYear = "";
+      boardFilterFrom = "";
+      boardFilterTo = "";
+      document.getElementById("boardYearFilter").value = "";
+      document.getElementById("boardMonthFrom").value = "";
+      document.getElementById("boardMonthTo").value = "";
+      page = 1;
+      loadBoard();
+    }
+
+    function populateBoardYearFilter(years) {
+      const sel = document.getElementById("boardYearFilter");
+      if (!sel) return;
+      const cur = sel.value;
+      const opts = ['<option value="">全部年份</option>']
+        .concat((years || []).map(y => `<option value="${y}">${y}年</option>`));
+      sel.innerHTML = opts.join("");
+      if (cur) sel.value = cur;
+    }
+
+    function pagesActiveSnapshot() {
+      return window.__PAGES_FULL__ || window.__PAGES_SNAPSHOT__ || window.__PAGES_MASKED__ || { programs: {} };
+    }
+
+    function pagesProgramTrades(program) {
+      const snap = pagesActiveSnapshot();
+      const list = (snap.programs && snap.programs[program]) || [];
+      return list.map(t => ({ ...t }));
+    }
+
+    function pagesEffPath(t) {
+      const p = String(t.path || "").trim().toUpperCase();
+      if (p === "A" || p === "B") return p;
+      const slot = String(t.slot || "").trim().toUpperCase();
+      if (slot.slice(0, 1) === "A" || slot.slice(0, 1) === "B") return slot.slice(0, 1);
+      const notes = String(t.notes || "");
+      let m = notes.match(/path\s*=\s*([AB])/i);
+      if (m) return m[1].toUpperCase();
+      m = notes.match(/V2\s*([AB])\b/i);
+      return m ? m[1].toUpperCase() : "";
+    }
+
+    function pagesFilterTrades(list, params) {
+      let trades = list.slice();
+      const month = params.get("month") || "";
+      const date = params.get("date") || "";
+      const rank = params.get("rank") || "";
+      const keyword = (params.get("keyword") || "").toLowerCase();
+      const board = params.get("board") || "";
+      const boardRank = params.get("board_rank") || "";
+      const path = (params.get("path") || "").toUpperCase();
+      const pathRank = params.get("path_rank") || "";
+      if (month) trades = trades.filter(t => String(t.date || "").startsWith(month));
+      if (date) trades = trades.filter(t => String(t.date || "") === date);
+      if (rank) {
+        const r = Number(rank);
+        trades = trades.filter(t => Number(t.rank || 0) === r);
+      } else {
+        const ranks = params.get("ranks") || "";
+        if (ranks) {
+          const allow = new Set(ranks.split(",").map(s => Number(s.trim())).filter(n => !Number.isNaN(n)));
+          trades = trades.filter(t => allow.has(Number(t.rank || 0)));
+        }
+      }
+      if (path === "A" || path === "B") {
+        trades = trades.filter(t => pagesEffPath(t) === path);
+        if (pathRank) {
+          const pr = Number(pathRank);
+          trades = trades.filter(t => Number(t.path_rank || 0) === pr);
+        }
+      }
+      if (keyword) {
+        trades = trades.filter(t =>
+          String(t.stock_code || "").toLowerCase().includes(keyword)
+          || String(t.stock_name || "").toLowerCase().includes(keyword)
+        );
+      }
+      if (board) {
+        trades = trades.filter(t => (t.board || "") === board && t.board_rank != null);
+        if (boardRank) {
+          const br = Number(boardRank);
+          trades = trades.filter(t => Number(t.board_rank || 0) === br);
+        }
+      }
+      trades.sort((a, b) => {
+        const da = String(a.date || "");
+        const db = String(b.date || "");
+        if (da !== db) return db.localeCompare(da);
+        return Number(b.id || 0) - Number(a.id || 0);
+      });
+      return trades;
+    }
+
+    function pagesComputeStats(list, month) {
+      const total = list.length;
+      const empty = {
+        total: 0, completed: 0, holding: 0,
+        win_rate_morning: 0, win_rate_afternoon: 0, win_rate_batch: 0,
+        sum_pnl_morning: 0, sum_pnl_afternoon: 0, sum_pnl_batch: 0,
+        sum_pnl_batch_half: 0, avg_pnl_morning: 0, avg_pnl_afternoon: 0,
+        avg_pnl_batch: 0, second_board_count: 0, second_board_rate: 0,
+        board_cyb_count: 0, board_zb_count: 0,
+        month_pnl_morning_half: 0, month_pnl_afternoon_half: 0, month_pnl_batch_half: 0,
+        max_win_streak: 0, max_loss_streak: 0, month: month || null,
+      };
+      if (!total) return empty;
+      const completed = list.filter(t => t.sell_price_935 != null || t.sell_price_1315 != null).length;
+      const sum = (key) => list.reduce((a, t) => a + (t[key] != null ? Number(t[key]) : 0), 0);
+      const round2 = (n) => Math.round(n * 100) / 100;
+      let maxWin = 0, maxLoss = 0, curW = 0, curL = 0;
+      const ordered = list.slice().sort((a, b) => String(a.date||"").localeCompare(String(b.date||"")) || Number(a.id||0)-Number(b.id||0));
+      ordered.forEach(t => {
+        const pnl = t.pnl_batch_total;
+        if (pnl == null) { curW = curL = 0; return; }
+        if (Number(pnl) > 0) { curW += 1; curL = 0; maxWin = Math.max(maxWin, curW); }
+        else if (Number(pnl) < 0) { curL += 1; curW = 0; maxLoss = Math.max(maxLoss, curL); }
+        else { curW = curL = 0; }
+      });
+      let cyb = 0, zb = 0;
+      list.forEach(t => {
+        if (t.board === "创业板") cyb += 1;
+        else if (t.board === "主板") zb += 1;
+      });
+      return {
+        ...empty,
+        total,
+        completed,
+        holding: total - completed,
+        board_cyb_count: cyb,
+        board_zb_count: zb,
+        month_pnl_morning_half: round2(sum("pnl_morning_half")),
+        month_pnl_afternoon_half: round2(sum("pnl_afternoon_half")),
+        month_pnl_batch_half: round2(sum("pnl_batch_total_half")),
+        max_win_streak: maxWin,
+        max_loss_streak: maxLoss,
+        month: month || null,
+      };
+    }
+
+    function pagesEmptyBucket() {
+      return { morning: 0, morning_half: 0, afternoon: 0, afternoon_half: 0, batch: 0, batch_half: 0, count: 0 };
+    }
+
+    function pagesAccumulateMonths(list) {
+      const by = {};
+      list.forEach(t => {
+        const d = String(t.date || "");
+        if (d.length < 7) return;
+        const m = d.slice(0, 7);
+        const b = by[m] || (by[m] = pagesEmptyBucket());
+        b.count += 1;
+        const map = [
+          ["pnl_morning", "morning"], ["pnl_morning_half", "morning_half"],
+          ["pnl_afternoon", "afternoon"], ["pnl_afternoon_half", "afternoon_half"],
+          ["pnl_batch_total", "batch"], ["pnl_batch_total_half", "batch_half"],
+        ];
+        map.forEach(([src, dst]) => {
+          if (t[src] != null) b[dst] += Number(t[src]);
+        });
+      });
+      Object.values(by).forEach(b => {
+        ["morning","morning_half","afternoon","afternoon_half","batch","batch_half"].forEach(k => {
+          b[k] = Math.round(b[k] * 100) / 100;
+        });
+      });
+      return by;
+    }
+
+    function pagesHistoryBoard(program, board, page, pageSize, year, monthFrom, monthTo, path) {
+      let list = pagesProgramTrades(program);
+      const pathKey = (path || "").toUpperCase();
+      if (pathKey === "A" || pathKey === "B") {
+        list = list.filter(t => pagesEffPath(t) === pathKey);
+      }
+      if (board) list = list.filter(t => (t.board || "") === board && t.board_rank != null);
+      let r1src, r2src;
+      if (board) {
+        r1src = list.filter(t => Number(t.board_rank || 0) === 1);
+        r2src = list.filter(t => Number(t.board_rank || 0) === 2);
+      } else if (pathKey === "A" || pathKey === "B") {
+        r1src = list.filter(t => Number(t.path_rank || 0) === 1);
+        r2src = list.filter(t => Number(t.path_rank || 0) === 2);
+      } else {
+        r1src = list.filter(t => Number(t.rank || 0) === 1);
+        r2src = list.filter(t => Number(t.rank || 0) === 2);
+      }
+      const r1 = pagesAccumulateMonths(r1src);
+      const r2 = pagesAccumulateMonths(r2src);
+      let months = Array.from(new Set([...Object.keys(r1), ...Object.keys(r2)])).sort().reverse();
+      const years = Array.from(new Set(months.map(m => m.slice(0, 4)))).sort().reverse();
+      if (year) months = months.filter(m => m.startsWith(year + "-"));
+      if (monthFrom) months = months.filter(m => m >= monthFrom);
+      if (monthTo) months = months.filter(m => m <= monthTo);
+      const rowsAll = months.map(month => ({
+        month,
+        rank1: r1[month] || pagesEmptyBucket(),
+        rank2: r2[month] || pagesEmptyBucket(),
+      }));
+      const total = rowsAll.length;
+      const totalPages = Math.max(1, Math.ceil((total || 1) / pageSize));
+      const p = Math.min(Math.max(1, page), totalPages);
+      const start = (p - 1) * pageSize;
+      return {
+        program, board: board || null, path: pathKey || null,
+        rows: rowsAll.slice(start, start + pageSize),
+        total, page: p, page_size: pageSize, total_pages: totalPages, years,
+      };
+    }
+
+    async function pagesApi(url, opts) {
+      const method = ((opts && opts.method) || "GET").toUpperCase();
+      if (method !== "GET") throw new Error("Pages 只读：请在本机 UI 操作写接口");
+      const u = new URL(url, location.origin);
+      const path = u.pathname.replace(/^\/+/, "/");
+      const params = u.searchParams;
+      const program = params.get("program") || "stock";
+      if (path === "/api/trades" || path.endsWith("/api/trades")) {
+        return pagesFilterTrades(pagesProgramTrades(program), params);
+      }
+      if (path === "/api/stats" || path.endsWith("/api/stats")) {
+        const filtered = pagesFilterTrades(pagesProgramTrades(program), params);
+        return pagesComputeStats(filtered, params.get("month") || "");
+      }
+      if (path === "/api/months" || path.endsWith("/api/months")) {
+        const list = pagesProgramTrades(program);
+        const months = Array.from(new Set(list.map(t => String(t.date || "").slice(0, 7)).filter(Boolean))).sort().reverse();
+        const cur = new Date().toISOString().slice(0, 7);
+        return [cur, ...months.filter(m => m !== cur)];
+      }
+      if (path === "/api/dates" || path.endsWith("/api/dates")) {
+        const list = pagesProgramTrades(program);
+        return Array.from(new Set(list.map(t => String(t.date || "")).filter(Boolean))).sort().reverse();
+      }
+      if (path === "/api/history-board" || path.endsWith("/api/history-board")) {
+        return pagesHistoryBoard(
+          program,
+          params.get("board") || "",
+          Number(params.get("page") || 1),
+          Math.max(1, Math.min(200, Number(params.get("page_size") || 40))),
+          params.get("year") || "",
+          params.get("month_from") || "",
+          params.get("month_to") || "",
+          params.get("path") || ""
+        );
+      }
+      if (path.indexOf("/api/jobs/after-close/status") >= 0) {
+        return { pages: true, note: "Pages 只读镜像" };
+      }
+      throw new Error("Pages 不支持接口 " + path);
+    }
+
+    async function api(url, opts) {
+      if (window.__PAGES_MODE__) return pagesApi(url, opts);
+      const res = await fetch(url, { headers: { "Content-Type": "application/json" }, ...opts });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || "请求失败");
+      return json.data;
+    }
+
+    function beijingMonth() {
+      return beijingToday().slice(0, 7);
+    }
+
+    function persistMonth(m) {
+      if (!m) return;
+      currentMonth = m;
+      try { sessionStorage.setItem(MONTH_STORAGE_KEY, m); } catch (e) {}
+    }
+
+    function restoreMonth() {
+      try {
+        const m = sessionStorage.getItem(MONTH_STORAGE_KEY);
+        if (m) currentMonth = m;
+      } catch (e) {}
+    }
+
+    /** 月份以 DOM 下拉框为准，保证 tab 切换与显示一致 */
+    function syncMonthFromDom() {
+      const sel = document.getElementById("monthFilter");
+      if (sel && sel.value) {
+        persistMonth(sel.value);
+        return sel.value;
+      }
+      if (currentMonth) return currentMonth;
+      const m = beijingMonth();
+      persistMonth(m);
+      return m;
+    }
+
+    function applyMonthToSelect() {
+      const sel = document.getElementById("monthFilter");
+      if (!sel || !currentMonth) return;
+      sel.value = currentMonth;
+      if (sel.value !== currentMonth) {
+        const opt = document.createElement("option");
+        opt.value = currentMonth;
+        opt.textContent = currentMonth.replace("-", "年") + "月";
+        opt.selected = true;
+        sel.insertBefore(opt, sel.firstChild);
+        sel.value = currentMonth;
+      }
+      applyMonthToPicker();
+    }
+
+    /* ── 12 宫格月份选择器 ─────────────────────────────────
+       两级结构（2026-10-26 用户要求）：
+         ① 顶部年份按钮，默认显示今年；点开 → 下方展开「年份 12 宫格」
+            （左上角第一个 = 今年；到 2027 年时左上角自动变成 2027 年）
+         ② 年份宫格点某年 → 跳到该年的「月份 12 宫格」（全年 12 个月都列出，
+            11/12 月无数据也照常显示可点，点了就是空表）
+       月份顺序：1→12 正序（比倒序更符合"全年"直觉）。
+       原生 <select id="monthFilter"> 保留但隐藏，仍是月份状态真值载体。 */
+    const MPICKER_PAGE = 12;
+    let mpickerYear = "";        // 当前展开的年份
+    let mpickerYearGridOpen = false;  // 年份宫格是否展开
+
+    /** 当前自然年（用于「左上角第一个 = 今年」规则） */
+    function mpickerCurrentYear() {
+      return beijingToday().slice(0, 4);
+    }
+
+    /**
+     * 年份 12 宫格的数据源：
+     *   左上角第一个 = 当前自然年；其后是「有数据的年份」按倒序；
+     *   若仍不足 12 格，用未来年份补齐（到明年 2027 年时第一个自然变成 2027）。
+     */
+    function monthPickerYearList() {
+      const cur = mpickerCurrentYear();
+      const withData = [...new Set(
+        availableMonths.filter(m => m && m.length >= 4).map(m => m.slice(0, 4))
+      )].sort((a, b) => b.localeCompare(a));
+
+      const list = [cur];
+      // 有数据的年份（倒序），跳过当前年（已在首位）
+      for (const y of withData) {
+        if (list.length >= MPICKER_PAGE) break;
+        if (!list.includes(y)) list.push(y);
+      }
+      // 仍不足 → 补未来年份
+      let future = Number(cur);
+      while (list.length < MPICKER_PAGE) {
+        future += 1;
+        const ys = String(future);
+        if (!list.includes(ys)) list.push(ys);
+      }
+      return list.slice(0, MPICKER_PAGE);
+    }
+
+    /** 该年 12 个月全部列出（无数据也列） */
+    function monthPickerMonthsOfYear(year) {
+      const out = [];
+      for (let i = 1; i <= 12; i++) {
+        out.push(`${year}-${String(i).padStart(2, "0")}`);
+      }
+      return out;
+    }
+
+    function monthPickerHasData(m) {
+      return availableMonths.includes(m);
+    }
+
+    function renderMonthPicker() {
+      if (!mpickerYear) {
+        mpickerYear = currentMonth
+          ? currentMonth.slice(0, 4)
+          : mpickerCurrentYear();
+      }
+      const label = document.getElementById("monthPickerLabel");
+      if (label) label.textContent = currentMonth ? currentMonth.replace("-", "年") + "月" : "月份";
+
+      // 顶部年份按钮（默认显示今年）
+      const yLabel = document.getElementById("monthPickerYearLabel");
+      if (yLabel) yLabel.textContent = mpickerYear + "年";
+      const yBtn = document.getElementById("monthPickerYearBtn");
+      if (yBtn) yBtn.classList.toggle("active", mpickerYearGridOpen);
+
+      // 年份 12 宫格（展开时才渲染）
+      const yGrid = document.getElementById("monthPickerYearGrid");
+      if (yGrid) {
+        if (mpickerYearGridOpen) {
+          const cur = mpickerCurrentYear();
+          yGrid.innerHTML = monthPickerYearList().map(y => {
+            const active = y === mpickerYear ? " active" : "";
+            const isCur = y === cur ? " 今年" : "";
+            const hasData = availableMonths.some(m => m && m.slice(0, 4) === y);
+            return `<button type="button" class="mpicker-cell${active}" onclick="monthPickerPickYear('${y}')"
+                      title="${y}年${hasData ? "" : "（暂无数据）"}">
+                      <span class="m-mm">${y}</span><span class="m-cn">${isCur || (hasData ? "" : "无数据")}</span>
+                    </button>`;
+          }).join("");
+          yGrid.style.display = "";
+        } else {
+          yGrid.style.display = "none";
+        }
+      }
+
+      // 月份 12 宫格：全年 12 个月都列出
+      const list = monthPickerMonthsOfYear(mpickerYear);
+      const gridEl = document.getElementById("monthPickerGrid");
+      if (gridEl) {
+        gridEl.innerHTML = list.map(m => {
+          const mm = m.slice(5, 7);
+          const active = m === currentMonth ? " active" : "";
+          const empty = monthPickerHasData(m) ? "" : " empty";
+          return `<button type="button" class="mpicker-cell${active}${empty}"
+                    onclick="monthPickerPick('${m}')"
+                    title="${m.replace("-", "年")}月${monthPickerHasData(m) ? "" : "（暂无数据）"}">
+                    <span class="m-mm">${parseInt(mm, 10)}月</span>
+                    <span class="m-cn">${monthPickerHasData(m) ? "" : "无"}</span>
+                  </button>`;
+        }).join("");
+        // 年份宫格展开时隐藏月份宫格，避免两屏挤在一起
+        gridEl.style.display = mpickerYearGridOpen ? "none" : "";
+      }
+
+      const info = document.getElementById("monthPickerPageInfo");
+      if (info) {
+        const n = list.filter(monthPickerHasData).length;
+        info.textContent = mpickerYearGridOpen
+          ? `${monthPickerYearList().length} 个年份`
+          : `${mpickerYear}年 · ${n} 个月有数据`;
+      }
+      const prev = document.getElementById("monthPickerPrev");
+      const next = document.getElementById("monthPickerNext");
+      if (prev) prev.disabled = mpickerYearGridOpen;
+      if (next) next.disabled = mpickerYearGridOpen;
+    }
+
+    function applyMonthToPicker() {
+      if (!currentMonth) return;
+      const y = currentMonth.slice(0, 4);
+      if (y !== mpickerYear) mpickerYear = y;
+      renderMonthPicker();
+    }
+
+    function toggleMonthPicker(ev) {
+      if (ev) ev.stopPropagation();
+      const panel = document.getElementById("monthPickerPanel");
+      if (!panel) return;
+      if (panel.classList.contains("show")) {
+        panel.classList.remove("show");
+        return;
+      }
+      mpickerYearGridOpen = false;
+      renderMonthPicker();
+      panel.classList.add("show");
+    }
+
+    function closeMonthPicker() {
+      const panel = document.getElementById("monthPickerPanel");
+      if (panel) panel.classList.remove("show");
+      mpickerYearGridOpen = false;
+    }
+
+    /** 展开 / 收起年份 12 宫格 */
+    function toggleYearGrid(ev) {
+      if (ev) ev.stopPropagation();
+      mpickerYearGridOpen = !mpickerYearGridOpen;
+      renderMonthPicker();
+    }
+
+    /** 点年份宫格某年 → 跳到该年月份 12 宫格 */
+    function monthPickerPickYear(y) {
+      mpickerYear = y;
+      mpickerYearGridOpen = false;
+      renderMonthPicker();
+    }
+
+    /** 回到当前月份：stock 程序 + 第一名 + 区分明细看板 + 当前月 */
+    function monthPickerGoNow(ev) {
+      if (ev) ev.stopPropagation();
+      const now = beijingMonth();
+
+      applyLaneState("stock");
+      if (viewMode !== "trades") {
+        viewMode = "trades";
+      }
+      applyViewMode();
+      currentRank = 1;
+      document.getElementById("tab1").classList.add("active");
+      document.getElementById("tab2").classList.remove("active");
+
+      persistMonth(now);
+      mpickerYear = now.slice(0, 4);
+      mpickerYearGridOpen = false;
+      applyMonthToSelect();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      closeMonthPicker();
+      loadAll();
+      toast(`已回到 ${now.replace("-", "年")}月 · Stock-V1 第一名`);
+    }
+
+    function monthPickerPage(delta) {
+      // 12 宫格下同一年只有 1 页，翻页改为切年份
+      if (mpickerYearGridOpen) return;
+      const years = monthPickerYearList();
+      const idx = years.indexOf(mpickerYear);
+      const nextIdx = Math.min(years.length - 1, Math.max(0, idx + delta));
+      if (nextIdx === idx) return;
+      mpickerYear = years[nextIdx];
+      renderMonthPicker();
+    }
+
+    function monthPickerPick(m) {
+      persistMonth(m);
+      mpickerYear = m.slice(0, 4);
+      applyMonthToSelect();
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      closeMonthPicker();
+      loadAll();
+    }
+
+    function clearDateFilterIfMonthMismatch() {
+      const month = syncMonthFromDom();
+      const dateEl = document.getElementById("dateFilter");
+      if (dateEl && dateEl.value && month && !dateEl.value.startsWith(month)) {
+        dateEl.value = "";
+      }
+    }
+
+    function applyLaneState(lane) {
+      // 兼容旧 lane → 四层导航
+      if (lane === "main") { currentFamily = "stock_v1"; currentSub = "main"; }
+      else if (lane === "cyb") { currentFamily = "stock_v1"; currentSub = "cyb"; }
+      else if (lane === "stock") { currentFamily = "stock_v1"; currentSub = "all"; }
+      else if (lane === "stock_v2") { currentFamily = "stock_v2"; currentSub = "A"; }
+      else if (lane === "stock_updata") { currentFamily = "stock_updata"; currentSub = ""; }
+      else if (lane === "slow") { currentFamily = "slow"; currentSub = ""; }
+      else if (lane === "up") { currentFamily = "up"; currentSub = ""; }
+      else { currentFamily = "stock_v1"; currentSub = "all"; }
+      syncNavState();
+    }
+
+    function setLane(lane) {
+      syncMonthFromDom();
+      applyLaneState(lane);
+      if (viewMode === "main" || viewMode === "cyb") {
+        viewMode = "trades";
+        applyViewMode();
+      } else {
+        applyViewMode();
+      }
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      reloadCurrentView();
+    }
+
+    // 兼容旧调用
+    function setProgram(p) {
+      if (p === "stock" || p === "stock_v2" || p === "slow" || p === "up" || p === "stock_updata") setLane(p);
+    }
+
+    function baiduFinanceUrl(code) {
+      const c = String(code || "").replace(/\D/g, "").padStart(6, "0");
+      if (!c || c === "000000") return "";
+      return `https://finance.baidu.com/stock/ab-${c}`;
+    }
+
+    function setRank(r) {
+      if (viewMode !== "trades") return;
+      syncMonthFromDom();
+      currentRank = r;
+      document.getElementById("tab1").classList.toggle("active", r === 1);
+      document.getElementById("tab2").classList.toggle("active", r === 2);
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      loadAll();
+    }
+
+    function setViewMode(mode) {
+      // 旧 main/cyb 已升为顶栏 lane，兼容跳转回明细
+      if (mode === "main" || mode === "cyb") {
+        setLane(mode);
+        mode = "trades";
+      }
+      if (viewMode === mode && mode !== "board") return;
+      viewMode = mode;
+      page = 1;
+      applyViewMode();
+      reloadCurrentView();
+    }
+
+    function reloadCurrentView() {
+      if (viewMode === "board") loadBoard();
+      else loadAll();
+    }
+
+    function applyViewMode() {
+      const isBoard = viewMode === "board";
+      const isDetail = viewMode === "trades" || viewMode === "merge";
+      document.body.classList.toggle("view-board", isBoard);
+      document.getElementById("mainView").style.display = isDetail ? "" : "none";
+      document.getElementById("boardView").style.display = isBoard ? "" : "none";
+      document.getElementById("stats").style.display = isDetail ? "" : "none";
+      const showRank = viewMode === "trades";
+      document.getElementById("rankTabs").style.display = showRank ? "" : "none";
+      const rankRow = document.getElementById("rankTabsRow");
+      if (rankRow) rankRow.style.display = showRank ? "" : "none";
+      document.getElementById("topActionsDetail").style.display = isDetail ? "" : "none";
+      document.getElementById("topActionsBoard").style.display = isBoard ? "" : "none";
+      document.getElementById("btnViewTrades").classList.toggle("active", viewMode === "trades");
+      document.getElementById("btnViewBoard").classList.toggle("active", viewMode === "board");
+      document.getElementById("btnViewMerge").classList.toggle("active", viewMode === "merge");
+      const label = laneLabel();
+      let hint = `${label} · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板 · 本页合计仅统计当前页`;
+      if (currentBoard) {
+        hint = `${label} · 仅统计该板块 Top2（board_rank）· 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板`;
+      } else if (currentPath) {
+        const pathName = currentPath === "A" ? "一进二" : "稳定版";
+        hint = `${label} · 路径${currentPath}（${pathName}）path_rank · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板`;
+      }
+      document.getElementById("boardHint").textContent = hint;
+    }
+
+    const BOARD_PNL_COLS = [
+      { key: "morning", label: "早盘盈亏累计" },
+      { key: "morning_half", label: "早盘半仓" },
+      { key: "afternoon", label: "午盘盈亏累计" },
+      { key: "afternoon_half", label: "午盘半仓" },
+      { key: "batch", label: "分批盈亏累计" },
+      { key: "batch_half", label: "分批半仓盈亏累计" },
+    ];
+
+    function qsBase() {
+      const month = syncMonthFromDom();
+      const qs = new URLSearchParams();
+      qs.set("program", currentProgram);
+      if (currentPath) {
+        // Stock-V2：path=A/B，名次用 path_rank（勿再传全局 rank）
+        qs.set("path", currentPath);
+        if (viewMode === "trades") qs.set("path_rank", String(currentRank));
+      } else if (currentBoard) {
+        // 主板 / 创业板：读 stock 里带 board_rank 的板块 Top2
+        qs.set("board", currentBoard);
+        if (viewMode === "trades") qs.set("board_rank", String(currentRank));
+      } else if (viewMode === "trades") {
+        qs.set("rank", String(currentRank));
+      } else if (viewMode === "merge") {
+        // 默认原合计：只算全局第一名+第二名，不含仅 board_rank 的主板/创业板记录
+        qs.set("ranks", "1,2");
+      }
+      if (month) qs.set("month", month);
+      const kw = document.getElementById("keyword").value.trim();
+      const date = document.getElementById("dateFilter").value;
+      if (kw) qs.set("keyword", kw);
+      if (date) qs.set("date", date);
+      return qs;
+    }
+
+    function toggleSort(key) {
+      if (sortKey === key) sortDir = sortDir === "asc" ? "desc" : "asc";
+      else { sortKey = key; sortDir = "desc"; }
+      renderAll();
+    }
+
+    function sortedTrades() {
+      const arr = [...trades];
+      arr.sort((a, b) => {
+        let va = a[sortKey], vb = b[sortKey];
+        if (sortKey === "rank" || sortKey === "board_rank" || sortKey === "path_rank") {
+          va = int(a[sortKey], 99); vb = int(b[sortKey], 99);
+        }
+        if (va == null) va = sortDir === "asc" ? Infinity : -Infinity;
+        if (vb == null) vb = sortDir === "asc" ? Infinity : -Infinity;
+        if (typeof va === "string") {
+          const cmp = String(va).localeCompare(String(vb), "zh");
+          if (cmp !== 0) return sortDir === "asc" ? cmp : -cmp;
+        } else {
+          const diff = sortDir === "asc" ? (va - vb) : (vb - va);
+          if (diff !== 0) return diff;
+        }
+        const dr = String(b.date || "").localeCompare(String(a.date || ""));
+        if (dr !== 0) return dr;
+        return int(a.rank, 99) - int(b.rank, 99);
+      });
+      return arr;
+    }
+
+    function int(v, d) {
+      const n = parseInt(v, 10);
+      return Number.isNaN(n) ? d : n;
+    }
+
+    function beijingToday() {
+      return new Date().toLocaleString("sv-SE", { timeZone: "Asia/Shanghai" }).slice(0, 10);
+    }
+
+    async function loadMonths(force) {
+      syncMonthFromDom();
+      // 月份列表缓存：同程序不重复请求（程序切换时才需重拉）
+      if (!force && monthsCache[currentProgram]) {
+        const months = monthsCache[currentProgram];
+        const cur = beijingMonth();
+        const sel = document.getElementById("monthFilter");
+        if (!months.includes(currentMonth)) months.unshift(currentMonth);
+        if (!months.includes(cur)) months.unshift(cur);
+        sel.innerHTML = months.map(m =>
+          `<option value="${m}">${m.replace("-", "年")}月</option>`
+        ).join("");
+        availableMonths = [...months];
+        applyMonthToSelect();
+        return;
+      }
+      const months = await api("/api/months?program=" + currentProgram);
+      const sel = document.getElementById("monthFilter");
+      const cur = beijingMonth();
+      if (!currentMonth) {
+        persistMonth(cur);
+      }
+      if (!months.includes(currentMonth)) {
+        months.unshift(currentMonth);
+      }
+      if (!months.includes(cur)) {
+        months.unshift(cur);
+      }
+      sel.innerHTML = months.map(m =>
+        `<option value="${m}">${m.replace("-", "年")}月</option>`
+      ).join("");
+      availableMonths = [...months];
+      monthsCache[currentProgram] = [...months];
+      applyMonthToSelect();
+    }
+
+    async function loadCloseJobStatus() {
+      if (window.__PAGES_MODE__) return;
+      const el = document.getElementById("closeJobStatus");
+      if (!el) return;
+      try {
+        const s = await api("/api/jobs/after-close/status");
+        const today = beijingToday();
+        const parts = [];
+        for (const prog of PROGRAMS) {
+          const done = s[`last_close_run_date_${prog}`] || (prog === "stock" ? s.last_close_run_date : "") || "";
+          const tag = PROGRAM_LABEL[prog] || prog;
+          parts.push(`${tag}:${done === today ? "✓" : "待"}`);
+        }
+        const mr = s.morning_readiness || {};
+        const mParts = [];
+        for (const prog of ["slow", "up"]) {
+          const p = (mr.programs || {})[prog] || {};
+          const tag = prog === "slow" ? "Slow" : "Up";
+          if (p.ready) mParts.push(`${tag}:✓`);
+          else if (mr.date === today) mParts.push(`${tag}:⚠${p.reason || "缺"}`);
+          else mParts.push(`${tag}:待`);
+        }
+        el.textContent = `收盘 ${parts.join(" | ")} ｜ 早盘 ${mParts.join(" ")}`;
+        if ((mr.programs || {}).up && !mr.programs.up.ready && mr.date === today) {
+          el.style.color = "#dc2626";
+        } else {
+          el.style.color = "";
+        }
+      } catch (e) {
+        el.textContent = "收盘补全状态读取失败";
+      }
+    }
+
+    async function loadAll() {
+      const seq = ++loadSeq;
+      try {
+        syncMonthFromDom();
+        await loadMonths();
+        if (seq !== loadSeq) return false;
+        applyMonthToSelect();
+        const qs = qsBase();
+        const month = syncMonthFromDom();
+        // 三个请求互不依赖，并行发出：串行会把 RTT 累加 3 倍
+        const [tradesData, stats, dates] = await Promise.all([
+          api("/api/trades?" + qs.toString()),
+          api("/api/stats?" + qs.toString()),
+          api("/api/dates?program=" + encodeURIComponent(currentProgram)),
+        ]);
+        if (seq !== loadSeq) return false;
+        trades = tradesData;
+        renderAll();
+        renderStats(stats);
+        renderDates(dates.filter(d => !month || d.startsWith(month)));
+        document.getElementById("exportLink").href = "/api/export/csv?" + qs.toString();
+        loadCloseJobStatus();   // 非阻塞：状态面板与列表刷新无关
+        return true;
+      } catch (e) {
+        if (seq !== loadSeq) return false;
+        toast(e.message || "刷新失败");
+        return false;
+      }
+    }
+
+    async function refreshView() {
+      if (busy) return;
+      setLoading(true, "刷新中…");
+      try {
+        const ok = viewMode === "board" ? await loadBoard() : await loadAll();
+        if (ok) toast("已刷新");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderDates(dates) {
+      const sel = document.getElementById("dateFilter");
+      const cur = sel.value;
+      sel.innerHTML = `<option value="">全部日期</option>` + dates.map(d =>
+        `<option value="${d}" ${d === cur ? "selected" : ""}>${d}</option>`
+      ).join("");
+    }
+
+    function renderStats(s) {
+      document.getElementById("stats").innerHTML = STAT_META.map(m => {
+        let val = s[m.key];
+        if (val === null || val === undefined) val = 0;
+        let cls = "";
+        if (m.pnl) {
+          if (Number(val) > 0) cls = "pos";
+          else if (Number(val) < 0) cls = "neg";
+        }
+        return `<div class="stat" style="--accent:${m.accent};--icon-bg:${m.bg}">
+          <div class="icon">${m.icon}</div>
+          <div class="value ${cls}">${val}${m.suffix || ""}</div>
+          <div class="label">${m.label}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function renderHead() {
+      const cols = getActiveCols();
+      document.getElementById("theadRow").innerHTML = cols.map(c => {
+        if (!c.sortable) return `<th>${c.label}</th>`;
+        const active = sortKey === c.key ? "sorted" : "";
+        const arrow = sortKey === c.key ? (sortDir === "asc" ? "↑" : "↓") : "↕";
+        return `<th class="sortable ${active}" onclick="toggleSort('${c.key}')">${c.label}<span class="sort-ind">${arrow}</span></th>`;
+      }).join("");
+    }
+
+    function renderSum(list) {
+      const cols = getActiveCols();
+      document.getElementById("sumRow").innerHTML = cols.map((c, idx) => {
+        if (idx === 0) return `<td>合计</td>`;
+        if (!c.sum) return `<td>—</td>`;
+        const vals = list.map(t => t[c.key]).filter(v => v != null && v !== "");
+        if (!vals.length) return `<td>—</td>`;
+        const s = round2(vals.reduce((a, b) => a + Number(b), 0));
+        return `<td class="${pnlClass(s)}">${(s > 0 ? "+" : "") + s}%</td>`;
+      }).join("");
+    }
+
+    function round2(n) { return Math.round(n * 100) / 100; }
+
+    function weekdayOf(dateStr) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(dateStr || ""));
+      if (!m) return "—";
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      if (Number.isNaN(dt.getTime())) return "—";
+      return ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"][dt.getDay()];
+    }
+
+    function cellHtml(t, c) {
+      if (c.key === "_ops") {
+        if (window.__PAGES_MODE__) return "—";
+        return `<div class="ops">
+          <button class="icon-btn edit" title="编辑" onclick="openEdit(${t.id})">✎</button>
+          <button class="icon-btn price" title="补空值/遗漏" onclick="refreshOne(${t.id})">↻</button>
+          <button class="icon-btn del" title="删除" onclick="removeTrade(${t.id})">✕</button>
+        </div>`;
+      }
+      if (c.key === "is_second_board") {
+        return t.is_second_board === true ? `<span class="badge badge-yes">是</span>`
+           : (t.is_second_board === false ? `<span class="badge badge-no">否</span>` : "—");
+      }
+      if (c.key === "rank" || c.key === "board_rank") {
+        const r = int(t[c.key], 0);
+        if (r === 1) return '<span class="rank-tag rank-1">🥇 第一名</span>';
+        if (r === 2) return '<span class="rank-tag rank-2">🥈 第二名</span>';
+        return r ? `第${r}名` : "—";
+      }
+      if (c.key === "weekday") return `<span class="weekday">${weekdayOf(t.date)}</span>`;
+      if (c.key === "stock_code") return `<span class="code">${t.stock_code || ""}</span>`;
+      if (c.key === "stock_name") {
+        const name = t.stock_name || "—";
+        const url = baiduFinanceUrl(t.stock_code);
+        if (!url || name === "—") return name;
+        return `<a class="name-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
+      }
+      if (c.key === "board") {
+        const b = t.board;
+        if (!b) return "—";
+        const cls = b === "创业板" ? "board-cyb" : b === "主板" ? "board-zb" : "board-other";
+        return `<span class="board-tag ${cls}">${b}</span>`;
+      }
+      if (c.key === "sell_price_935" && t.sell_price_935 == null && t.sell_price_1315 == null) {
+        if (t.skip_reason && t.skip_reason.includes("买不进")) {
+          return `<span class="badge badge-no-buy">没买</span>`;
+        }
+        return `<span class="badge badge-hold">持仓中</span>`;
+      }
+      const v = t[c.key];
+      if (c.pnl) {
+        if (v == null || v === "") return "—";
+        return `<span>${(Number(v) > 0 ? "+" : "") + v}%</span>`;
+      }
+      return fmt(v);
+    }
+
+    function goPage(p) {
+      const newPage = Math.max(1, Math.min(totalPages, p));
+      if (newPage === page && viewMode !== "board") {
+        renderTableBody();
+        return;
+      }
+      page = newPage;
+      if (viewMode === "board") loadBoard();
+      else renderTableBody();
+    }
+
+    function fmtPnl(v) {
+      if (v == null || v === "") return "—";
+      const n = Number(v);
+      const s = (n > 0 ? "+" : "") + round2(n) + "%";
+      return `<span class="${pnlClass(n)}">${s}</span>`;
+    }
+
+    function fmtBoardPnl(v) {
+      if (v == null || v === "") return "—";
+      const n = Number(v);
+      return (n > 0 ? "+" : "") + round2(n) + "%";
+    }
+
+    async function loadBoard() {
+      const seq = ++loadSeq;
+      try {
+        if (viewMode !== "board") return false;
+        pageSize = Number(document.getElementById("pageSize").value) || 40;
+        const qs = new URLSearchParams({
+          program: currentProgram,
+          page: String(page),
+          page_size: String(pageSize),
+        });
+        if (currentBoard) qs.set("board", currentBoard);
+        if (currentPath) qs.set("path", currentPath);
+        if (boardFilterYear) qs.set("year", boardFilterYear);
+        if (boardFilterFrom) qs.set("month_from", boardFilterFrom);
+        if (boardFilterTo) qs.set("month_to", boardFilterTo);
+        const data = await api("/api/history-board?" + qs.toString());
+        if (seq !== loadSeq) return false;
+        boardRows = data.rows || [];
+        boardTotal = data.total || 0;
+        totalPages = data.total_pages || 1;
+        if (page > totalPages) page = totalPages;
+        populateBoardYearFilter(data.years || []);
+        const months = await api("/api/months?program=" + currentProgram);
+        if (seq !== loadSeq) return false;
+        populateBoardMonthSelects(months);
+        renderBoard();
+        return true;
+      } catch (e) {
+        if (seq !== loadSeq) return false;
+        toast(e.message || "历史看板加载失败");
+        return false;
+      }
+    }
+
+    function renderBoardHead() {
+      const headHtml = `<th>月份</th>` + BOARD_PNL_COLS.map(c => `<th>${c.label}</th>`).join("") +
+        `<th>笔数</th><th>月度盈亏</th>`;
+      document.getElementById("boardHeadRank1").innerHTML = headHtml;
+      document.getElementById("boardHeadRank2").innerHTML = headHtml;
+    }
+
+    function renderBoardPanel(rankKey, rankNum, tbodyId, sumRowId) {
+      const slice = boardRows.map(r => ({ month: r.month, ...(r[rankKey] || {}) }));
+      const tb = document.getElementById(tbodyId);
+      const sumCells = BOARD_PNL_COLS.map(c => {
+        const v = round2(slice.reduce((a, r) => a + Number(r[c.key] || 0), 0));
+        const cls = boardSumTextClass(v);
+        return `<td class="${cls}">${v > 0 ? "+" : ""}${v}%</td>`;
+      }).join("");
+      const cnt = slice.reduce((a, r) => a + Number(r.count || 0), 0);
+      const batchHalfSum = round2(slice.reduce((a, r) => a + Number(r.batch_half || 0), 0));
+      document.getElementById(sumRowId).innerHTML =
+        `<td>本页合计</td>${sumCells}<td>${cnt}</td><td>${monthResultHtml(batchHalfSum)}</td>`;
+
+      tb.innerHTML = slice.map(r => {
+        const label = r.month.replace("-", "年") + "月";
+        const cells = BOARD_PNL_COLS.map(c =>
+          `<td class="${boardPnlClass(r[c.key])}">${fmtBoardPnl(r[c.key])}</td>`
+        ).join("");
+        return `<tr>
+          <td class="month-link" onclick="goDetailFromBoard('${r.month}', ${rankNum})">${label}</td>
+          ${cells}
+          <td>${r.count || 0}</td>
+          <td>${monthResultHtml(r.batch_half)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    function renderBoardBody() {
+      const empty = document.getElementById("boardEmpty");
+      document.getElementById("pageInfo").textContent =
+        `${boardTotal} 个月份  第 ${boardTotal ? page : 0}/${boardTotal ? totalPages : 0} 页 · 第一名 vs 第二名`;
+      ["btnFirst","btnPrev"].forEach(id => document.getElementById(id).disabled = page <= 1);
+      ["btnNext","btnLast"].forEach(id => document.getElementById(id).disabled = page >= totalPages || !boardTotal);
+
+      if (!boardRows.length) {
+        document.getElementById("boardTbodyRank1").innerHTML = "";
+        document.getElementById("boardTbodyRank2").innerHTML = "";
+        document.getElementById("boardSumRank1").innerHTML = `<td>本页合计</td>${BOARD_PNL_COLS.map(() => "<td>—</td>").join("")}<td>—</td><td>—</td>`;
+        document.getElementById("boardSumRank2").innerHTML = document.getElementById("boardSumRank1").innerHTML;
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+      renderBoardHead();
+      renderBoardPanel("rank1", 1, "boardTbodyRank1", "boardSumRank1");
+      renderBoardPanel("rank2", 2, "boardTbodyRank2", "boardSumRank2");
+    }
+
+    function renderBoard() {
+      renderBoardBody();
+    }
+
+    function renderAll() {
+      renderHead();
+      const list = sortedTrades();
+      renderSum(list);
+      renderTableBody(list);
+    }
+
+    function renderTableBody(list) {
+      list = list || sortedTrades();
+      const tb = document.getElementById("tbody");
+      const empty = document.getElementById("empty");
+      pageSize = Number(document.getElementById("pageSize").value) || 40;
+      totalPages = Math.max(1, Math.ceil(list.length / pageSize));
+      if (page > totalPages) page = totalPages;
+      const scope = currentBoard
+        ? `${currentBoard} · `
+        : (currentPath ? `路径${currentPath} · ` : "");
+      document.getElementById("pageInfo").textContent =
+        `${list.length} 条记录  第 ${list.length ? page : 0}/${list.length ? totalPages : 0} 页 · ` +
+        scope + (viewMode === "merge" ? "第一名+第二名合计" : (currentRank === 1 ? "第一名" : "第二名"));
+      ["btnFirst","btnPrev"].forEach(id => document.getElementById(id).disabled = page <= 1);
+      ["btnNext","btnLast"].forEach(id => document.getElementById(id).disabled = page >= totalPages || !list.length);
+
+      if (!list.length) {
+        tb.innerHTML = "";
+        empty.style.display = "block";
+        return;
+      }
+      empty.style.display = "none";
+      const slice = list.slice((page - 1) * pageSize, page * pageSize);
+      tb.innerHTML = slice.map(t => {
+        const cols = getActiveCols();
+        return `<tr>` + cols.map(c => {
+          const cls = [
+            c.key === "stock_name" ? "left" : "",
+            c.pnl ? pnlClass(t[c.key]) : "",
+          ].filter(Boolean).join(" ");
+          return `<td class="${cls}">${cellHtml(t, c)}</td>`;
+        }).join("") + `</tr>`;
+      }).join("");
+    }
+
+    function openCreate() {
+      editingId = null;
+      document.getElementById("modalTitle").textContent = `新增交易 (${currentProgram})`;
+      buildForm({ rank: currentRank, program: currentProgram });
+      document.getElementById("modal").classList.add("show");
+      bindNameLookup();
+    }
+    function openEdit(id) {
+      const t = trades.find(x => x.id === id);
+      if (!t) return;
+      editingId = id;
+      document.getElementById("modalTitle").textContent = `编辑 #${id}`;
+      buildForm(t);
+      document.getElementById("modal").classList.add("show");
+      bindNameLookup();
+    }
+    function buildForm(t) {
+      document.getElementById("form").innerHTML = FIELDS.map(f => {
+        let val = t[f.key];
+        if (f.key === "is_second_board") val = val === true ? "true" : (val === false ? "false" : "");
+        if (f.type === "select") {
+          return `<label>${f.label}<select name="${f.key}">
+            ${f.options.map(o => `<option value="${o.v}" ${String(val)===o.v?"selected":""}>${o.t}</option>`).join("")}
+          </select></label>`;
+        }
+        const extra = f.key === "stock_code" ? `<span class="hint-inline" id="codeHint"></span>` : "";
+        return `<label>${f.label}${extra}
+          <input name="${f.key}" type="${f.type}" value="${val ?? ""}" ${f.required?"required":""} step="0.01" />
+        </label>`;
+      }).join("");
+    }
+    function bindNameLookup() {
+      const nameInput = document.querySelector('#form [name="stock_name"]');
+      const codeInput = document.querySelector('#form [name="stock_code"]');
+      if (!nameInput || !codeInput) return;
+      let timer = null;
+      nameInput.addEventListener("input", () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+          const name = nameInput.value.trim();
+          if (name.length < 2) return;
+          try {
+            const r = await api("/api/stock/lookup?name=" + encodeURIComponent(name));
+            if (r.code) {
+              codeInput.value = r.code;
+              const hint = document.getElementById("codeHint");
+              if (hint) hint.textContent = ` → ${r.code}`;
+            }
+          } catch (_) {}
+        }, 350);
+      });
+    }
+    function closeModal() { document.getElementById("modal").classList.remove("show"); }
+    function formData() {
+      const data = {};
+      FIELDS.forEach(f => {
+        const el = document.querySelector(`#form [name="${f.key}"]`);
+        if (!el) return;
+        let v = el.value;
+        if (v === "") { data[f.key] = null; return; }
+        if (f.key === "is_second_board") data[f.key] = v === "true" ? true : (v === "false" ? false : null);
+        else if (f.type === "number") data[f.key] = Number(v);
+        else data[f.key] = v;
+      });
+      if (data.stock_code) data.stock_code = String(data.stock_code).padStart(6, "0");
+      if (data.rank == null) data.rank = currentRank;
+      data.program = currentProgram;
+      return data;
+    }
+    async function saveTrade() {
+      const data = formData();
+      if (!data.date || (!data.stock_name && !data.stock_code)) {
+        toast("请填写买入日期，以及股票名称或代码");
+        return;
+      }
+      try {
+        setLoading(true, editingId == null ? "新增保存中…" : "编辑保存中…");
+        if (editingId == null) {
+          data.auto_fill = true;
+          data.program = currentProgram;
+          await api("/api/trades", { method: "POST", body: JSON.stringify(data) });
+          toast("已新增，价格后台补全中");
+        } else {
+          data.auto_fill = true;
+          data.program = currentProgram;
+          await api(`/api/trades/${editingId}`, { method: "PUT", body: JSON.stringify(data) });
+          toast("已保存，空价将后台补全");
+        }
+        closeModal();
+        await loadAll();
+        // 稍等后台补价后再刷一次
+        setTimeout(() => { loadAll(); }, 2500);
+      } catch (e) { toast(e.message); }
+      finally { setLoading(false); }
+    }
+    async function removeTrade(id) {
+      if (!confirm(`确认删除 #${id}？`)) return;
+      try {
+        await api(`/api/trades/${id}?program=${currentProgram}`, { method: "DELETE" });
+        toast("已删除");
+        await loadAll();
+      } catch (e) { toast(e.message); }
+    }
+    async function refreshPrices(force) {
+      if (busy) return;
+      try {
+        setLoading(true, force ? "强制重拉中（当前月）…" : "补全空值中（当前月）…");
+        const body = { force, program: currentProgram };
+        const month = syncMonthFromDom();
+        if (month) body.month = month;
+        const date = document.getElementById("dateFilter").value;
+        if (date) body.date = date;
+        const r = await api("/api/trades/refresh-prices", {
+          method: "POST",
+          body: JSON.stringify(body),
+        });
+        const uf = (r.unfilled_open_limit || []).length;
+        const pe = (r.price_errors || []).length;
+        let extra = "";
+        if (r.ensure && r.ensure.programs) {
+          const p = r.ensure.programs[currentProgram];
+          if (p && !p.ready) extra = `，${currentProgram}仍未就绪(${p.reason || "?"})`;
+          else if (p && p.ready) extra = `，已同步${currentProgram}买入记录`;
+        }
+        toast(`补全完成：更新 ${r.updated} 条` + (uf ? `，一字留档 ${uf} 条` : "") + (pe ? `，${pe} 条取价失败` : "") + extra);
+        await loadAll();
+      } catch (e) { toast(e.message || "补全失败"); }
+      finally { setLoading(false); }
+    }
+    async function refreshOne(id) {
+      if (busy) return;
+      try {
+        setLoading(true, `补价 #${id}…`);
+        const r = await api("/api/trades/refresh-prices", {
+          method: "POST",
+          body: JSON.stringify({ force: false, ids: [id], program: currentProgram }),
+        });
+        if ((r.unfilled_open_limit || []).length) toast("一字/开盘涨停：已留档，不写买卖价");
+        else toast("已补全");
+        await loadAll();
+      } catch (e) { toast(e.message); }
+      finally { setLoading(false); }
+    }
+
+    async function runCloseJob() {
+      if (busy) return;
+      try {
+        setLoading(true, "收盘补全执行中 (stock/slow/up/水下)…");
+        const r = await api("/api/jobs/after-close", {
+          method: "POST",
+          body: JSON.stringify({ force: false, program: "all" }),
+        });
+        const parts = [];
+        for (const prog of PROGRAMS) {
+          const x = r[prog] || {};
+          if (x.skipped) parts.push(`${prog}:跳过`);
+          else if (x.error) parts.push(`${prog}:失败`);
+          else parts.push(`${prog}:买${(x.buy_sync&&x.buy_sync.synced)||0}/补卖${x.sell_enriched||0}`);
+        }
+        toast(`收盘补全完成 — ${parts.join(" · ")}`);
+        await loadAll();
+      } catch (e) { toast(e.message || "收盘补全失败"); }
+      finally { setLoading(false); }
+    }
+
+    document.getElementById("keyword").addEventListener("keydown", e => { if (e.key === "Enter") loadAll(); });
+    document.getElementById("dateFilter").addEventListener("change", loadAll);
+    document.getElementById("pageSize").addEventListener("change", () => {
+      page = 1;
+      if (viewMode === "board") loadBoard();
+      else renderTableBody();
+    });
+    document.getElementById("monthFilter").addEventListener("change", e => {
+      persistMonth(e.target.value);
+      clearDateFilterIfMonthMismatch();
+      page = 1;
+      loadAll();
+    });
+
+    async function __pagesFetchJson(url) {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error("加载失败 " + url + " " + r.status);
+      return r.json();
+    }
+
+    async function __pagesDecrypt(payload, password) {
+      const enc = new TextEncoder();
+      const salt = Uint8Array.from(atob(payload.salt), c => c.charCodeAt(0));
+      const iv = Uint8Array.from(atob(payload.iv), c => c.charCodeAt(0));
+      const tag = Uint8Array.from(atob(payload.tag), c => c.charCodeAt(0));
+      const ct = Uint8Array.from(atob(payload.ct), c => c.charCodeAt(0));
+      const body = new Uint8Array(ct.length + tag.length);
+      body.set(ct, 0); body.set(tag, ct.length);
+      const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+      const key = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: payload.iter || 100000, hash: "SHA-256" },
+        baseKey,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+      const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, body);
+      return JSON.parse(new TextDecoder().decode(pt));
+    }
+
+    function __pagesUpdateAuthUi() {
+      const badge = document.getElementById("authBadge");
+      const btn = document.getElementById("btnAuth");
+      if (!badge || !btn) return;
+      badge.style.display = "";
+      btn.style.display = "";
+      badge.textContent = window.__PAGES_FULL__ ? "已登录·完整" : "公开·脱敏";
+      btn.textContent = window.__PAGES_FULL__ ? "退出" : "登录";
+    }
+
+    function __pagesShowTransit(msg) {
+      const el = document.getElementById("authTransit");
+      const text = document.getElementById("authTransitMsg");
+      if (text) text.textContent = msg || "处理中…";
+      if (el) el.classList.add("show");
+    }
+
+    function __pagesHideTransit() {
+      document.getElementById("authTransit")?.classList.remove("show");
+    }
+
+    function __pagesSetLoginBusy(busy) {
+      const ok = document.getElementById("authOk");
+      const cancel = document.getElementById("authCancel");
+      const user = document.getElementById("authUser");
+      const pass = document.getElementById("authPass");
+      if (ok) {
+        ok.disabled = !!busy;
+        ok.textContent = busy ? "登录中…" : "登录";
+      }
+      if (cancel) cancel.disabled = !!busy;
+      if (user) user.disabled = !!busy;
+      if (pass) pass.disabled = !!busy;
+    }
+
+    async function __pagesPaint() {
+      // 重活前强制刷一帧，避免手机端「点了没反应」
+      await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
+    }
+
+    function __pagesToggleAuth() {
+      if (window.__pagesLoginLock) return;
+      if (window.__PAGES_FULL__) {
+        __pagesShowTransit("正在退出，切回脱敏视图…");
+        setTimeout(() => {
+          window.__PAGES_FULL__ = null;
+          window.__PAGES_SNAPSHOT__ = window.__PAGES_MASKED__;
+          sessionStorage.removeItem("trade_ui_authed");
+          __pagesUpdateAuthUi();
+          loadAll().finally(() => {
+            __pagesHideTransit();
+            toast("已退出，当前为脱敏公开视图");
+          });
+        }, 40);
+        return;
+      }
+      document.getElementById("authModal").classList.add("show");
+      document.getElementById("authUser").value = "stock";
+      document.getElementById("authPass").value = "";
+      document.getElementById("authErr").textContent = "";
+      __pagesSetLoginBusy(false);
+      setTimeout(() => document.getElementById("authPass")?.focus(), 40);
+    }
+
+    async function __pagesDoLogin() {
+      if (window.__pagesLoginLock) return;
+      const user = (document.getElementById("authUser").value || "").trim().toLowerCase();
+      const pass = document.getElementById("authPass").value || "";
+      const err = document.getElementById("authErr");
+      if (user !== "stock") { err.textContent = "账号或密码错误"; return; }
+      if (!pass) { err.textContent = "请输入密码"; return; }
+      if (!window.crypto || !window.crypto.subtle) {
+        err.textContent = "当前浏览器不支持安全解密，请升级系统浏览器后重试";
+        return;
+      }
+      err.textContent = "";
+      window.__pagesLoginLock = true;
+      __pagesSetLoginBusy(true);
+      __pagesShowTransit("正在校验并解密数据，手机端可能需几秒…");
+      await __pagesPaint();
+      try {
+        const enc = await __pagesFetchJson("data/encrypted.json");
+        __pagesShowTransit("正在解密完整数据…");
+        await __pagesPaint();
+        const full = await __pagesDecrypt(enc, pass);
+        document.getElementById("authModal").classList.remove("show");
+        __pagesShowTransit("登录成功，正在加载看板…");
+        await __pagesPaint();
+        window.__PAGES_FULL__ = full;
+        window.__PAGES_SNAPSHOT__ = full;
+        sessionStorage.setItem("trade_ui_authed", "1");
+        __pagesUpdateAuthUi();
+        await loadAll();
+        toast("登录成功 · 已显示完整数据");
+      } catch (e) {
+        const msg = (e && e.message) ? String(e.message) : "";
+        if (/加载失败|Failed to fetch|NetworkError/i.test(msg)) {
+          err.textContent = "网络异常，请检查网络后重试";
+        } else {
+          err.textContent = "密码错误或解密失败，请重试";
+        }
+        toast(err.textContent);
+      } finally {
+        window.__pagesLoginLock = false;
+        __pagesSetLoginBusy(false);
+        __pagesHideTransit();
+      }
+    }
+
+    async function __pagesBoot() {
+      const masked = await __pagesFetchJson("data/masked.json");
+      window.__PAGES_MASKED__ = masked;
+      window.__PAGES_SNAPSHOT__ = masked;
+      __pagesUpdateAuthUi();
+      document.getElementById("pagesBootMask")?.classList.add("done");
+    }
+
+    (async () => {
+      if (window.__PAGES_MODE__) {
+        try {
+          window.__PAGES_BOOT__ = __pagesBoot();
+          await window.__PAGES_BOOT__;
+          document.getElementById("btnAuth")?.addEventListener("click", __pagesToggleAuth);
+          document.getElementById("authCancel")?.addEventListener("click", () => {
+            if (window.__pagesLoginLock) return;
+            document.getElementById("authModal").classList.remove("show");
+          });
+          // onclick 已绑 __pagesDoLogin；此处再绑一次无妨（有 loginLock）
+          document.getElementById("authOk")?.addEventListener("click", (e) => {
+            e.preventDefault();
+            __pagesDoLogin();
+          });
+          document.getElementById("authPass")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") __pagesDoLogin();
+          });
+          document.getElementById("authUser")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") document.getElementById("authPass")?.focus();
+          });
+        } catch (e) {
+          const el = document.getElementById("pagesBootMask");
+          if (el) el.textContent = "看板数据加载失败：" + (e && e.message ? e.message : e);
+          return;
+        }
+      }
+      restoreMonth();
+      applyLaneState(currentLane);
+      applyViewMode();
+      await loadMonths();
+      await loadAll();
+    })();
+  </script>
+</body>
+</html>
