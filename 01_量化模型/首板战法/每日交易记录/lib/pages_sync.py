@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
-"""交易落盘 → 导出 docs/trade-ui →（可选）git commit/push 同步 GitHub Pages。"""
+"""交易落盘 → 导出 docs/trade-ui →（可选）git commit/push 同步 GitHub Pages。
+
+重要：早盘 ensure / cron 是短生命周期进程。进程内 threading.Timer
+在父进程退出后会被取消，导致「本机 HTML 有今日选票、Pages 没有」。
+因此防抖必须用独立 shell `sleep` + token，保证父进程退出后仍会执行。
+"""
 from __future__ import annotations
 
 import os
+import shlex
 import subprocess
 import sys
 import threading
 import time
 from typing import Any
 
-from runtime_paths import BASE_DIR, ensure_sys_path
+from runtime_paths import BASE_DIR, DATA_DIR, ensure_sys_path
 
 ensure_sys_path()
 
 _JOB_SCRIPT = os.path.join(BASE_DIR, "jobs", "sync_trade_ui_pages.py")
 _REPO_ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", "..", ".."))
+_TOKEN_PATH = os.path.join(DATA_DIR, ".pages_sync_token")
 PAGES_URL = "https://shen9220.github.io/stock-quant-select/trade-ui/"
 
 _lock = threading.Lock()
-_timer: threading.Timer | None = None
-_DEBOUNCE_SEC = float(os.environ.get("TRADE_UI_PAGES_DEBOUNCE", "45") or 45)
+_DEBOUNCE_SEC = float(os.environ.get("TRADE_UI_PAGES_DEBOUNCE", "20") or 20)
 _LAST_RESULT: dict[str, Any] = {}
 
 
@@ -117,7 +123,6 @@ def _git_push_pages() -> dict[str, Any]:
 def sync_pages_now(*, push: bool | None = None) -> dict[str, Any]:
     """立即导出；默认按环境变量决定是否 push。"""
     with _lock:
-        # 延迟导入：避免 Flask 进程缺 Crypto 时整站起不来
         from pages_export import export_pages_bundle
 
         summary = export_pages_bundle()
@@ -136,45 +141,33 @@ def sync_pages_now(*, push: bool | None = None) -> dict[str, Any]:
         return summary
 
 
-def _debounced_fire() -> None:
-    global _timer
+def schedule_pages_sync(*, delay: float | None = None) -> None:
+    """交易落盘后调用：防抖后在独立进程同步（父进程退出也执行）。"""
+    if not pages_sync_enabled():
+        return
+    wait = max(0.0, _DEBOUNCE_SEC if delay is None else float(delay))
+    py = _crypto_python()
+    push_flag = "--push" if pages_git_push_enabled() else "--no-push"
+    token = f"{time.time():.6f}"
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(_TOKEN_PATH, "w", encoding="utf-8") as f:
+        f.write(token)
+
+    # 独立 shell：sleep 后再比对 token，实现跨进程防抖；start_new_session 防 SIGHUP
+    cmd = (
+        f"sleep {wait:.0f}; "
+        f'tok=$(cat {shlex.quote(_TOKEN_PATH)} 2>/dev/null || true); '
+        f'[ "$tok" = {shlex.quote(token)} ] || exit 0; '
+        f"exec {shlex.quote(py)} {shlex.quote(_JOB_SCRIPT)} {push_flag}"
+    )
     try:
-        if not pages_sync_enabled():
-            return
-        py = _crypto_python()
-        args = [py, _JOB_SCRIPT]
-        # 默认 push；环境变量可关
-        if not pages_git_push_enabled():
-            args.append("--no-push")
-        else:
-            args.append("--push")
-        print(f"[pages-sync] 后台启动: {' '.join(args)}", flush=True)
         subprocess.Popen(
-            args,
+            ["/bin/bash", "-c", cmd],
             cwd=BASE_DIR,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
             start_new_session=True,
         )
+        print(f"[pages-sync] 已调度独立同步 delay={wait:.0f}s token={token[-6:]}", flush=True)
     except Exception as e:
-        print(f"[pages-sync] 失败: {e}", flush=True)
-    finally:
-        with _lock:
-            _timer = None
-
-
-def schedule_pages_sync(*, delay: float | None = None) -> None:
-    """交易落盘后调用：防抖后后台同步。"""
-    if not pages_sync_enabled():
-        return
-    wait = _DEBOUNCE_SEC if delay is None else float(delay)
-    global _timer
-    with _lock:
-        if _timer is not None:
-            try:
-                _timer.cancel()
-            except Exception:
-                pass
-        _timer = threading.Timer(wait, _debounced_fire)
-        _timer.daemon = True
-        _timer.start()
+        print(f"[pages-sync] 调度失败: {e}", flush=True)
