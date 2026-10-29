@@ -181,23 +181,33 @@
     .wrap { padding: 16px 20px 40px; }
     .tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
     .tab {
-      border: 1px solid #dbeafe;
+      border: 1px solid #e2e8f0;
       background: #fff;
-      color: var(--muted);
-      padding: 10px 24px;
+      color: #64748b;
+      padding: 9px 22px;
       border-radius: 999px;
       font: inherit;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,.04);
-      transition: .18s transform, .18s box-shadow, .18s background;
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+      transition: .18s transform, .18s box-shadow, .18s background, .18s color;
     }
-    .tab:hover { transform: translateY(-2px); }
+    .tab:hover { transform: translateY(-1px); border-color: #bfdbfe; color: #1d4ed8; }
     .tab.active {
       background: linear-gradient(135deg, #60a5fa, #3b82f6);
       color: #fff;
       border-color: transparent;
-      box-shadow: 0 10px 20px rgba(59,130,246,.35);
+      box-shadow: 0 8px 16px rgba(59,130,246,.28);
+    }
+    @media (max-width: 860px) {
+      .nav-row { padding: 26px 8px 8px; }
+      .nav-row-label {
+        left: 50%; top: 6px; transform: translateX(-50%);
+        font-size: 10px;
+      }
+      .prog-tab { padding: 8px 12px; font-size: 12px; }
+      .nav-stack { padding: 10px; gap: 8px; }
     }
 
     .stats {
@@ -347,73 +357,91 @@
     .board-cyb { background: #ede9fe; color: #6d28d9; }
     .board-zb { background: #dbeafe; color: #1d4ed8; }
     .board-other { background: #f3f4f6; color: #4b5563; }
-    /* ── 四层导航 ── */
+    /* ── 四层导航：每层底色 / 形状 / 选中色分开 ── */
     .nav-stack {
-      display: flex; flex-direction: column; gap: 10px;
-      margin: 0 0 14px; padding: 14px 14px 12px;
-      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-      border: 1px solid #e2e8f0; border-radius: 18px;
+      display: flex; flex-direction: column; gap: 8px;
+      margin: 0 0 14px; padding: 12px;
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 18px;
       box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
     }
-    .nav-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; align-items: center; }
-    .nav-row-label {
-      font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: .08em;
-      text-transform: uppercase; margin-right: 4px; min-width: 2.5em;
+    .nav-row {
+      position: relative;
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;
+      padding: 10px 72px; border-radius: 14px; min-height: 54px;
     }
-    .prog-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .nav-row-label {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; font-weight: 800; letter-spacing: .12em;
+      pointer-events: none;
+    }
+    .nav-l1 { background: #eef2ff; border: 1px solid #c7d2fe; }
+    .nav-l1 .nav-row-label { color: #3730a3; }
+    .nav-l2 { background: #f5f3ff; border: 1px solid #ddd6fe; }
+    .nav-l2 .nav-row-label { color: #6d28d9; }
+    .nav-l3 { background: #fff7ed; border: 1px solid #fed7aa; }
+    .nav-l3 .nav-row-label { color: #c2410c; }
+    .nav-l4 { background: #fffbeb; border: 1px solid #fde68a; }
+    .nav-l4 .nav-row-label { color: #a16207; }
+    .prog-tabs { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
     .prog-tab {
-      border: 1.5px solid #e2e8f0;
-      background: #fff;
-      color: #64748b;
+      border: 1.5px solid transparent;
       padding: 10px 18px;
-      border-radius: 12px;
+      border-radius: 10px;
       font: inherit;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(15,23,42,.04);
-      transition: .18s transform, .18s box-shadow, .18s background, .18s border-color, .18s color;
+      transition: .16s transform, .16s box-shadow, .16s background, .16s color;
       letter-spacing: .02em;
     }
-    .prog-tab:hover { transform: translateY(-1px); border-color: #cbd5e1; color: #334155; }
+    .prog-tab:hover { transform: translateY(-1px); filter: brightness(.97); }
+    .prog-tab.prog-stock { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+    .prog-tab.prog-stock_v2 { background: #ffe4e6; color: #be123c; border-color: #fda4af; }
+    .prog-tab.prog-stock_updata { background: #ccfbf1; color: #0f766e; border-color: #5eead4; }
+    .prog-tab.prog-slow { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
+    .prog-tab.prog-up { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
     .prog-tab.active { color: #fff; border-color: transparent; }
     .prog-tab.prog-stock.active {
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-      box-shadow: 0 8px 18px rgba(37, 99, 235, .28);
+      box-shadow: 0 8px 16px rgba(37, 99, 235, .32);
     }
     .prog-tab.prog-slow.active {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      box-shadow: 0 8px 18px rgba(245, 158, 11, .28);
+      background: linear-gradient(135deg, #fb923c, #ea580c);
+      box-shadow: 0 8px 16px rgba(234, 88, 12, .32);
     }
     .prog-tab.prog-up.active {
-      background: linear-gradient(135deg, #10b981, #059669);
-      box-shadow: 0 8px 18px rgba(16, 185, 129, .28);
+      background: linear-gradient(135deg, #34d399, #059669);
+      box-shadow: 0 8px 16px rgba(5, 150, 105, .32);
     }
     .prog-tab.prog-stock_updata.active {
-      background: linear-gradient(135deg, #14b8a6, #0f766e);
-      box-shadow: 0 8px 18px rgba(15, 118, 110, .28);
+      background: linear-gradient(135deg, #2dd4bf, #0f766e);
+      box-shadow: 0 8px 16px rgba(15, 118, 110, .32);
     }
     .prog-tab.prog-stock_v2.active {
-      background: linear-gradient(135deg, #f43f5e, #be123c);
-      box-shadow: 0 8px 18px rgba(225, 29, 72, .28);
+      background: linear-gradient(135deg, #fb7185, #be123c);
+      box-shadow: 0 8px 16px rgba(190, 18, 60, .32);
     }
     .sub-tabs {
-      display: none; gap: 8px; justify-content: center; flex-wrap: wrap;
-      padding-top: 2px;
+      display: none; gap: 10px; justify-content: center; flex-wrap: wrap;
     }
     .sub-tabs.show { display: flex; }
     .sub-tab {
-      border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b;
-      padding: 7px 14px; border-radius: 999px; font: inherit; font-size: 12px;
-      font-weight: 700; cursor: pointer; transition: .15s background, .15s color, .15s border-color;
+      border: 1px dashed #c4b5fd; background: #fff; color: #6d28d9;
+      padding: 8px 16px; border-radius: 8px; font: inherit; font-size: 13px;
+      font-weight: 700; cursor: pointer;
+      transition: .15s background, .15s color, .15s border-color, .15s box-shadow;
     }
-    .sub-tab:hover { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
-    .sub-tab.active {
-      background: #eff6ff; border-color: #3b82f6; color: #1d4ed8;
-      box-shadow: inset 0 0 0 1px rgba(59,130,246,.15);
-    }
-    .sub-tab.sub-v2a.active { background: #fff1f2; border-color: #fb7185; color: #be123c; }
-    .sub-tab.sub-v2b.active { background: #ecfdf5; border-color: #34d399; color: #047857; }
+    .sub-tab:hover { transform: translateY(-1px); }
+    .sub-tab.sub-all { border-style: solid; border-color: #a5b4fc; color: #4338ca; background: #eef2ff; }
+    .sub-tab.sub-main { border-style: solid; border-color: #93c5fd; color: #1d4ed8; background: #eff6ff; }
+    .sub-tab.sub-cyb { border-style: solid; border-color: #d8b4fe; color: #7e22ce; background: #faf5ff; }
+    .sub-tab.sub-v2a { border-style: solid; border-color: #fda4af; color: #be123c; background: #fff1f2; }
+    .sub-tab.sub-v2b { border-style: solid; border-color: #6ee7b7; color: #047857; background: #ecfdf5; }
+    .sub-tab.sub-all.active { background: #4f46e5; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(79,70,229,.28); }
+    .sub-tab.sub-main.active { background: #2563eb; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(37,99,235,.28); }
+    .sub-tab.sub-cyb.active { background: #9333ea; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(147,51,234,.28); }
+    .sub-tab.sub-v2a.active { background: #e11d48; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(225,29,72,.28); }
+    .sub-tab.sub-v2b.active { background: #059669; color: #fff; border-color: transparent; box-shadow: 0 6px 14px rgba(5,150,105,.28); }
     a.name-link {
       color: inherit;
       text-decoration: none;
@@ -423,19 +451,43 @@
     body.view-board .prog-tab { font-size: 14px; font-weight: 800; padding: 11px 20px; }
 
     .view-nav {
-      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
-      padding: 4px; background: #f1f5f9; border-radius: 12px;
+      display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+      padding: 0; background: transparent; border-radius: 0;
     }
     .view-nav-btn {
-      border: none; background: transparent; color: #64748b;
-      padding: 8px 16px; border-radius: 10px; font: inherit; font-weight: 700;
+      border: 1px solid transparent; background: rgba(255,255,255,.72); color: #9a3412;
+      padding: 8px 18px; border-radius: 999px; font: inherit; font-weight: 700;
       font-size: 13px; cursor: pointer;
-      transition: .15s background, .15s color, .15s box-shadow;
+      transition: .15s background, .15s color, .15s box-shadow, .15s border-color;
     }
-    .view-nav-btn:hover { color: #334155; background: rgba(255,255,255,.7); }
-    .view-nav-btn.active {
-      background: #fff; color: #1d4ed8;
-      box-shadow: 0 2px 8px rgba(15,23,42,.08);
+    .view-nav-btn:hover { filter: brightness(.97); }
+    .view-nav-btn.view-trades { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; }
+    .view-nav-btn.view-board { color: #6d28d9; border-color: #ddd6fe; background: #f5f3ff; }
+    .view-nav-btn.view-merge { color: #c2410c; border-color: #fed7aa; background: #fff7ed; }
+    .view-nav-btn.view-trades.active {
+      background: #1d4ed8; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(29,78,216,.28);
+    }
+    .view-nav-btn.view-board.active {
+      background: #7c3aed; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(124,58,237,.28);
+    }
+    .view-nav-btn.view-merge.active {
+      background: #ea580c; color: #fff; border-color: transparent;
+      box-shadow: 0 6px 14px rgba(234,88,12,.28);
+    }
+    #rankTabs .tab { background: #fff; }
+    #rankTabs #tab1 { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    #rankTabs #tab2 { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    #rankTabs #tab1.active {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 8px 16px rgba(217, 119, 6, .32);
+    }
+    #rankTabs #tab2.active {
+      background: linear-gradient(135deg, #94a3b8, #475569);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 8px 16px rgba(71, 85, 105, .28);
     }
 
     .filter-sep { color: var(--muted); font-size: 13px; padding: 0 2px; }
@@ -658,7 +710,7 @@
 
   <div class="wrap">
     <div class="nav-stack" id="navStack">
-      <div class="nav-row">
+      <div class="nav-row nav-l1">
         <span class="nav-row-label">策略</span>
         <div class="prog-tabs" id="familyTabs">
           <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setFamily('stock_v1')">Stock-V1</button>
@@ -668,19 +720,19 @@
           <button class="prog-tab prog-up" id="progUp" type="button" onclick="setFamily('up')">Up</button>
         </div>
       </div>
-      <div class="nav-row" id="subTabsRow" style="display:none">
+      <div class="nav-row nav-l2" id="subTabsRow" style="display:none">
         <span class="nav-row-label">分层</span>
         <div class="sub-tabs show" id="subTabs"></div>
       </div>
-      <div class="nav-row">
+      <div class="nav-row nav-l3">
         <span class="nav-row-label">看板</span>
         <div class="view-nav" id="viewNav">
-          <button type="button" class="view-nav-btn active" id="btnViewTrades" onclick="setViewMode('trades')">明细看板</button>
-          <button type="button" class="view-nav-btn" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
-          <button type="button" class="view-nav-btn" id="btnViewMerge" onclick="setViewMode('merge')">合计看板</button>
+          <button type="button" class="view-nav-btn view-trades active" id="btnViewTrades" onclick="setViewMode('trades')">明细看板</button>
+          <button type="button" class="view-nav-btn view-board" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
+          <button type="button" class="view-nav-btn view-merge" id="btnViewMerge" onclick="setViewMode('merge')">合计看板</button>
         </div>
       </div>
-      <div class="nav-row" id="rankTabsRow">
+      <div class="nav-row nav-l4" id="rankTabsRow">
         <span class="nav-row-label">名次</span>
         <div class="tabs" id="rankTabs">
           <button class="tab active" id="tab1" type="button" onclick="setRank(1)">🥇 第一名</button>
@@ -846,9 +898,9 @@
       stock_v1: {
         program: "stock", label: "Stock-V1", tabClass: "prog-stock",
         subs: [
-          { key: "all", label: "Stock-V1（默认原）", board: "" },
-          { key: "main", label: "Stock-V1（主板）", board: "主板" },
-          { key: "cyb", label: "Stock-V1（创业板）", board: "创业板" },
+          { key: "all", label: "Stock-V1（默认原）", board: "", cls: "sub-all" },
+          { key: "main", label: "Stock-V1（主板）", board: "主板", cls: "sub-main" },
+          { key: "cyb", label: "Stock-V1（创业板）", board: "创业板", cls: "sub-cyb" },
         ],
         defaultSub: "all",
       },
@@ -1249,6 +1301,15 @@
       return list.map(t => ({ ...t }));
     }
 
+    function pagesEffPath(t) {
+      const p = String(t.path || "").trim().toUpperCase();
+      if (p === "A" || p === "B") return p;
+      const slot = String(t.slot || "").trim().toUpperCase();
+      if (slot.slice(0, 1) === "A" || slot.slice(0, 1) === "B") return slot.slice(0, 1);
+      const m = String(t.notes || "").match(/V2\s*([AB])/i);
+      return m ? m[1].toUpperCase() : "";
+    }
+
     function pagesFilterTrades(list, params) {
       let trades = list.slice();
       const month = params.get("month") || "";
@@ -1257,11 +1318,20 @@
       const keyword = (params.get("keyword") || "").toLowerCase();
       const board = params.get("board") || "";
       const boardRank = params.get("board_rank") || "";
+      const path = (params.get("path") || "").toUpperCase();
+      const pathRank = params.get("path_rank") || "";
       if (month) trades = trades.filter(t => String(t.date || "").startsWith(month));
       if (date) trades = trades.filter(t => String(t.date || "") === date);
       if (rank) {
         const r = Number(rank);
         trades = trades.filter(t => Number(t.rank || 0) === r);
+      }
+      if (path === "A" || path === "B") {
+        trades = trades.filter(t => pagesEffPath(t) === path);
+        if (pathRank) {
+          const pr = Number(pathRank);
+          trades = trades.filter(t => Number(t.path_rank || 0) === pr);
+        }
       }
       if (keyword) {
         trades = trades.filter(t =>
@@ -1360,15 +1430,24 @@
       return by;
     }
 
-    function pagesHistoryBoard(program, board, page, pageSize, year, monthFrom, monthTo) {
+    function pagesHistoryBoard(program, board, page, pageSize, year, monthFrom, monthTo, path) {
       let list = pagesProgramTrades(program);
+      const pathKey = (path || "").toUpperCase();
+      if (pathKey === "A" || pathKey === "B") {
+        list = list.filter(t => pagesEffPath(t) === pathKey);
+      }
       if (board) list = list.filter(t => (t.board || "") === board && t.board_rank != null);
-      const r1src = board
-        ? list.filter(t => Number(t.board_rank || 0) === 1)
-        : list.filter(t => Number(t.rank || 0) === 1);
-      const r2src = board
-        ? list.filter(t => Number(t.board_rank || 0) === 2)
-        : list.filter(t => Number(t.rank || 0) === 2);
+      let r1src, r2src;
+      if (board) {
+        r1src = list.filter(t => Number(t.board_rank || 0) === 1);
+        r2src = list.filter(t => Number(t.board_rank || 0) === 2);
+      } else if (pathKey === "A" || pathKey === "B") {
+        r1src = list.filter(t => Number(t.path_rank || 0) === 1);
+        r2src = list.filter(t => Number(t.path_rank || 0) === 2);
+      } else {
+        r1src = list.filter(t => Number(t.rank || 0) === 1);
+        r2src = list.filter(t => Number(t.rank || 0) === 2);
+      }
       const r1 = pagesAccumulateMonths(r1src);
       const r2 = pagesAccumulateMonths(r2src);
       let months = Array.from(new Set([...Object.keys(r1), ...Object.keys(r2)])).sort().reverse();
@@ -1386,7 +1465,7 @@
       const p = Math.min(Math.max(1, page), totalPages);
       const start = (p - 1) * pageSize;
       return {
-        program, board: board || null,
+        program, board: board || null, path: pathKey || null,
         rows: rowsAll.slice(start, start + pageSize),
         total, page: p, page_size: pageSize, total_pages: totalPages, years,
       };
@@ -1424,7 +1503,8 @@
           Math.max(1, Math.min(200, Number(params.get("page_size") || 40))),
           params.get("year") || "",
           params.get("month_from") || "",
-          params.get("month_to") || ""
+          params.get("month_to") || "",
+          params.get("path") || ""
         );
       }
       if (path.indexOf("/api/jobs/after-close/status") >= 0) {
