@@ -308,6 +308,7 @@
     }
     td.left { text-align: left; font-weight: 650; }
     .code { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .weekday { color: #475569; font-weight: 650; }
 
     .pnl-red-deep { background: #fca5a5 !important; color: #7f1d1d; font-weight: 700; }
     .pnl-red-light { background: #fecaca !important; color: #991b1b; font-weight: 700; }
@@ -951,6 +952,7 @@
     const COLS_BASE = [
       { key: "id", label: "ID", sum: false },
       { key: "date", label: "买入日期", sum: false, sortable: true },
+      { key: "weekday", label: "星期", sum: false },
       { key: "stock_code", label: "代码", sum: false },
       { key: "stock_name", label: "名称", sum: false },
       { key: "board", label: "板块", sum: false },
@@ -983,7 +985,7 @@
         let rankCol = COL_RANK;
         if (currentBoard) rankCol = { key: "board_rank", label: "名次", sum: false, sortable: true };
         else if (currentPath) rankCol = { key: "path_rank", label: "名次", sum: false, sortable: true };
-        cols.splice(2, 0, rankCol);
+        cols.splice(3, 0, rankCol);
         return cols;
       }
       return COLS_BASE;
@@ -1325,6 +1327,12 @@
       if (rank) {
         const r = Number(rank);
         trades = trades.filter(t => Number(t.rank || 0) === r);
+      } else {
+        const ranks = params.get("ranks") || "";
+        if (ranks) {
+          const allow = new Set(ranks.split(",").map(s => Number(s.trim())).filter(n => !Number.isNaN(n)));
+          trades = trades.filter(t => allow.has(Number(t.rank || 0)));
+        }
       }
       if (path === "A" || path === "B") {
         trades = trades.filter(t => pagesEffPath(t) === path);
@@ -1901,6 +1909,9 @@
         if (viewMode === "trades") qs.set("board_rank", String(currentRank));
       } else if (viewMode === "trades") {
         qs.set("rank", String(currentRank));
+      } else if (viewMode === "merge") {
+        // 默认原合计：只算全局第一名+第二名，不含仅 board_rank 的主板/创业板记录
+        qs.set("ranks", "1,2");
       }
       if (month) qs.set("month", month);
       const kw = document.getElementById("keyword").value.trim();
@@ -2107,6 +2118,14 @@
 
     function round2(n) { return Math.round(n * 100) / 100; }
 
+    function weekdayOf(dateStr) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(dateStr || ""));
+      if (!m) return "—";
+      const dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+      if (Number.isNaN(dt.getTime())) return "—";
+      return ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"][dt.getDay()];
+    }
+
     function cellHtml(t, c) {
       if (c.key === "_ops") {
         if (window.__PAGES_MODE__) return "—";
@@ -2126,6 +2145,7 @@
         if (r === 2) return '<span class="rank-tag rank-2">🥈 第二名</span>';
         return r ? `第${r}名` : "—";
       }
+      if (c.key === "weekday") return `<span class="weekday">${weekdayOf(t.date)}</span>`;
       if (c.key === "stock_code") return `<span class="code">${t.stock_code || ""}</span>`;
       if (c.key === "stock_name") {
         const name = t.stock_name || "—";
