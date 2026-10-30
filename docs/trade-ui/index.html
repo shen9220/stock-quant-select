@@ -278,6 +278,75 @@
       color: #ffffff !important;
     }
 
+    /* 全部日期 · 区间宫格 */
+    .drange { position: relative; }
+    .drange-trigger {
+      display: inline-flex; align-items: center; gap: 8px;
+      min-width: 240px; font: inherit; border-radius: 10px;
+      border: 1px solid var(--line); padding: 8px 12px; background: #fff;
+      color: var(--text); cursor: pointer; white-space: nowrap;
+    }
+    .drange-trigger.active { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15); }
+    .drange-trigger .drange-sep { color: var(--muted); }
+    .drange-trigger .drange-ico { margin-left: auto; color: #7c3aed; }
+    .drange-panel {
+      display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 80;
+      background: #fff; border: 1px solid #e9d5ff; border-radius: 12px;
+      box-shadow: 0 18px 40px rgba(91,33,182,.18); overflow: hidden;
+    }
+    .drange-panel.show { display: flex; }
+    .drange-presets {
+      width: 108px; padding: 10px 0; border-right: 1px solid #f3e8ff;
+      background: #faf5ff; flex-shrink: 0;
+    }
+    .drange-presets button {
+      display: block; width: 100%; text-align: left; border: 0; background: transparent;
+      padding: 9px 14px; font: inherit; font-size: 13px; color: #4c1d95; cursor: pointer;
+    }
+    .drange-presets button:hover { background: #ede9fe; }
+    .drange-presets button.on { background: #7c3aed; color: #fff; font-weight: 600; }
+    .drange-cals { display: flex; gap: 8px; padding: 12px 14px 14px; }
+    .drange-cal { width: 252px; }
+    .drange-cal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px; font-weight: 700; font-size: 13px; color: #1f2937;
+    }
+    .drange-cal-head .navs { display: flex; gap: 2px; }
+    .drange-cal-head button {
+      border: 0; background: transparent; cursor: pointer; color: #6b7280;
+      padding: 2px 6px; border-radius: 6px; font-size: 13px;
+    }
+    .drange-cal-head button:hover { background: #f3e8ff; color: #7c3aed; }
+    .drange-dow, .drange-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;
+    }
+    .drange-dow span {
+      font-size: 11px; color: #9ca3af; padding: 4px 0; font-weight: 600;
+    }
+    .drange-grid button {
+      border: 0; background: transparent; height: 30px; border-radius: 999px;
+      font: inherit; font-size: 12.5px; color: #111827; cursor: pointer; position: relative;
+    }
+    .drange-grid button.out { color: #d1d5db; }
+    .drange-grid button.in-range { background: #ede9fe; border-radius: 0; }
+    .drange-grid button.range-start,
+    .drange-grid button.range-end {
+      background: #7c3aed; color: #fff; font-weight: 700; border-radius: 999px; z-index: 1;
+    }
+    .drange-grid button.range-start.in-range { border-radius: 999px 0 0 999px; }
+    .drange-grid button.range-end.in-range { border-radius: 0 999px 999px 0; }
+    .drange-grid button.range-start.range-end { border-radius: 999px; }
+    .drange-grid button:hover:not(.out):not(.range-start):not(.range-end) { background: #f3e8ff; }
+    .drange-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 14px 12px; border-top: 1px solid #f3e8ff; font-size: 12px; color: #6b7280;
+    }
+    .drange-foot button {
+      border: 1px solid #e9d5ff; background: #fff; border-radius: 8px;
+      padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; color: #6d28d9;
+    }
+    .drange-foot button:hover { background: #faf5ff; }
+
     .table-card {
       background: #fff; border-radius: 16px; box-shadow: var(--shadow);
       border: 1px solid #eff6ff; overflow: hidden;
@@ -752,7 +821,29 @@
       <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
       <button type="button" id="btnMonthPrev" title="切换到上一个月" onclick="goPrevMonth()">‹ 上月</button>
       <button type="button" id="btnMonthNext" title="切换到下一个月" onclick="goNextMonth()">下月 ›</button>
-      <select id="dateFilter"><option value="">全部日期</option></select>
+      <div class="drange" id="dateRange" onclick="event.stopPropagation()">
+        <button type="button" class="drange-trigger" id="dateRangeTrigger" onclick="toggleDateRange(event)" title="全部日期（区间）">
+          <span id="dateRangeLabel">全部日期 · 本月</span>
+          <span class="drange-ico">📅</span>
+        </button>
+        <div class="drange-panel" id="dateRangePanel">
+          <div class="drange-presets" id="dateRangePresets">
+            <button type="button" data-preset="this_week" onclick="applyDatePreset('this_week')">本周</button>
+            <button type="button" data-preset="last_week" onclick="applyDatePreset('last_week')">上一周</button>
+            <button type="button" data-preset="d30" onclick="applyDatePreset('d30')">近 30 天</button>
+            <button type="button" data-preset="d60" onclick="applyDatePreset('d60')">近 60 天</button>
+            <button type="button" data-preset="d180" onclick="applyDatePreset('d180')">近半年</button>
+            <button type="button" data-preset="d365" onclick="applyDatePreset('d365')">近 1 年</button>
+          </div>
+          <div>
+            <div class="drange-cals" id="dateRangeCals"></div>
+            <div class="drange-foot">
+              <span id="dateRangeHint">点选开始日与结束日</span>
+              <button type="button" onclick="clearDateRangeAndReload()">清除 · 回本月</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="dropdown" id="monthOps">
         <button type="button" id="btnMonthOps" onclick="toggleMonthOps(event)">操作 ▾</button>
         <div class="dropdown-menu" id="monthOpsMenu">
@@ -828,7 +919,7 @@
         <div>
           <span id="pageInfo">0 条记录</span>
           <select id="pageSize" style="margin-left:8px">
-            <option value="40" selected>40条</option>
+            <option value="30" selected>30条</option>
             <option value="20">20条</option>
             <option value="50">50条</option>
             <option value="100">100条</option>
@@ -896,8 +987,15 @@
     let trades = [];
     let editingId = null;
     let page = 1;
-    let pageSize = 40;
+    let pageSize = 30;
     let totalPages = 1;
+    // 全部日期区间：激活后覆盖右上角月份；刷新/改月份后回退月份
+    let dateRangeActive = false;
+    let dateFrom = "";
+    let dateTo = "";
+    let dateRangePreset = "";
+    let rangePickStart = "";
+    let calViewYm = ""; // 左月 YYYY-MM
     // 真实数据程序（定时任务/收盘补全仍只用这些，与展示 lane 解耦）
     const PROGRAMS = ["stock", "stock_v2", "slow", "up", "stock_updata"];
     const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）", up: "Up", stock_updata: "Stock-V1（水下）" };
@@ -1202,13 +1300,18 @@
       const menu = document.getElementById("monthOpsMenu");
       if (menu) menu.classList.remove("show");
       closeMonthPicker();
+      closeDateRange();
     });
-    // ESC 关闭九宫格
+    // ESC 关闭九宫格 / 日期区间
     document.addEventListener("keydown", e => {
-      if (e.key === "Escape") closeMonthPicker();
+      if (e.key === "Escape") {
+        closeMonthPicker();
+        closeDateRange();
+      }
     });
 
     function shiftMonth(delta) {
+      clearDateRange();
       syncMonthFromDom();
       const cur = syncMonthFromDom();
       if (!availableMonths.length) {
@@ -1225,7 +1328,6 @@
       const target = availableMonths[targetIdx];
       persistMonth(target);
       applyMonthToSelect();
-      clearDateFilterIfMonthMismatch();
       page = 1;
       loadAll();
     }
@@ -1242,7 +1344,7 @@
 
     function resetAllFilters() {
       document.getElementById("keyword").value = "";
-      document.getElementById("dateFilter").value = "";
+      clearDateRange();
       currentRank = 1;
       document.getElementById("tab1").classList.add("active");
       document.getElementById("tab2").classList.remove("active");
@@ -1258,10 +1360,10 @@
       currentRank = rank || 1;
       document.getElementById("tab1").classList.toggle("active", currentRank === 1);
       document.getElementById("tab2").classList.toggle("active", currentRank === 2);
+      clearDateRange();
       persistMonth(month);
       applyMonthToSelect();
       document.getElementById("keyword").value = "";
-      document.getElementById("dateFilter").value = "";
       page = 1;
       setViewMode("trades");
     }
@@ -1336,14 +1438,29 @@
       let trades = list.slice();
       const month = params.get("month") || "";
       const date = params.get("date") || "";
+      let dateFromP = (params.get("date_from") || "").slice(0, 10);
+      let dateToP = (params.get("date_to") || "").slice(0, 10);
       const rank = params.get("rank") || "";
       const keyword = (params.get("keyword") || "").toLowerCase();
       const board = params.get("board") || "";
       const boardRank = params.get("board_rank") || "";
       const path = (params.get("path") || "").toUpperCase();
       const pathRank = params.get("path_rank") || "";
-      if (month) trades = trades.filter(t => String(t.date || "").startsWith(month));
-      if (date) trades = trades.filter(t => String(t.date || "") === date);
+      if (dateFromP || dateToP) {
+        if (dateFromP && dateToP && dateFromP > dateToP) {
+          const tmp = dateFromP; dateFromP = dateToP; dateToP = tmp;
+        }
+        trades = trades.filter(t => {
+          const d = String(t.date || "").slice(0, 10);
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
+          if (dateFromP && d < dateFromP) return false;
+          if (dateToP && d > dateToP) return false;
+          return true;
+        });
+      } else {
+        if (month) trades = trades.filter(t => String(t.date || "").startsWith(month));
+        if (date) trades = trades.filter(t => String(t.date || "") === date);
+      }
       if (rank) {
         const r = Number(rank);
         trades = trades.filter(t => Number(t.rank || 0) === r);
@@ -1778,11 +1895,11 @@
       document.getElementById("tab1").classList.add("active");
       document.getElementById("tab2").classList.remove("active");
 
+      clearDateRange();
       persistMonth(now);
       mpickerYear = now.slice(0, 4);
       mpickerYearGridOpen = false;
       applyMonthToSelect();
-      clearDateFilterIfMonthMismatch();
       page = 1;
       closeMonthPicker();
       loadAll();
@@ -1801,21 +1918,231 @@
     }
 
     function monthPickerPick(m) {
+      clearDateRange();
       persistMonth(m);
       mpickerYear = m.slice(0, 4);
       applyMonthToSelect();
-      clearDateFilterIfMonthMismatch();
       page = 1;
       closeMonthPicker();
       loadAll();
     }
 
     function clearDateFilterIfMonthMismatch() {
-      const month = syncMonthFromDom();
-      const dateEl = document.getElementById("dateFilter");
-      if (dateEl && dateEl.value && month && !dateEl.value.startsWith(month)) {
-        dateEl.value = "";
+      // 兼容旧调用：改月份时清除区间，回到右上角月份口径
+      clearDateRange();
+    }
+
+    function fmtYmd(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function parseYmd(s) {
+      const [y, m, d] = String(s || "").split("-").map(Number);
+      if (!y || !m || !d) return null;
+      return new Date(y, m - 1, d);
+    }
+
+    function addDaysYmd(ymd, days) {
+      const d = parseYmd(ymd);
+      if (!d) return ymd;
+      d.setDate(d.getDate() + days);
+      return fmtYmd(d);
+    }
+
+    function startOfWeekMon(d) {
+      const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      const day = x.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      x.setDate(x.getDate() + diff);
+      return x;
+    }
+
+    function updateDateRangeLabel() {
+      const el = document.getElementById("dateRangeLabel");
+      const trig = document.getElementById("dateRangeTrigger");
+      if (!el) return;
+      if (dateRangeActive && dateFrom && dateTo) {
+        el.innerHTML = `<span>${dateFrom}</span><span class="drange-sep">→</span><span>${dateTo}</span>`;
+        if (trig) trig.classList.add("active");
+      } else {
+        const month = syncMonthFromDom() || beijingMonth();
+        el.textContent = `全部日期 · ${month}`;
+        if (trig) trig.classList.remove("active");
       }
+      const box = document.getElementById("dateRangePresets");
+      if (box) {
+        box.querySelectorAll("button").forEach(b => {
+          b.classList.toggle("on", !!dateRangePreset && b.dataset.preset === dateRangePreset);
+        });
+      }
+    }
+
+    function clearDateRange() {
+      dateRangeActive = false;
+      dateFrom = "";
+      dateTo = "";
+      dateRangePreset = "";
+      rangePickStart = "";
+      updateDateRangeLabel();
+    }
+
+    function clearDateRangeAndReload() {
+      clearDateRange();
+      closeDateRange();
+      page = 1;
+      loadAll();
+      toast("已回右上角月份");
+    }
+
+    function closeDateRange() {
+      const panel = document.getElementById("dateRangePanel");
+      if (panel) panel.classList.remove("show");
+    }
+
+    function toggleDateRange(ev) {
+      if (ev) ev.stopPropagation();
+      const panel = document.getElementById("dateRangePanel");
+      if (!panel) return;
+      const open = !panel.classList.contains("show");
+      closeMonthPicker();
+      if (open) {
+        const base = dateFrom || (syncMonthFromDom() || beijingMonth()) + "-01";
+        calViewYm = base.slice(0, 7);
+        rangePickStart = "";
+        renderDateRangeCals();
+        updateDateRangeLabel();
+        panel.classList.add("show");
+      } else {
+        panel.classList.remove("show");
+      }
+    }
+
+    function shiftCalView(months) {
+      let [y, m] = (calViewYm || beijingMonth()).split("-").map(Number);
+      m += months;
+      while (m < 1) { m += 12; y -= 1; }
+      while (m > 12) { m -= 12; y += 1; }
+      calViewYm = `${y}-${String(m).padStart(2, "0")}`;
+      renderDateRangeCals();
+    }
+
+    function applyDateRange(from, to, preset) {
+      if (!from || !to) return;
+      if (from > to) { const t = from; from = to; to = t; }
+      dateRangeActive = true;
+      dateFrom = from;
+      dateTo = to;
+      dateRangePreset = preset || "";
+      rangePickStart = "";
+      updateDateRangeLabel();
+      closeDateRange();
+      page = 1;
+      loadAll();
+    }
+
+    function applyDatePreset(key) {
+      const today = parseYmd(beijingToday());
+      let from, to;
+      if (key === "this_week") {
+        const s = startOfWeekMon(today);
+        from = fmtYmd(s);
+        to = beijingToday();
+      } else if (key === "last_week") {
+        const thisMon = startOfWeekMon(today);
+        const lastSun = new Date(thisMon); lastSun.setDate(lastSun.getDate() - 1);
+        const lastMon = startOfWeekMon(lastSun);
+        from = fmtYmd(lastMon);
+        to = fmtYmd(lastSun);
+      } else if (key === "d30") {
+        to = beijingToday();
+        from = addDaysYmd(to, -29);
+      } else if (key === "d60") {
+        to = beijingToday();
+        from = addDaysYmd(to, -59);
+      } else if (key === "d180") {
+        to = beijingToday();
+        from = addDaysYmd(to, -179);
+      } else if (key === "d365") {
+        to = beijingToday();
+        from = addDaysYmd(to, -364);
+      } else return;
+      applyDateRange(from, to, key);
+    }
+
+    function onCalDayClick(ymd) {
+      if (!ymd) return;
+      if (!rangePickStart) {
+        rangePickStart = ymd;
+        dateRangePreset = "";
+        const hint = document.getElementById("dateRangeHint");
+        if (hint) hint.textContent = `已选开始 ${ymd}，再点结束日`;
+        renderDateRangeCals();
+        return;
+      }
+      applyDateRange(rangePickStart, ymd, "");
+    }
+
+    function renderOneCal(ym, showLeftNav, showRightNav) {
+      const [yy, mm] = ym.split("-").map(Number);
+      const first = new Date(yy, mm - 1, 1);
+      const startDow = (first.getDay() + 6) % 7; // Mon=0
+      const daysInMonth = new Date(yy, mm, 0).getDate();
+      const prevDays = new Date(yy, mm - 1, 0).getDate();
+      const title = `${yy}年 ${mm}月`;
+      const navL = showLeftNav
+        ? `<span class="navs"><button type="button" onclick="shiftCalView(-12)" title="上一年">«</button><button type="button" onclick="shiftCalView(-1)" title="上一月">‹</button></span>`
+        : `<span class="navs"></span>`;
+      const navR = showRightNav
+        ? `<span class="navs"><button type="button" onclick="shiftCalView(1)" title="下一月">›</button><button type="button" onclick="shiftCalView(12)" title="下一年">»</button></span>`
+        : `<span class="navs"></span>`;
+      const cells = [];
+      for (let i = 0; i < 42; i++) {
+        let y = yy, m = mm, d, out = false;
+        if (i < startDow) {
+          d = prevDays - startDow + i + 1;
+          m = mm - 1; if (m < 1) { m = 12; y -= 1; }
+          out = true;
+        } else if (i >= startDow + daysInMonth) {
+          d = i - startDow - daysInMonth + 1;
+          m = mm + 1; if (m > 12) { m = 1; y += 1; }
+          out = true;
+        } else {
+          d = i - startDow + 1;
+        }
+        const ymd = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+        let cls = out ? "out" : "";
+        const previewFrom = rangePickStart || (dateRangeActive ? dateFrom : "");
+        const previewTo = rangePickStart ? "" : (dateRangeActive ? dateTo : "");
+        if (previewFrom && previewTo) {
+          if (ymd >= previewFrom && ymd <= previewTo) cls += " in-range";
+          if (ymd === previewFrom) cls += " range-start";
+          if (ymd === previewTo) cls += " range-end";
+        } else if (previewFrom && ymd === previewFrom) {
+          cls += " range-start";
+        }
+        cells.push(`<button type="button" class="${cls.trim()}" onclick="onCalDayClick('${ymd}')">${d}</button>`);
+      }
+      return `<div class="drange-cal">
+        <div class="drange-cal-head">${navL}<span>${title}</span>${navR}</div>
+        <div class="drange-dow"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+        <div class="drange-grid">${cells.join("")}</div>
+      </div>`;
+    }
+
+    function nextYm(ym) {
+      let [y, m] = ym.split("-").map(Number);
+      m += 1; if (m > 12) { m = 1; y += 1; }
+      return `${y}-${String(m).padStart(2, "0")}`;
+    }
+
+    function renderDateRangeCals() {
+      const host = document.getElementById("dateRangeCals");
+      if (!host) return;
+      if (!calViewYm) calViewYm = beijingMonth();
+      host.innerHTML = renderOneCal(calViewYm, true, false) + renderOneCal(nextYm(calViewYm), false, true);
     }
 
     function applyLaneState(lane) {
@@ -1939,11 +2266,15 @@
         // 默认原合计：只算全局第一名+第二名，不含仅 board_rank 的主板/创业板记录
         qs.set("ranks", "1,2");
       }
-      if (month) qs.set("month", month);
+      // 区间激活时覆盖月份；未激活只按右上角月份（默认本月）
+      if (dateRangeActive && dateFrom && dateTo) {
+        qs.set("date_from", dateFrom);
+        qs.set("date_to", dateTo);
+      } else if (month) {
+        qs.set("month", month);
+      }
       const kw = document.getElementById("keyword").value.trim();
-      const date = document.getElementById("dateFilter").value;
       if (kw) qs.set("keyword", kw);
-      if (date) qs.set("date", date);
       return qs;
     }
 
@@ -2061,19 +2392,17 @@
         await loadMonths();
         if (seq !== loadSeq) return false;
         applyMonthToSelect();
+        updateDateRangeLabel();
         const qs = qsBase();
-        const month = syncMonthFromDom();
-        // 三个请求互不依赖，并行发出：串行会把 RTT 累加 3 倍
-        const [tradesData, stats, dates] = await Promise.all([
+        // 两个请求互不依赖，并行发出
+        const [tradesData, stats] = await Promise.all([
           api("/api/trades?" + qs.toString()),
           api("/api/stats?" + qs.toString()),
-          api("/api/dates?program=" + encodeURIComponent(currentProgram)),
         ]);
         if (seq !== loadSeq) return false;
         trades = tradesData;
         renderAll();
         renderStats(stats);
-        renderDates(dates.filter(d => !month || d.startsWith(month)));
         document.getElementById("exportLink").href = "/api/export/csv?" + qs.toString();
         loadCloseJobStatus();   // 非阻塞：状态面板与列表刷新无关
         return true;
@@ -2086,6 +2415,8 @@
 
     async function refreshView() {
       if (busy) return;
+      // 刷新后以右上角年份/月份为准，丢弃区间覆盖
+      clearDateRange();
       setLoading(true, "刷新中…");
       try {
         const ok = viewMode === "board" ? await loadBoard() : await loadAll();
@@ -2095,12 +2426,8 @@
       }
     }
 
-    function renderDates(dates) {
-      const sel = document.getElementById("dateFilter");
-      const cur = sel.value;
-      sel.innerHTML = `<option value="">全部日期</option>` + dates.map(d =>
-        `<option value="${d}" ${d === cur ? "selected" : ""}>${d}</option>`
-      ).join("");
+    function renderDates(_dates) {
+      // 旧下拉已替换为区间宫格，保留空实现兼容调用
     }
 
     function renderStats(s) {
@@ -2227,7 +2554,7 @@
       const seq = ++loadSeq;
       try {
         if (viewMode !== "board") return false;
-        pageSize = Number(document.getElementById("pageSize").value) || 40;
+        pageSize = Number(document.getElementById("pageSize").value) || 30;
         const qs = new URLSearchParams({
           program: currentProgram,
           page: String(page),
@@ -2337,20 +2664,27 @@
       list = list || sortedTrades();
       const tb = document.getElementById("tbody");
       const empty = document.getElementById("empty");
-      pageSize = Number(document.getElementById("pageSize").value) || 40;
+      pageSize = Number(document.getElementById("pageSize").value) || 30;
       totalPages = Math.max(1, Math.ceil(list.length / pageSize));
       if (page > totalPages) page = totalPages;
       const scope = currentBoard
         ? `${currentBoard} · `
         : (currentPath ? `路径${currentPath} · ` : "");
+      const timeScope = dateRangeActive && dateFrom && dateTo
+        ? `${dateFrom}→${dateTo}`
+        : (syncMonthFromDom() || "");
       document.getElementById("pageInfo").textContent =
         `${list.length} 条记录  第 ${list.length ? page : 0}/${list.length ? totalPages : 0} 页 · ` +
-        scope + (viewMode === "merge" ? "第一名+第二名合计" : (currentRank === 1 ? "第一名" : "第二名"));
+        scope + timeScope + " · " +
+        (viewMode === "merge" ? "第一名+第二名合计" : (currentRank === 1 ? "第一名" : "第二名"));
       ["btnFirst","btnPrev"].forEach(id => document.getElementById(id).disabled = page <= 1);
       ["btnNext","btnLast"].forEach(id => document.getElementById(id).disabled = page >= totalPages || !list.length);
 
       if (!list.length) {
         tb.innerHTML = "";
+        empty.textContent = dateRangeActive
+          ? "当前日期区间暂无记录"
+          : "当前月份暂无记录";
         empty.style.display = "block";
         return;
       }
@@ -2476,10 +2810,13 @@
       try {
         setLoading(true, force ? "强制重拉中（当前月）…" : "补全空值中（当前月）…");
         const body = { force, program: currentProgram };
-        const month = syncMonthFromDom();
-        if (month) body.month = month;
-        const date = document.getElementById("dateFilter").value;
-        if (date) body.date = date;
+        if (dateRangeActive && dateFrom && dateTo) {
+          body.date_from = dateFrom;
+          body.date_to = dateTo;
+        } else {
+          const month = syncMonthFromDom();
+          if (month) body.month = month;
+        }
         const r = await api("/api/trades/refresh-prices", {
           method: "POST",
           body: JSON.stringify(body),
@@ -2534,15 +2871,14 @@
     }
 
     document.getElementById("keyword").addEventListener("keydown", e => { if (e.key === "Enter") loadAll(); });
-    document.getElementById("dateFilter").addEventListener("change", loadAll);
     document.getElementById("pageSize").addEventListener("change", () => {
       page = 1;
       if (viewMode === "board") loadBoard();
       else renderTableBody();
     });
     document.getElementById("monthFilter").addEventListener("change", e => {
+      clearDateRange();
       persistMonth(e.target.value);
-      clearDateFilterIfMonthMismatch();
       page = 1;
       loadAll();
     });
