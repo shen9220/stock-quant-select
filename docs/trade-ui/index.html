@@ -585,15 +585,20 @@
       .form-grid { grid-template-columns: 1fr; }
       .topbar { flex-direction: column; align-items: flex-start; }
     }
-    /* GitHub Pages：隐藏本机专属操作（即使已登录也不显示） */
+    /* GitHub Pages：隐藏本机专属写操作（即使已登录也不显示）
+       注意：不可一刀切藏 button.primary —— 历史看板「搜索」也是 primary，Pages 需保留 */
     html.pages-mode #btnCloseJob,
     html.pages-mode #btnFillEmpty,
     html.pages-mode #btnForcePull,
     html.pages-mode #exportLink,
     html.pages-mode #btnRefresh,
-    html.pages-mode button.primary,
+    html.pages-mode #mainView button.primary,
     html.pages-mode .ops,
     html.pages-mode #closeJobStatus { display: none !important; }
+    html.pages-mode #boardFilters button.primary {
+      display: inline-flex !important;
+      align-items: center;
+    }
     html.pages-mode .auth-badge {
       font-size: 12px; color: #1e3a8a; margin-right: 8px;
       padding: 6px 12px; border: 1px solid #93c5fd; border-radius: 999px;
@@ -784,8 +789,8 @@
         <select id="boardMonthTo" title="结束月份">
           <option value="">结束月份</option>
         </select>
-        <button type="button" class="primary" onclick="searchBoard()">搜索</button>
-        <button type="button" onclick="resetBoardFilters()">重置</button>
+        <button type="button" class="primary" id="btnBoardSearch" onclick="searchBoard()">搜索</button>
+        <button type="button" id="btnBoardReset" onclick="resetBoardFilters()">重置</button>
       </div>
       <div class="board-hint" id="boardHint">按月份汇总 · 左第一名 / 右第二名 · 点击月份跳转明细</div>
       <div class="board-split">
