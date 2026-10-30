@@ -750,6 +750,8 @@
     <div id="mainView">
     <div class="toolbar">
       <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
+      <button type="button" id="btnMonthPrev" title="切换到上一个月" onclick="goPrevMonth()">‹ 上月</button>
+      <button type="button" id="btnMonthNext" title="切换到下一个月" onclick="goNextMonth()">下月 ›</button>
       <select id="dateFilter"><option value="">全部日期</option></select>
       <div class="dropdown" id="monthOps">
         <button type="button" id="btnMonthOps" onclick="toggleMonthOps(event)">操作 ▾</button>
