@@ -263,61 +263,69 @@
       content: "⌕"; position: absolute; left: 11px; top: 50%;
       transform: translateY(-50%); color: var(--muted);
     }
-    select, .toolbar button {
+    /* 仅工具栏一级控件；勿选中 .drange 宫格内按钮（否则格子被撑爆/裁切） */
+    .toolbar > select,
+    .toolbar > button,
+    .toolbar > .dropdown > button,
+    .toolbar .drange-trigger {
       font: inherit; border-radius: 10px; border: 1px solid var(--line);
       padding: 8px 12px; background: #fff; color: var(--text); cursor: pointer;
     }
-    .toolbar button.primary {
+    .toolbar > button.primary {
       background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
       border: 1px solid #1d4ed8 !important;
       color: #ffffff !important;
       font-weight: 700;
       box-shadow: 0 8px 16px rgba(37, 99, 235, 0.35);
     }
-    .toolbar button.primary:hover {
+    .toolbar > button.primary:hover {
       filter: brightness(1.06);
       color: #ffffff !important;
     }
 
-    /* 全部日期 · 区间宫格 */
-    .drange { position: relative; z-index: 40; }
+    /* 全部日期 · 区间宫格（panel 用 fixed，避开父级裁切） */
+    .drange { position: relative; z-index: 40; flex-shrink: 0; }
     .drange-trigger {
       display: inline-flex; align-items: center; gap: 8px;
-      min-width: 240px; font: inherit; border-radius: 10px;
-      border: 1px solid var(--line); padding: 8px 12px; background: #fff;
-      color: var(--text); cursor: pointer; white-space: nowrap;
+      min-width: 240px; white-space: nowrap;
     }
     .drange-trigger.active { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,.15); }
-    .drange-trigger .drange-sep { color: var(--muted); }
+    .drange-trigger .drange-sep { color: var(--muted); margin: 0 2px; }
     .drange-trigger .drange-ico { margin-left: auto; color: #7c3aed; }
     .drange-panel {
-      display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 120;
+      display: none; position: fixed; z-index: 260;
       background: #fff; border: 1px solid #e9d5ff; border-radius: 12px;
-      box-shadow: 0 18px 40px rgba(91,33,182,.18); overflow: hidden;
+      box-shadow: 0 18px 40px rgba(91,33,182,.22);
+      overflow: visible; max-width: calc(100vw - 16px);
     }
-    .drange-panel.show { display: flex; }
+    .drange-panel.show { display: flex; align-items: stretch; }
     .drange-presets {
-      width: 108px; padding: 10px 0; border-right: 1px solid #f3e8ff;
-      background: #faf5ff; flex-shrink: 0;
+      width: 112px; padding: 10px 0; border-right: 1px solid #f3e8ff;
+      background: #faf5ff; flex-shrink: 0; border-radius: 12px 0 0 12px;
     }
     .drange-presets button {
-      display: block; width: 100%; text-align: left; border: 0; background: transparent;
-      padding: 9px 14px; font: inherit; font-size: 13px; color: #4c1d95; cursor: pointer;
+      display: block; width: 100%; text-align: left; border: 0 !important;
+      background: transparent !important; border-radius: 0 !important;
+      padding: 9px 14px !important; font: inherit; font-size: 13px;
+      color: #4c1d95; cursor: pointer; box-shadow: none !important;
     }
-    .drange-presets button:hover { background: #ede9fe; }
-    .drange-presets button.on { background: #7c3aed; color: #fff; font-weight: 600; }
-    .drange-cals { display: flex; gap: 8px; padding: 12px 14px 14px; }
-    .drange-cal { width: 252px; }
+    .drange-presets button:hover { background: #ede9fe !important; }
+    .drange-presets button.on { background: #7c3aed !important; color: #fff !important; font-weight: 600; }
+    .drange-main { display: flex; flex-direction: column; min-width: 0; }
+    .drange-cals { display: flex; gap: 12px; padding: 14px 16px 10px; flex-wrap: nowrap; }
+    .drange-cal { width: 238px; flex-shrink: 0; }
     .drange-cal-head {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 8px; font-weight: 700; font-size: 13px; color: #1f2937;
+      min-height: 28px;
     }
-    .drange-cal-head .navs { display: flex; gap: 2px; }
+    .drange-cal-head .navs { display: flex; gap: 2px; min-width: 52px; }
     .drange-cal-head button {
-      border: 0; background: transparent; cursor: pointer; color: #6b7280;
-      padding: 2px 6px; border-radius: 6px; font-size: 13px;
+      border: 0 !important; background: transparent !important; cursor: pointer;
+      color: #6b7280; padding: 2px 6px !important; border-radius: 6px !important;
+      font-size: 13px; line-height: 1.2; box-shadow: none !important;
     }
-    .drange-cal-head button:hover { background: #f3e8ff; color: #7c3aed; }
+    .drange-cal-head button:hover { background: #f3e8ff !important; color: #7c3aed; }
     .drange-dow, .drange-grid {
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; text-align: center;
     }
@@ -325,28 +333,40 @@
       font-size: 11px; color: #9ca3af; padding: 4px 0; font-weight: 600;
     }
     .drange-grid button {
-      border: 0; background: transparent; height: 30px; border-radius: 999px;
-      font: inherit; font-size: 12.5px; color: #111827; cursor: pointer; position: relative;
+      border: 0 !important; background: transparent !important;
+      width: 100%; height: 30px; padding: 0 !important; margin: 0;
+      border-radius: 999px !important; font: inherit; font-size: 12.5px;
+      color: #111827; cursor: pointer; position: relative; box-shadow: none !important;
+      line-height: 30px;
     }
     .drange-grid button.out { color: #d1d5db; }
-    .drange-grid button.in-range { background: #ede9fe; border-radius: 0; }
+    .drange-grid button.in-range { background: #ede9fe !important; border-radius: 0 !important; }
     .drange-grid button.range-start,
     .drange-grid button.range-end {
-      background: #7c3aed; color: #fff; font-weight: 700; border-radius: 999px; z-index: 1;
+      background: #7c3aed !important; color: #fff !important; font-weight: 700;
+      border-radius: 999px !important; z-index: 1;
     }
-    .drange-grid button.range-start.in-range { border-radius: 999px 0 0 999px; }
-    .drange-grid button.range-end.in-range { border-radius: 0 999px 999px 0; }
-    .drange-grid button.range-start.range-end { border-radius: 999px; }
-    .drange-grid button:hover:not(.out):not(.range-start):not(.range-end) { background: #f3e8ff; }
+    .drange-grid button.range-start.in-range { border-radius: 999px 0 0 999px !important; }
+    .drange-grid button.range-end.in-range { border-radius: 0 999px 999px 0 !important; }
+    .drange-grid button.range-start.range-end { border-radius: 999px !important; }
+    .drange-grid button:hover:not(.out):not(.range-start):not(.range-end) { background: #f3e8ff !important; }
     .drange-foot {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 14px 12px; border-top: 1px solid #f3e8ff; font-size: 12px; color: #6b7280;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      padding: 8px 16px 12px; border-top: 1px solid #f3e8ff; font-size: 12px; color: #6b7280;
     }
     .drange-foot button {
-      border: 1px solid #e9d5ff; background: #fff; border-radius: 8px;
-      padding: 5px 10px; font: inherit; font-size: 12px; cursor: pointer; color: #6d28d9;
+      border: 1px solid #e9d5ff !important; background: #fff !important;
+      border-radius: 8px !important; padding: 5px 10px !important;
+      font: inherit; font-size: 12px; cursor: pointer; color: #6d28d9;
+      box-shadow: none !important; white-space: nowrap;
     }
-    .drange-foot button:hover { background: #faf5ff; }
+    .drange-foot button:hover { background: #faf5ff !important; }
+    @media (max-width: 720px) {
+      .drange-panel.show { flex-direction: column; max-height: min(78vh, 560px); overflow: auto; }
+      .drange-presets { width: 100%; display: flex; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid #f3e8ff; border-radius: 12px 12px 0 0; padding: 6px; gap: 4px; }
+      .drange-presets button { width: auto; border-radius: 8px !important; padding: 6px 10px !important; }
+      .drange-cals { flex-wrap: wrap; justify-content: center; }
+    }
 
     .table-card {
       background: #fff; border-radius: 16px; box-shadow: var(--shadow);
@@ -834,7 +854,7 @@
             <button type="button" data-preset="d180" onclick="applyDatePreset('d180')">近半年</button>
             <button type="button" data-preset="d365" onclick="applyDatePreset('d365')">近 1 年</button>
           </div>
-          <div>
+          <div class="drange-main">
             <div class="drange-cals" id="dateRangeCals"></div>
             <div class="drange-foot">
               <span id="dateRangeHint">点选开始日与结束日</span>
@@ -2003,6 +2023,30 @@
       if (panel) panel.classList.remove("show");
     }
 
+    function placeDateRangePanel() {
+      const panel = document.getElementById("dateRangePanel");
+      const trigger = document.getElementById("dateRangeTrigger");
+      if (!panel || !trigger || !panel.classList.contains("show")) return;
+      const rect = trigger.getBoundingClientRect();
+      const pad = 8;
+      // 先放到可视区外测尺寸，再贴到 trigger 下方并钳制在视口内
+      panel.style.left = "0px";
+      panel.style.top = "0px";
+      const pw = panel.offsetWidth || 620;
+      const ph = panel.offsetHeight || 340;
+      let left = rect.left;
+      let top = rect.bottom + 6;
+      if (left + pw > window.innerWidth - pad) left = Math.max(pad, window.innerWidth - pw - pad);
+      if (left < pad) left = pad;
+      if (top + ph > window.innerHeight - pad) {
+        // 下方不够则翻到上方
+        const above = rect.top - ph - 6;
+        top = above >= pad ? above : Math.max(pad, window.innerHeight - ph - pad);
+      }
+      panel.style.left = Math.round(left) + "px";
+      panel.style.top = Math.round(top) + "px";
+    }
+
     function toggleDateRange(ev) {
       if (ev) ev.stopPropagation();
       const panel = document.getElementById("dateRangePanel");
@@ -2015,7 +2059,11 @@
         rangePickStart = "";
         renderDateRangeCals();
         updateDateRangeLabel();
+        const hint = document.getElementById("dateRangeHint");
+        if (hint) hint.textContent = "点选开始日与结束日";
         panel.classList.add("show");
+        placeDateRangePanel();
+        requestAnimationFrame(placeDateRangePanel);
       } else {
         panel.classList.remove("show");
       }
@@ -2144,7 +2192,15 @@
       if (!host) return;
       if (!calViewYm) calViewYm = beijingMonth();
       host.innerHTML = renderOneCal(calViewYm, true, false) + renderOneCal(nextYm(calViewYm), false, true);
+      placeDateRangePanel();
     }
+
+    window.addEventListener("resize", () => {
+      if (document.getElementById("dateRangePanel")?.classList.contains("show")) placeDateRangePanel();
+    });
+    window.addEventListener("scroll", () => {
+      if (document.getElementById("dateRangePanel")?.classList.contains("show")) placeDateRangePanel();
+    }, true);
 
     function applyLaneState(lane) {
       // 兼容旧 lane → 四层导航
