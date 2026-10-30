@@ -953,7 +953,7 @@
     let sortKey = "date";
     let sortDir = "desc";
 
-    // 表头：按需求排序。末尾两个「半仓盈亏」对应 早/午 全仓盈亏的一半列
+    // 表头：早/午半仓价与半仓盈亏与全仓卖出价重复，已从明细列移除（后端字段仍保留供分批/统计）
     const COLS_BASE = [
       { key: "id", label: "ID", sum: false },
       { key: "date", label: "买入日期", sum: false, sortable: true },
@@ -966,18 +966,12 @@
       { key: "pnl_morning", label: "早盘盈亏", sum: true, pnl: true, sortable: true },
       { key: "sell_price_1315", label: "午盘卖出价", sum: false },
       { key: "pnl_afternoon", label: "午盘盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_half_935", label: "早盘半仓价", sum: false },
-      { key: "pnl_batch_morning", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_half_1315", label: "午盘半仓价", sum: false },
-      { key: "pnl_batch_afternoon", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
       { key: "sell_price_batch_avg", label: "分批总价", sum: false },
       { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
       { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
       { key: "hold_days", label: "持有天数", sum: false },
       { key: "is_second_board", label: "二板", sum: false },
       { key: "pnl_batch_total_half", label: "分批半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_morning_half", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_afternoon_half", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
       { key: "_ops", label: "操作", sum: false },
     ];
 
@@ -1100,8 +1094,6 @@
       { key: "buy_price", label: "买入价(开盘)", type: "number" },
       { key: "sell_price_935", label: "早盘卖出价", type: "number" },
       { key: "sell_price_1315", label: "午盘卖出价", type: "number" },
-      { key: "sell_price_half_935", label: "早盘半仓价", type: "number" },
-      { key: "sell_price_half_1315", label: "午盘半仓价", type: "number" },
       { key: "sell_date", label: "卖出日期", type: "date" },
       { key: "is_second_board", label: "二板", type: "select", options: [
         { v: "", t: "未知/自动" }, { v: "true", t: "是" }, { v: "false", t: "否" }
