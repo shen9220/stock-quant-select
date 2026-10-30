@@ -1176,6 +1176,22 @@
       return '<span class="month-loss">亏损</span>';
     }
 
+    /** 大盘是否盈亏：红=是，绿=否 */
+    function indexProfitHtml(profit) {
+      if (profit === true) return '<span class="month-profit">是</span>';
+      if (profit === false) return '<span class="month-loss">否</span>';
+      return "—";
+    }
+
+    function indexPctHtml(v) {
+      if (v == null || v === "") return "—";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "—";
+      const s = (n > 0 ? "+" : "") + round2(n) + "%";
+      const cls = n >= 0 ? "month-profit" : "month-loss";
+      return `<span class="${cls}">${s}</span>`;
+    }
+
     function toggleMonthOps(ev) {
       ev.stopPropagation();
       document.getElementById("monthOpsMenu").classList.toggle("show");
@@ -1466,11 +1482,17 @@
       if (year) months = months.filter(m => m.startsWith(year + "-"));
       if (monthFrom) months = months.filter(m => m >= monthFrom);
       if (monthTo) months = months.filter(m => m <= monthTo);
-      const rowsAll = months.map(month => ({
-        month,
-        rank1: r1[month] || pagesEmptyBucket(),
-        rank2: r2[month] || pagesEmptyBucket(),
-      }));
+      const indexMap = (pagesActiveSnapshot().index_months) || {};
+      const rowsAll = months.map(month => {
+        const ix = indexMap[month];
+        const pct = (ix && typeof ix === "object") ? ix.pct : ix;
+        return {
+          month,
+          rank1: r1[month] || pagesEmptyBucket(),
+          rank2: r2[month] || pagesEmptyBucket(),
+          index_pct: (pct == null || pct === "") ? null : Number(pct),
+        };
+      });
       const total = rowsAll.length;
       const totalPages = Math.max(1, Math.ceil((total || 1) / pageSize));
       const p = Math.min(Math.max(1, page), totalPages);
@@ -2236,13 +2258,17 @@
 
     function renderBoardHead() {
       const headHtml = `<th>月份</th>` + BOARD_PNL_COLS.map(c => `<th>${c.label}</th>`).join("") +
-        `<th>笔数</th><th>月度盈亏</th>`;
+        `<th>笔数</th><th>大盘涨跌幅度</th><th>月度盈亏</th>`;
       document.getElementById("boardHeadRank1").innerHTML = headHtml;
       document.getElementById("boardHeadRank2").innerHTML = headHtml;
     }
 
     function renderBoardPanel(rankKey, rankNum, tbodyId, sumRowId) {
-      const slice = boardRows.map(r => ({ month: r.month, ...(r[rankKey] || {}) }));
+      const slice = boardRows.map(r => ({
+        month: r.month,
+        index_pct: r.index_pct,
+        ...(r[rankKey] || {}),
+      }));
       const tb = document.getElementById(tbodyId);
       const sumCells = BOARD_PNL_COLS.map(c => {
         const v = round2(slice.reduce((a, r) => a + Number(r[c.key] || 0), 0));
@@ -2251,8 +2277,13 @@
       }).join("");
       const cnt = slice.reduce((a, r) => a + Number(r.count || 0), 0);
       const batchHalfSum = round2(slice.reduce((a, r) => a + Number(r.batch_half || 0), 0));
+      // 大盘涨跌幅度：本页各月幅度累加（与其它盈亏列合计口径一致）
+      const indexVals = slice.map(r => r.index_pct).filter(v => v != null && v !== "" && !Number.isNaN(Number(v)));
+      const indexPctSum = indexVals.length ? round2(indexVals.reduce((a, v) => a + Number(v), 0)) : null;
       document.getElementById(sumRowId).innerHTML =
-        `<td>本页合计</td>${sumCells}<td>${cnt}</td><td>${monthResultHtml(batchHalfSum)}</td>`;
+        `<td>本页合计</td>${sumCells}<td>${cnt}</td>` +
+        `<td>${indexPctHtml(indexPctSum)}</td>` +
+        `<td>${monthResultHtml(batchHalfSum)}</td>`;
 
       tb.innerHTML = slice.map(r => {
         const label = r.month.replace("-", "年") + "月";
@@ -2263,6 +2294,7 @@
           <td class="month-link" onclick="goDetailFromBoard('${r.month}', ${rankNum})">${label}</td>
           ${cells}
           <td>${r.count || 0}</td>
+          <td>${indexPctHtml(r.index_pct)}</td>
           <td>${monthResultHtml(r.batch_half)}</td>
         </tr>`;
       }).join("");
@@ -2278,7 +2310,7 @@
       if (!boardRows.length) {
         document.getElementById("boardTbodyRank1").innerHTML = "";
         document.getElementById("boardTbodyRank2").innerHTML = "";
-        document.getElementById("boardSumRank1").innerHTML = `<td>本页合计</td>${BOARD_PNL_COLS.map(() => "<td>—</td>").join("")}<td>—</td><td>—</td>`;
+        document.getElementById("boardSumRank1").innerHTML = `<td>本页合计</td>${BOARD_PNL_COLS.map(() => "<td>—</td>").join("")}<td>—</td><td>—</td><td>—</td>`;
         document.getElementById("boardSumRank2").innerHTML = document.getElementById("boardSumRank1").innerHTML;
         empty.style.display = "block";
         return;
