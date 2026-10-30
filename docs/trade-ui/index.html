@@ -252,6 +252,7 @@
       display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
       margin-bottom: 14px; background: #fff; border-radius: 16px;
       padding: 12px 14px; box-shadow: var(--shadow); border: 1px solid #eff6ff;
+      overflow: visible; position: relative; z-index: 20;
     }
     .search-box { flex: 1; min-width: 200px; position: relative; }
     .search-box input {
@@ -279,7 +280,7 @@
     }
 
     /* 全部日期 · 区间宫格 */
-    .drange { position: relative; }
+    .drange { position: relative; z-index: 40; }
     .drange-trigger {
       display: inline-flex; align-items: center; gap: 8px;
       min-width: 240px; font: inherit; border-radius: 10px;
@@ -290,7 +291,7 @@
     .drange-trigger .drange-sep { color: var(--muted); }
     .drange-trigger .drange-ico { margin-left: auto; color: #7c3aed; }
     .drange-panel {
-      display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 80;
+      display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 120;
       background: #fff; border: 1px solid #e9d5ff; border-radius: 12px;
       box-shadow: 0 18px 40px rgba(91,33,182,.18); overflow: hidden;
     }
@@ -819,8 +820,6 @@
     <div id="mainView">
     <div class="toolbar">
       <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
-      <button type="button" id="btnMonthPrev" title="切换到上一个月" onclick="goPrevMonth()">‹ 上月</button>
-      <button type="button" id="btnMonthNext" title="切换到下一个月" onclick="goNextMonth()">下月 ›</button>
       <div class="drange" id="dateRange" onclick="event.stopPropagation()">
         <button type="button" class="drange-trigger" id="dateRangeTrigger" onclick="toggleDateRange(event)" title="全部日期（区间）">
           <span id="dateRangeLabel">全部日期 · 本月</span>
@@ -844,6 +843,8 @@
           </div>
         </div>
       </div>
+      <button type="button" id="btnMonthPrev" title="切换到上一个月" onclick="goPrevMonth()">‹ 上月</button>
+      <button type="button" id="btnMonthNext" title="切换到下一个月" onclick="goNextMonth()">下月 ›</button>
       <div class="dropdown" id="monthOps">
         <button type="button" id="btnMonthOps" onclick="toggleMonthOps(event)">操作 ▾</button>
         <div class="dropdown-menu" id="monthOpsMenu">
