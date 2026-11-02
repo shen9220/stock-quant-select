@@ -1,0 +1,21 @@
+{
+  "lane": "sohu",
+  "src": "sohu",
+  "finished_at": "2026-10-30T17:25:55.654584",
+  "results": [
+    {
+      "date": "2026-09-08",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-04",
+      "status": "ok",
+      "filled": 1,
+      "hold": 0,
+      "fail": 0
+    }
+  ]
+}

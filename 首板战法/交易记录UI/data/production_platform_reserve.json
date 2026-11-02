@@ -1,0 +1,41 @@
+{
+  "_doc": "正式通知/早盘模型占用的第三方平台（观测+文档）。回补窗口已统一为每日 10:00→次日 00:00，全平台窗外禁打。",
+  "_rule": "统一窗：每日 10:00→次日 00:00；00:00–10:00 全体安静（护 07–10 正式通知）。过零点停，次日 10:00 续。",
+  "models": {
+    "stock": {
+      "cron": ["08:50 morning_all", "09:05/09:06/09:10 notify watchdog"],
+      "platforms": ["eastmoney", "ths", "baostock", "sina"],
+      "notes": "涨停池主东财、回退同花顺；空壳补字段 eastmoney kline→baostock；日历 sina"
+    },
+    "stock_updata": {
+      "cron": ["09:23 stock_updata_0918"],
+      "platforms": ["eastmoney", "tencent", "sina"],
+      "notes": "涨停池东财；日线/竞价相关腾讯；日历 sina"
+    },
+    "stock_v2": {
+      "cron": ["08:40 d0_preselect", "09:24 auction-final", "09:28 watchdog"],
+      "platforms": ["ths", "eastmoney", "tencent", "tdx", "baostock"],
+      "notes": "名单 ths/东财；换手东财/腾讯/baostock；早盘快照腾讯；真竞价 tdx（hist 另窗）"
+    },
+    "slow": {
+      "cron": ["08:50 morning_all"],
+      "platforms": ["eastmoney", "sina", "tencent"],
+      "notes": "涨停池东财；K 线新浪/腾讯"
+    },
+    "up": {
+      "cron": ["07:50 morning_up_early", "08:50 morning_all"],
+      "platforms": ["eastmoney"],
+      "notes": "涨停池/日线/快照以东财为主"
+    }
+  },
+  "reserved_platforms": ["eastmoney", "ths", "tencent", "baostock", "tdx", "sina", "sohu"],
+  "non_reserved_platforms": [],
+  "aliases": {
+    "em": "eastmoney",
+    "qq": "tencent",
+    "tx": "tencent",
+    "10jqka": "ths",
+    "mootdx": "tdx",
+    "pytdx": "tdx"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "run_id": "163002_run_v2_cf7824f7",
+  "program": "run_v2",
+  "profile": "v2",
+  "finished_at": "2026-10-29T16:30:02",
+  "ok": true,
+  "detail_path": "data_v2/runs/2026-10-29/163002_run_v2_cf7824f7.json",
+  "summary": {
+    "asof": "2026-10-29",
+    "phase": "hold",
+    "ok": true,
+    "paper": true,
+    "profile": "v2",
+    "buy_actions": 0,
+    "buy_types": {},
+    "sell_actions": 0,
+    "sell_types": {}
+  }
+}

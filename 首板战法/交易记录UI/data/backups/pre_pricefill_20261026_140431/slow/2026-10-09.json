@@ -1,0 +1,30 @@
+[
+  {
+    "id": 360,
+    "date": "2026-10-09",
+    "program": "slow",
+    "stock_code": "002687",
+    "stock_name": "乔治白",
+    "buy_price": 6.41,
+    "sell_price_935": 6.46,
+    "sell_price_1315": 6.33,
+    "sell_price_half_935": 6.46,
+    "sell_price_half_1315": 6.33,
+    "sell_price_batch_avg": 6.39,
+    "sell_date": "2026-10-12",
+    "hold_days": 3,
+    "pnl_morning": 0.78,
+    "pnl_afternoon": -1.25,
+    "pnl_morning_half": 0.39,
+    "pnl_afternoon_half": -0.62,
+    "pnl_batch_morning": 0.78,
+    "pnl_batch_afternoon": -1.25,
+    "pnl_batch_total": -0.23,
+    "pnl_batch_total_half": -0.12,
+    "is_second_board": false,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": null,
+    "board": "主板"
+  }
+]

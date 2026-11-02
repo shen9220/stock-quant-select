@@ -1,0 +1,648 @@
+{
+  "analysis_date": "2026-07-17",
+  "model": "强度首板战法",
+  "strategy": "连续涨停1天，早盘集合竞价买入，次日收盘前全部卖出",
+  "position": "每次买入50%（五层仓）",
+  "total_stocks": 42,
+  "qualified_count": 32,
+  "all_stocks": [
+    {
+      "stock_code": "002632",
+      "stock_name": "道明光学",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.6339800357818604,
+        "amount": 145704404,
+        "pct_change": 10.057143211364746,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603580",
+      "stock_name": "艾艾精工",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 0.1128004789352417,
+        "amount": 6019816,
+        "pct_change": 9.991920471191406,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600664",
+      "stock_name": "哈药股份",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 11.784217834472656,
+        "amount": 1464972736,
+        "pct_change": 10.022271156311035,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603327",
+      "stock_name": "福蓉科技",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.1786181926727295,
+        "amount": 195193994,
+        "pct_change": 10.012836456298828,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002739",
+      "stock_name": "儒意电影",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 3.9847586154937744,
+        "amount": 847772736,
+        "pct_change": 10.021322250366211,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600162",
+      "stock_name": "香江控股",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 10.561324119567871,
+        "amount": 906769312,
+        "pct_change": 9.881422996520996,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "920305",
+      "stock_name": "云创退",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 23.227861404418945,
+        "amount": 28797490,
+        "pct_change": 30.000001907348633,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002365",
+      "stock_name": "永安药业",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 10.521297454833984,
+        "amount": 332393760,
+        "pct_change": 10.016695022583008,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002760",
+      "stock_name": "凤形股份",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.911914348602295,
+        "amount": 113018873,
+        "pct_change": 9.975520133972168,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000892",
+      "stock_name": "欢瑞世纪",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 10.799383163452148,
+        "amount": 286035344,
+        "pct_change": 9.943181991577148,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "300968",
+      "stock_name": "格林精密",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.934720993041992,
+        "amount": 164026361,
+        "pct_change": 20.046892166137695,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000920",
+      "stock_name": "沃顿科技",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.5500738620758057,
+        "amount": 229939517,
+        "pct_change": 10.03110408782959,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002045",
+      "stock_name": "国光电器",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.500051021575928,
+        "amount": 250010298,
+        "pct_change": 10.026385307312012,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600602",
+      "stock_name": "云赛智联",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.1885452270507812,
+        "amount": 610624816,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000504",
+      "stock_name": "南华生物",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 8.731159210205078,
+        "amount": 264578564,
+        "pct_change": 9.988248825073242,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002829",
+      "stock_name": "星网宇达",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 8.546716690063477,
+        "amount": 225182984,
+        "pct_change": 9.982486724853516,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "920701",
+      "stock_name": "豪声电子",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 8.274404525756836,
+        "amount": 108155976,
+        "pct_change": 30.000001907348633,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "301176",
+      "stock_name": "逸豪新材",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.740187168121338,
+        "amount": 606740144,
+        "pct_change": 20.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "001230",
+      "stock_name": "劲旅环境",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 8.974895477294922,
+        "amount": 188972284,
+        "pct_change": 10.005653381347656,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600203",
+      "stock_name": "福日电子",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 8.770415306091309,
+        "amount": 606816656,
+        "pct_change": 9.963099479675293,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "300805",
+      "stock_name": "电声股份",
+      "score": 62.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 15.038381576538086,
+        "amount": 367283664,
+        "pct_change": 19.97282600402832,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000676",
+      "stock_name": "智度股份",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 6.61122465133667,
+        "amount": 492758976,
+        "pct_change": 10.088496208190918,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000829",
+      "stock_name": "天音控股",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.107738971710205,
+        "amount": 464930640,
+        "pct_change": 10.012063026428223,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603407",
+      "stock_name": "长裕集团",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 7.970287322998047,
+        "amount": 181259248,
+        "pct_change": 10.005027770996094,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603178",
+      "stock_name": "圣龙股份",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.931967735290527,
+        "amount": 214993618,
+        "pct_change": 9.993012428283691,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603496",
+      "stock_name": "恒为科技",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 7.651207447052002,
+        "amount": 597720224,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002881",
+      "stock_name": "美格智能",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.791943073272705,
+        "amount": 470338400,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002350",
+      "stock_name": "北京科锐",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.451817035675049,
+        "amount": 449832752,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "001365",
+      "stock_name": "天海电子",
+      "score": 62.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 19.251920700073242,
+        "amount": 458764096,
+        "pct_change": 9.994914054870605,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002127",
+      "stock_name": "南极电商",
+      "score": 62.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.2081379890441895,
+        "amount": 391155968,
+        "pct_change": 9.863945960998535,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002173",
+      "stock_name": "创新医疗",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 11.642388343811035,
+        "amount": 828419440,
+        "pct_change": 10.031545639038086,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600785",
+      "stock_name": "新华百货",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 9.56689167022705,
+        "amount": 266701015,
+        "pct_change": 10.035419464111328,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "601595",
+      "stock_name": "上海电影",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.2058544158935547,
+        "amount": 250891899,
+        "pct_change": 9.993943214416504,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000014",
+      "stock_name": "沙河股份",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.21834135055542,
+        "amount": 146091445,
+        "pct_change": 10.011000633239746,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000566",
+      "stock_name": "海南海药",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 22.74599838256836,
+        "amount": 1614644688,
+        "pct_change": 10.097086906433105,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603716",
+      "stock_name": "塞力医疗",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 12.128650665283203,
+        "amount": 422280064,
+        "pct_change": 10.034130096435547,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603108",
+      "stock_name": "润达医疗",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 7.376425743103027,
+        "amount": 445274896,
+        "pct_change": 10.03201675415039,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "001258",
+      "stock_name": "立新能源",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.323430061340332,
+        "amount": 362353568,
+        "pct_change": 9.941520690917969,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002775",
+      "stock_name": "文科股份",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.7634947299957275,
+        "amount": 74252831,
+        "pct_change": 10.06289291381836,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600436",
+      "stock_name": "片仔癀",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.8448188304901123,
+        "amount": 2315698976,
+        "pct_change": 9.998441696166992,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603567",
+      "stock_name": "珍宝岛",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.925288677215576,
+        "amount": 238262495,
+        "pct_change": 10.0401611328125,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600611",
+      "stock_name": "大众交通",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.644952297210693,
+        "amount": 347116528,
+        "pct_change": 9.946236610412598,
+        "zt_reason": "未知"
+      }
+    }
+  ],
+  "top_stocks": [
+    {
+      "rank": 1,
+      "stock_code": "301176",
+      "stock_name": "逸豪新材",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "current_price": 58.2,
+      "market_cap": 0.0,
+      "pe_ratio": 0.0,
+      "turnover": 6.740187168121338,
+      "amount": 606740144.0,
+      "zt_reason": "未知",
+      "trading_advice": {
+        "buy_price": 58.2,
+        "stop_loss": 55.29,
+        "target_profit_up": 62.86,
+        "target_profit_down": 56.45,
+        "forecast_up_pct": 8.0,
+        "forecast_down_pct": -3.0,
+        "position": "50%",
+        "buy_time": "早盘集合竞价附近（9:25）",
+        "sell_time": "次日收盘前"
+      },
+      "details": {
+        "涨停数据": {
+          "score": 45,
+          "details": {
+            "成交额": "6.07亿",
+            "换手率": "6.74%",
+            "涨幅": "20.00%"
+          }
+        },
+        "热点题材": {
+          "score": 15,
+          "reason": "未知"
+        },
+        "基本信息": {
+          "score": 10,
+          "details": {
+            "股价": "未知",
+            "市值": "未知"
+          }
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "stock_code": "600203",
+      "stock_name": "福日电子",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "current_price": 11.92,
+      "market_cap": 0.0,
+      "pe_ratio": 0.0,
+      "turnover": 8.770415306091309,
+      "amount": 606816656.0,
+      "zt_reason": "未知",
+      "trading_advice": {
+        "buy_price": 11.92,
+        "stop_loss": 11.32,
+        "target_profit_up": 12.87,
+        "target_profit_down": 11.56,
+        "forecast_up_pct": 8.0,
+        "forecast_down_pct": -3.0,
+        "position": "50%",
+        "buy_time": "早盘集合竞价附近（9:25）",
+        "sell_time": "次日收盘前"
+      },
+      "details": {
+        "涨停数据": {
+          "score": 45,
+          "details": {
+            "成交额": "6.07亿",
+            "换手率": "8.77%",
+            "涨幅": "9.96%"
+          }
+        },
+        "热点题材": {
+          "score": 15,
+          "reason": "未知"
+        },
+        "基本信息": {
+          "score": 10,
+          "details": {
+            "股价": "未知",
+            "市值": "未知"
+          }
+        }
+      }
+    }
+  ]
+}

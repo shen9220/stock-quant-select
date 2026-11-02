@@ -1,0 +1,2139 @@
+{
+  "checked": 179,
+  "ok": 179,
+  "mismatch": 0,
+  "missing_trades": 0,
+  "d0_confusion_hints": 149,
+  "rows": [
+    {
+      "md": "20260105_recommendations.md",
+      "d0": "2026-01-05",
+      "buy": "2026-01-06",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300238 冠昊生物",
+        "trades_on_d0_cy1": "300058"
+      }
+    },
+    {
+      "md": "20260106_recommendations.md",
+      "d0": "2026-01-06",
+      "buy": "2026-01-07",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300269 联建光电",
+        "trades_on_d0_cy1": "300238"
+      }
+    },
+    {
+      "md": "20260107_recommendations.md",
+      "d0": "2026-01-07",
+      "buy": "2026-01-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301213 观想科技",
+        "trades_on_d0_cy1": "300269"
+      }
+    },
+    {
+      "md": "20260108_recommendations.md",
+      "d0": "2026-01-08",
+      "buy": "2026-01-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300887 谱尼测试",
+        "trades_on_d0_cy1": "301213"
+      }
+    },
+    {
+      "md": "20260109_recommendations.md",
+      "d0": "2026-01-09",
+      "buy": "2026-01-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300051 琏升科技",
+        "trades_on_d0_cy1": "300887"
+      }
+    },
+    {
+      "md": "20260112_recommendations.md",
+      "d0": "2026-01-12",
+      "buy": "2026-01-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300986 志特新材",
+        "trades_on_d0_cy1": "300051"
+      }
+    },
+    {
+      "md": "20260113_recommendations.md",
+      "d0": "2026-01-13",
+      "buy": "2026-01-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300078 思创医惠",
+        "trades_on_d0_cy1": "300986"
+      }
+    },
+    {
+      "md": "20260114_recommendations.md",
+      "d0": "2026-01-14",
+      "buy": "2026-01-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300792 壹网壹创",
+        "trades_on_d0_cy1": "300078"
+      }
+    },
+    {
+      "md": "20260115_recommendations.md",
+      "d0": "2026-01-15",
+      "buy": "2026-01-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300452 山河药辅",
+        "trades_on_d0_cy1": "300792"
+      }
+    },
+    {
+      "md": "20260116_recommendations.md",
+      "d0": "2026-01-16",
+      "buy": "2026-01-19",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300606 金太阳",
+        "trades_on_d0_cy1": "300452"
+      }
+    },
+    {
+      "md": "20260119_recommendations.md",
+      "d0": "2026-01-19",
+      "buy": "2026-01-20",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300111 向日葵",
+        "trades_on_d0_cy1": "300606"
+      }
+    },
+    {
+      "md": "20260120_recommendations.md",
+      "d0": "2026-01-20",
+      "buy": "2026-01-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300242 佳云科技",
+        "trades_on_d0_cy1": "300111"
+      }
+    },
+    {
+      "md": "20260121_recommendations.md",
+      "d0": "2026-01-21",
+      "buy": "2026-01-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300837 浙矿股份",
+        "trades_on_d0_cy1": "300242"
+      }
+    },
+    {
+      "md": "20260122_recommendations.md",
+      "d0": "2026-01-22",
+      "buy": "2026-01-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300592 华凯易佰",
+        "trades_on_d0_cy1": "300837"
+      }
+    },
+    {
+      "md": "20260123_recommendations.md",
+      "d0": "2026-01-23",
+      "buy": "2026-01-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300051 琏升科技",
+        "trades_on_d0_cy1": "300592"
+      }
+    },
+    {
+      "md": "20260126_recommendations.md",
+      "d0": "2026-01-26",
+      "buy": "2026-01-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300017 网宿科技",
+        "trades_on_d0_cy1": "300051"
+      }
+    },
+    {
+      "md": "20260127_recommendations.md",
+      "d0": "2026-01-27",
+      "buy": "2026-01-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300806 斯迪克",
+        "trades_on_d0_cy1": "300017"
+      }
+    },
+    {
+      "md": "20260128_recommendations.md",
+      "d0": "2026-01-28",
+      "buy": "2026-01-29",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300798 锦鸡股份",
+        "trades_on_d0_cy1": "300806"
+      }
+    },
+    {
+      "md": "20260129_recommendations.md",
+      "d0": "2026-01-29",
+      "buy": "2026-01-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300780 德恩精工",
+        "trades_on_d0_cy1": "300798"
+      }
+    },
+    {
+      "md": "20260130_recommendations.md",
+      "d0": "2026-01-30",
+      "buy": "2026-02-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300731 科创新源",
+        "trades_on_d0_cy1": "300780"
+      }
+    },
+    {
+      "md": "20260202_recommendations.md",
+      "d0": "2026-02-02",
+      "buy": "2026-02-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300215 电科院",
+        "trades_on_d0_cy1": "300731"
+      }
+    },
+    {
+      "md": "20260203_recommendations.md",
+      "d0": "2026-02-03",
+      "buy": "2026-02-04",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300757 罗博特科",
+        "trades_on_d0_cy1": "300215"
+      }
+    },
+    {
+      "md": "20260204_recommendations.md",
+      "d0": "2026-02-04",
+      "buy": "2026-02-05",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300393 中来股份",
+        "trades_on_d0_cy1": "300757"
+      }
+    },
+    {
+      "md": "20260205_recommendations.md",
+      "d0": "2026-02-05",
+      "buy": "2026-02-06",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300300 海峡创新",
+        "trades_on_d0_cy1": "300393"
+      }
+    },
+    {
+      "md": "20260206_recommendations.md",
+      "d0": "2026-02-06",
+      "buy": "2026-02-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301312 智立方",
+        "trades_on_d0_cy1": "300300"
+      }
+    },
+    {
+      "md": "20260209_recommendations.md",
+      "d0": "2026-02-09",
+      "buy": "2026-02-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300364 中文在线",
+        "trades_on_d0_cy1": "301312"
+      }
+    },
+    {
+      "md": "20260210_recommendations.md",
+      "d0": "2026-02-10",
+      "buy": "2026-02-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300182 捷成股份",
+        "trades_on_d0_cy1": "300364"
+      }
+    },
+    {
+      "md": "20260211_recommendations.md",
+      "d0": "2026-02-11",
+      "buy": "2026-02-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301526 国际复材",
+        "trades_on_d0_cy1": "300182"
+      }
+    },
+    {
+      "md": "20260212_recommendations.md",
+      "d0": "2026-02-12",
+      "buy": "2026-02-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300277 海联讯",
+        "trades_on_d0_cy1": "301526"
+      }
+    },
+    {
+      "md": "20260213_recommendations.md",
+      "d0": "2026-02-13",
+      "buy": "2026-02-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300719 安达维尔",
+        "trades_on_d0_cy1": "300277"
+      }
+    },
+    {
+      "md": "20260224_recommendations.md",
+      "d0": "2026-02-24",
+      "buy": "2026-02-25",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300157 新锦动力",
+        "trades_on_d0_cy1": "300719"
+      }
+    },
+    {
+      "md": "20260225_recommendations.md",
+      "d0": "2026-02-25",
+      "buy": "2026-02-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300437 清水源",
+        "trades_on_d0_cy1": "300157"
+      }
+    },
+    {
+      "md": "20260226_recommendations.md",
+      "d0": "2026-02-26",
+      "buy": "2026-02-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300943 春晖智控",
+        "trades_on_d0_cy1": "300437"
+      }
+    },
+    {
+      "md": "20260227_recommendations.md",
+      "d0": "2026-02-27",
+      "buy": "2026-03-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300317 珈伟新能",
+        "trades_on_d0_cy1": "300943"
+      }
+    },
+    {
+      "md": "20260302_recommendations.md",
+      "d0": "2026-03-02",
+      "buy": "2026-03-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300191 潜能恒信",
+        "trades_on_d0_cy1": "300317"
+      }
+    },
+    {
+      "md": "20260303_recommendations.md",
+      "d0": "2026-03-03",
+      "buy": "2026-03-04",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300157 新锦动力",
+        "trades_on_d0_cy1": "300191"
+      }
+    },
+    {
+      "md": "20260304_recommendations.md",
+      "d0": "2026-03-04",
+      "buy": "2026-03-05",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300265 通光线缆",
+        "trades_on_d0_cy1": "300157"
+      }
+    },
+    {
+      "md": "20260305_recommendations.md",
+      "d0": "2026-03-05",
+      "buy": "2026-03-06",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300162 雷曼光电",
+        "trades_on_d0_cy1": "300265"
+      }
+    },
+    {
+      "md": "20260306_recommendations.md",
+      "d0": "2026-03-06",
+      "buy": "2026-03-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301032 新柴股份",
+        "trades_on_d0_cy1": "300162"
+      }
+    },
+    {
+      "md": "20260309_recommendations.md",
+      "d0": "2026-03-09",
+      "buy": "2026-03-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301179 泽宇智能",
+        "trades_on_d0_cy1": "301032"
+      }
+    },
+    {
+      "md": "20260310_recommendations.md",
+      "d0": "2026-03-10",
+      "buy": "2026-03-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260311_recommendations.md",
+      "d0": "2026-03-11",
+      "buy": "2026-03-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260312_recommendations.md",
+      "d0": "2026-03-12",
+      "buy": "2026-03-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301396 宏景科技",
+        "trades_on_d0_cy1": "301658"
+      }
+    },
+    {
+      "md": "20260313_recommendations.md",
+      "d0": "2026-03-13",
+      "buy": "2026-03-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300185 通裕重工",
+        "trades_on_d0_cy1": "301396"
+      }
+    },
+    {
+      "md": "20260316_recommendations.md",
+      "d0": "2026-03-16",
+      "buy": "2026-03-17",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300051 琏升科技",
+        "trades_on_d0_cy1": "300185"
+      }
+    },
+    {
+      "md": "20260317_recommendations.md",
+      "d0": "2026-03-17",
+      "buy": "2026-03-18",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301226 祥明智能",
+        "trades_on_d0_cy1": "300051"
+      }
+    },
+    {
+      "md": "20260318_recommendations.md",
+      "d0": "2026-03-18",
+      "buy": "2026-03-19",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300042 朗科科技",
+        "trades_on_d0_cy1": "301226"
+      }
+    },
+    {
+      "md": "20260319_recommendations.md",
+      "d0": "2026-03-19",
+      "buy": "2026-03-20",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300332 天壕能源",
+        "trades_on_d0_cy1": "300042"
+      }
+    },
+    {
+      "md": "20260320_recommendations.md",
+      "d0": "2026-03-20",
+      "buy": "2026-03-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301658 首航新能",
+        "trades_on_d0_cy1": "300332"
+      }
+    },
+    {
+      "md": "20260323_recommendations.md",
+      "d0": "2026-03-23",
+      "buy": "2026-03-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300385 雪浪环境",
+        "trades_on_d0_cy1": "301658"
+      }
+    },
+    {
+      "md": "20260324_recommendations.md",
+      "d0": "2026-03-24",
+      "buy": "2026-03-25",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301226 祥明智能",
+        "trades_on_d0_cy1": "300385"
+      }
+    },
+    {
+      "md": "20260325_recommendations.md",
+      "d0": "2026-03-25",
+      "buy": "2026-03-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300658 延江股份",
+        "trades_on_d0_cy1": "301226"
+      }
+    },
+    {
+      "md": "20260326_recommendations.md",
+      "d0": "2026-03-26",
+      "buy": "2026-03-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260327_recommendations.md",
+      "d0": "2026-03-27",
+      "buy": "2026-03-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260330_recommendations.md",
+      "d0": "2026-03-30",
+      "buy": "2026-03-31",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300385 雪浪环境",
+        "trades_on_d0_cy1": "300204"
+      }
+    },
+    {
+      "md": "20260331_recommendations.md",
+      "d0": "2026-03-31",
+      "buy": "2026-04-01",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300834 星辉环材",
+        "trades_on_d0_cy1": "300385"
+      }
+    },
+    {
+      "md": "20260401_recommendations.md",
+      "d0": "2026-04-01",
+      "buy": "2026-04-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300149 睿智医药",
+        "trades_on_d0_cy1": "300834"
+      }
+    },
+    {
+      "md": "20260402_recommendations.md",
+      "d0": "2026-04-02",
+      "buy": "2026-04-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300839 博汇股份",
+        "trades_on_d0_cy1": "300149"
+      }
+    },
+    {
+      "md": "20260403_recommendations.md",
+      "d0": "2026-04-03",
+      "buy": "2026-04-07",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300608 思特奇",
+        "trades_on_d0_cy1": "300839"
+      }
+    },
+    {
+      "md": "20260407_recommendations.md",
+      "d0": "2026-04-07",
+      "buy": "2026-04-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300651 金陵体育",
+        "trades_on_d0_cy1": "300608"
+      }
+    },
+    {
+      "md": "20260408_recommendations.md",
+      "d0": "2026-04-08",
+      "buy": "2026-04-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300058 蓝色光标",
+        "trades_on_d0_cy1": "300651"
+      }
+    },
+    {
+      "md": "20260409_recommendations.md",
+      "d0": "2026-04-09",
+      "buy": "2026-04-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260410_recommendations.md",
+      "d0": "2026-04-10",
+      "buy": "2026-04-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260413_recommendations.md",
+      "d0": "2026-04-13",
+      "buy": "2026-04-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260414_recommendations.md",
+      "d0": "2026-04-14",
+      "buy": "2026-04-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300857 协创数据",
+        "trades_on_d0_cy1": "301667"
+      }
+    },
+    {
+      "md": "20260415_recommendations.md",
+      "d0": "2026-04-15",
+      "buy": "2026-04-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301408 华人健康",
+        "trades_on_d0_cy1": "300857"
+      }
+    },
+    {
+      "md": "20260416_recommendations.md",
+      "d0": "2026-04-16",
+      "buy": "2026-04-17",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300798 锦鸡股份",
+        "trades_on_d0_cy1": "301408"
+      }
+    },
+    {
+      "md": "20260417_recommendations.md",
+      "d0": "2026-04-17",
+      "buy": "2026-04-20",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260420_recommendations.md",
+      "d0": "2026-04-20",
+      "buy": "2026-04-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260421_recommendations.md",
+      "d0": "2026-04-21",
+      "buy": "2026-04-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300067 安诺其",
+        "trades_on_d0_cy1": "301265"
+      }
+    },
+    {
+      "md": "20260422_recommendations.md",
+      "d0": "2026-04-22",
+      "buy": "2026-04-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260423_recommendations.md",
+      "d0": "2026-04-23",
+      "buy": "2026-04-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260424_recommendations.md",
+      "d0": "2026-04-24",
+      "buy": "2026-04-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300283 温州宏丰",
+        "trades_on_d0_cy1": "300061"
+      }
+    },
+    {
+      "md": "20260427_recommendations.md",
+      "d0": "2026-04-27",
+      "buy": "2026-04-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300582 英飞特",
+        "trades_on_d0_cy1": "300283"
+      }
+    },
+    {
+      "md": "20260429_recommendations.md",
+      "d0": "2026-04-29",
+      "buy": "2026-04-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260430_recommendations.md",
+      "d0": "2026-04-30",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260506_recommendations.md",
+      "d0": "2026-05-06",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260507_recommendations.md",
+      "d0": "2026-05-07",
+      "buy": "2026-05-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300052 中青宝",
+        "trades_on_d0_cy1": "301308"
+      }
+    },
+    {
+      "md": "20260508_recommendations.md",
+      "d0": "2026-05-08",
+      "buy": "2026-05-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300283 温州宏丰",
+        "trades_on_d0_cy1": "300052"
+      }
+    },
+    {
+      "md": "20260511_recommendations.md",
+      "d0": "2026-05-11",
+      "buy": "2026-05-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300449 汉邦高科",
+        "trades_on_d0_cy1": "300283"
+      }
+    },
+    {
+      "md": "20260512_recommendations.md",
+      "d0": "2026-05-12",
+      "buy": "2026-05-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300004 南风股份",
+        "trades_on_d0_cy1": "300449"
+      }
+    },
+    {
+      "md": "20260513_recommendations.md",
+      "d0": "2026-05-13",
+      "buy": "2026-05-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300965 恒宇信通",
+        "trades_on_d0_cy1": "300004"
+      }
+    },
+    {
+      "md": "20260514_recommendations.md",
+      "d0": "2026-05-14",
+      "buy": "2026-05-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260515_recommendations.md",
+      "d0": "2026-05-15",
+      "buy": "2026-05-18",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260518_recommendations.md",
+      "d0": "2026-05-18",
+      "buy": "2026-05-19",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300657 弘信电子",
+        "trades_on_d0_cy1": "301081"
+      }
+    },
+    {
+      "md": "20260519_recommendations.md",
+      "d0": "2026-05-19",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260520_recommendations.md",
+      "d0": "2026-05-20",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260521_recommendations.md",
+      "d0": "2026-05-21",
+      "buy": "2026-05-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260522_recommendations.md",
+      "d0": "2026-05-22",
+      "buy": "2026-05-25",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260525_recommendations.md",
+      "d0": "2026-05-25",
+      "buy": "2026-05-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300196 长海股份",
+        "trades_on_d0_cy1": "300243"
+      }
+    },
+    {
+      "md": "20260526_recommendations.md",
+      "d0": "2026-05-26",
+      "buy": "2026-05-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300795 米奥会展",
+        "trades_on_d0_cy1": "300196"
+      }
+    },
+    {
+      "md": "20260527_recommendations.md",
+      "d0": "2026-05-27",
+      "buy": "2026-05-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260528_recommendations.md",
+      "d0": "2026-05-28",
+      "buy": "2026-05-29",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260529_recommendations.md",
+      "d0": "2026-05-29",
+      "buy": "2026-06-01",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301360 荣旗科技",
+        "trades_on_d0_cy1": "300489"
+      }
+    },
+    {
+      "md": "20260601_recommendations.md",
+      "d0": "2026-06-01",
+      "buy": "2026-06-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300103 达刚控股",
+        "trades_on_d0_cy1": "301360"
+      }
+    },
+    {
+      "md": "20260602_recommendations.md",
+      "d0": "2026-06-02",
+      "buy": "2026-06-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300197 节能铁汉",
+        "trades_on_d0_cy1": "300103"
+      }
+    },
+    {
+      "md": "20260603_recommendations.md",
+      "d0": "2026-06-03",
+      "buy": "2026-06-04",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300516 久之洋",
+        "trades_on_d0_cy1": "300197"
+      }
+    },
+    {
+      "md": "20260604_recommendations.md",
+      "d0": "2026-06-04",
+      "buy": "2026-06-05",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300726 宏达电子",
+        "trades_on_d0_cy1": "300516"
+      }
+    },
+    {
+      "md": "20260605_recommendations.md",
+      "d0": "2026-06-05",
+      "buy": "2026-06-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300626 华瑞股份",
+        "trades_on_d0_cy1": "300726"
+      }
+    },
+    {
+      "md": "20260608_recommendations.md",
+      "d0": "2026-06-08",
+      "buy": "2026-06-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300105 龙源技术",
+        "trades_on_d0_cy1": "300626"
+      }
+    },
+    {
+      "md": "20260609_recommendations.md",
+      "d0": "2026-06-09",
+      "buy": "2026-06-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300260 新莱应材",
+        "trades_on_d0_cy1": "300105"
+      }
+    },
+    {
+      "md": "20260610_recommendations.md",
+      "d0": "2026-06-10",
+      "buy": "2026-06-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300721 怡达股份",
+        "trades_on_d0_cy1": "300260"
+      }
+    },
+    {
+      "md": "20260611_recommendations.md",
+      "d0": "2026-06-11",
+      "buy": "2026-06-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300289 利德曼",
+        "trades_on_d0_cy1": "300721"
+      }
+    },
+    {
+      "md": "20260612_recommendations.md",
+      "d0": "2026-06-12",
+      "buy": "2026-06-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301348 蓝箭电子",
+        "trades_on_d0_cy1": "300289"
+      }
+    },
+    {
+      "md": "20260615_recommendations.md",
+      "d0": "2026-06-15",
+      "buy": "2026-06-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300570 太辰光",
+        "trades_on_d0_cy1": "301348"
+      }
+    },
+    {
+      "md": "20260616_recommendations.md",
+      "d0": "2026-06-16",
+      "buy": "2026-06-17",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300780 德恩精工",
+        "trades_on_d0_cy1": "300570"
+      }
+    },
+    {
+      "md": "20260617_recommendations.md",
+      "d0": "2026-06-17",
+      "buy": "2026-06-18",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300351 永贵电器",
+        "trades_on_d0_cy1": "300780"
+      }
+    },
+    {
+      "md": "20260618_recommendations.md",
+      "d0": "2026-06-18",
+      "buy": "2026-06-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301580 爱迪特",
+        "trades_on_d0_cy1": "300351"
+      }
+    },
+    {
+      "md": "20260622_recommendations.md",
+      "d0": "2026-06-22",
+      "buy": "2026-06-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301548 崇德科技",
+        "trades_on_d0_cy1": "301580"
+      }
+    },
+    {
+      "md": "20260623_recommendations.md",
+      "d0": "2026-06-23",
+      "buy": "2026-06-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300961 深水海纳",
+        "trades_on_d0_cy1": "301548"
+      }
+    },
+    {
+      "md": "20260624_recommendations.md",
+      "d0": "2026-06-24",
+      "buy": "2026-06-25",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260625_recommendations.md",
+      "d0": "2026-06-25",
+      "buy": "2026-06-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260626_recommendations.md",
+      "d0": "2026-06-26",
+      "buy": "2026-06-29",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300540 蜀道装备",
+        "trades_on_d0_cy1": "300819"
+      }
+    },
+    {
+      "md": "20260629_recommendations.md",
+      "d0": "2026-06-29",
+      "buy": "2026-06-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300204 舒泰神",
+        "trades_on_d0_cy1": "300540"
+      }
+    },
+    {
+      "md": "20260630_recommendations.md",
+      "d0": "2026-06-30",
+      "buy": "2026-07-01",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300269 联建光电",
+        "trades_on_d0_cy1": "300204"
+      }
+    },
+    {
+      "md": "20260701_recommendations.md",
+      "d0": "2026-07-01",
+      "buy": "2026-07-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300175 朗源股份",
+        "trades_on_d0_cy1": "300269"
+      }
+    },
+    {
+      "md": "20260702_recommendations.md",
+      "d0": "2026-07-02",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260703_recommendations.md",
+      "d0": "2026-07-03",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260706_recommendations.md",
+      "d0": "2026-07-06",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260707_recommendations.md",
+      "d0": "2026-07-07",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260708_recommendations.md",
+      "d0": "2026-07-08",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260709_recommendations.md",
+      "d0": "2026-07-09",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260710_recommendations.md",
+      "d0": "2026-07-10",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260713_recommendations.md",
+      "d0": "2026-07-13",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260714_recommendations.md",
+      "d0": "2026-07-14",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260715_recommendations.md",
+      "d0": "2026-07-15",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260716_recommendations.md",
+      "d0": "2026-07-16",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260717_recommendations.md",
+      "d0": "2026-07-17",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260720_recommendations.md",
+      "d0": "2026-07-20",
+      "buy": "2026-07-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300368 汇金股份",
+        "trades_on_d0_cy1": "300577"
+      }
+    },
+    {
+      "md": "20260721_recommendations.md",
+      "d0": "2026-07-21",
+      "buy": "2026-07-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300093 金刚光伏",
+        "trades_on_d0_cy1": "300368"
+      }
+    },
+    {
+      "md": "20260722_recommendations.md",
+      "d0": "2026-07-22",
+      "buy": "2026-07-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300834 星辉环材",
+        "trades_on_d0_cy1": "300093"
+      }
+    },
+    {
+      "md": "20260723_recommendations.md",
+      "d0": "2026-07-23",
+      "buy": "2026-07-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300062 中能电气",
+        "trades_on_d0_cy1": "300834"
+      }
+    },
+    {
+      "md": "20260724_recommendations.md",
+      "d0": "2026-07-24",
+      "buy": "2026-07-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301583 托伦斯",
+        "trades_on_d0_cy1": "300062"
+      }
+    },
+    {
+      "md": "20260727_recommendations.md",
+      "d0": "2026-07-27",
+      "buy": "2026-07-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300214 日科化学",
+        "trades_on_d0_cy1": "301583"
+      }
+    },
+    {
+      "md": "20260728_recommendations.md",
+      "d0": "2026-07-28",
+      "buy": null,
+      "status": "skip_empty"
+    },
+    {
+      "md": "20260729_recommendations.md",
+      "d0": "2026-07-29",
+      "buy": "2026-07-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300333 兆日科技",
+        "trades_on_d0_cy1": "300067"
+      }
+    },
+    {
+      "md": "20260730_recommendations.md",
+      "d0": "2026-07-30",
+      "buy": "2026-07-31",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300996 普联软件",
+        "trades_on_d0_cy1": "300333"
+      }
+    },
+    {
+      "md": "20260731_recommendations.md",
+      "d0": "2026-07-31",
+      "buy": "2026-08-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300508 维宏股份",
+        "trades_on_d0_cy1": "300996"
+      }
+    },
+    {
+      "md": "20260803_recommendations.md",
+      "d0": "2026-08-03",
+      "buy": "2026-08-04",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300613 富瀚微",
+        "trades_on_d0_cy1": "300508"
+      }
+    },
+    {
+      "md": "20260804_recommendations.md",
+      "d0": "2026-08-04",
+      "buy": "2026-08-05",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301396 宏景科技",
+        "trades_on_d0_cy1": "300613"
+      }
+    },
+    {
+      "md": "20260805_recommendations.md",
+      "d0": "2026-08-05",
+      "buy": "2026-08-06",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300248 新开普",
+        "trades_on_d0_cy1": "301396"
+      }
+    },
+    {
+      "md": "20260806_recommendations.md",
+      "d0": "2026-08-06",
+      "buy": "2026-08-07",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300311 任子行",
+        "trades_on_d0_cy1": "300248"
+      }
+    },
+    {
+      "md": "20260807_recommendations.md",
+      "d0": "2026-08-07",
+      "buy": "2026-08-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301234 五洲医疗",
+        "trades_on_d0_cy1": "300311"
+      }
+    },
+    {
+      "md": "20260810_recommendations.md",
+      "d0": "2026-08-10",
+      "buy": "2026-08-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300862 蓝盾光电",
+        "trades_on_d0_cy1": "301234"
+      }
+    },
+    {
+      "md": "20260811_recommendations.md",
+      "d0": "2026-08-11",
+      "buy": "2026-08-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300426 华智数媒",
+        "trades_on_d0_cy1": "300862"
+      }
+    },
+    {
+      "md": "20260812_recommendations.md",
+      "d0": "2026-08-12",
+      "buy": "2026-08-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300197 节能铁汉",
+        "trades_on_d0_cy1": "300426"
+      }
+    },
+    {
+      "md": "20260813_recommendations.md",
+      "d0": "2026-08-13",
+      "buy": "2026-08-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300333 兆日科技",
+        "trades_on_d0_cy1": "300197"
+      }
+    },
+    {
+      "md": "20260814_recommendations.md",
+      "d0": "2026-08-14",
+      "buy": "2026-08-17",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300017 网宿科技",
+        "trades_on_d0_cy1": "300333"
+      }
+    },
+    {
+      "md": "20260817_recommendations.md",
+      "d0": "2026-08-17",
+      "buy": "2026-08-18",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301282 金禄电子",
+        "trades_on_d0_cy1": "300017"
+      }
+    },
+    {
+      "md": "20260818_recommendations.md",
+      "d0": "2026-08-18",
+      "buy": "2026-08-19",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301106 骏成科技",
+        "trades_on_d0_cy1": "301282"
+      }
+    },
+    {
+      "md": "20260819_recommendations.md",
+      "d0": "2026-08-19",
+      "buy": "2026-08-20",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300911 亿田智能",
+        "trades_on_d0_cy1": "301106"
+      }
+    },
+    {
+      "md": "20260820_recommendations.md",
+      "d0": "2026-08-20",
+      "buy": "2026-08-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300006 莱美药业",
+        "trades_on_d0_cy1": "300911"
+      }
+    },
+    {
+      "md": "20260821_recommendations.md",
+      "d0": "2026-08-21",
+      "buy": "2026-08-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300016 北陆药业",
+        "trades_on_d0_cy1": "300006"
+      }
+    },
+    {
+      "md": "20260824_recommendations.md",
+      "d0": "2026-08-24",
+      "buy": "2026-08-25",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300313 天山生物",
+        "trades_on_d0_cy1": "300016"
+      }
+    },
+    {
+      "md": "20260825_recommendations.md",
+      "d0": "2026-08-25",
+      "buy": "2026-08-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300097 智云股份",
+        "trades_on_d0_cy1": "300313"
+      }
+    },
+    {
+      "md": "20260826_recommendations.md",
+      "d0": "2026-08-26",
+      "buy": "2026-08-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301177 迪阿股份",
+        "trades_on_d0_cy1": "300097"
+      }
+    },
+    {
+      "md": "20260827_recommendations.md",
+      "d0": "2026-08-27",
+      "buy": "2026-08-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301591 肯特股份",
+        "trades_on_d0_cy1": "301177"
+      }
+    },
+    {
+      "md": "20260828_recommendations.md",
+      "d0": "2026-08-28",
+      "buy": "2026-08-31",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300378 鼎捷数智",
+        "trades_on_d0_cy1": "301591"
+      }
+    },
+    {
+      "md": "20260831_recommendations.md",
+      "d0": "2026-08-31",
+      "buy": "2026-09-01",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300911 亿田智能",
+        "trades_on_d0_cy1": "300378"
+      }
+    },
+    {
+      "md": "20260901_recommendations.md",
+      "d0": "2026-09-01",
+      "buy": "2026-09-02",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300189 神农种业",
+        "trades_on_d0_cy1": "300911"
+      }
+    },
+    {
+      "md": "20260902_recommendations.md",
+      "d0": "2026-09-02",
+      "buy": "2026-09-03",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260903_recommendations.md",
+      "d0": "2026-09-03",
+      "buy": "2026-09-04",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260904_recommendations.md",
+      "d0": "2026-09-04",
+      "buy": "2026-09-07",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260907_recommendations.md",
+      "d0": "2026-09-07",
+      "buy": "2026-09-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260908_recommendations.md",
+      "d0": "2026-09-08",
+      "buy": "2026-09-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300788 中信出版",
+        "trades_on_d0_cy1": "301516"
+      }
+    },
+    {
+      "md": "20260909_recommendations.md",
+      "d0": "2026-09-09",
+      "buy": "2026-09-10",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260910_recommendations.md",
+      "d0": "2026-09-10",
+      "buy": "2026-09-11",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260911_recommendations.md",
+      "d0": "2026-09-11",
+      "buy": "2026-09-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260914_recommendations.md",
+      "d0": "2026-09-14",
+      "buy": "2026-09-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260915_recommendations.md",
+      "d0": "2026-09-15",
+      "buy": "2026-09-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260916_recommendations.md",
+      "d0": "2026-09-16",
+      "buy": "2026-09-17",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": null
+    },
+    {
+      "md": "20260917_recommendations.md",
+      "d0": "2026-09-17",
+      "buy": "2026-09-18",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301390 经纬股份",
+        "trades_on_d0_cy1": "300656"
+      }
+    },
+    {
+      "md": "20260918_recommendations.md",
+      "d0": "2026-09-18",
+      "buy": "2026-09-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301689 电科思仪",
+        "trades_on_d0_cy1": "301390"
+      }
+    },
+    {
+      "md": "20260921_recommendations.md",
+      "d0": "2026-09-21",
+      "buy": "2026-09-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300642 透景生命",
+        "trades_on_d0_cy1": "301689"
+      }
+    },
+    {
+      "md": "20260922_recommendations.md",
+      "d0": "2026-09-22",
+      "buy": "2026-09-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300324 旋极信息",
+        "trades_on_d0_cy1": "300642"
+      }
+    },
+    {
+      "md": "20260923_recommendations.md",
+      "d0": "2026-09-23",
+      "buy": "2026-09-24",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301150 中一科技",
+        "trades_on_d0_cy1": "300324"
+      }
+    },
+    {
+      "md": "20260924_recommendations.md",
+      "d0": "2026-09-24",
+      "buy": "2026-09-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301689 电科思仪",
+        "trades_on_d0_cy1": "301150"
+      }
+    },
+    {
+      "md": "20260928_recommendations.md",
+      "d0": "2026-09-28",
+      "buy": "2026-09-29",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301190 善水科技",
+        "trades_on_d0_cy1": "301689"
+      }
+    },
+    {
+      "md": "20260929_recommendations.md",
+      "d0": "2026-09-29",
+      "buy": "2026-09-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301560 众捷股份",
+        "trades_on_d0_cy1": "301190"
+      }
+    },
+    {
+      "md": "20260930_recommendations.md",
+      "d0": "2026-09-30",
+      "buy": "2026-10-08",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300893 松原安全",
+        "trades_on_d0_cy1": "301560"
+      }
+    },
+    {
+      "md": "20261008_recommendations.md",
+      "d0": "2026-10-08",
+      "buy": "2026-10-09",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301697 贝特利",
+        "trades_on_d0_cy1": "300893"
+      }
+    },
+    {
+      "md": "20261009_recommendations.md",
+      "d0": "2026-10-09",
+      "buy": "2026-10-12",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300821 东岳硅材",
+        "trades_on_d0_cy1": "301697"
+      }
+    },
+    {
+      "md": "20261012_recommendations.md",
+      "d0": "2026-10-12",
+      "buy": "2026-10-13",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300006 莱美药业",
+        "trades_on_d0_cy1": "300821"
+      }
+    },
+    {
+      "md": "20261013_recommendations.md",
+      "d0": "2026-10-13",
+      "buy": "2026-10-14",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300107 建新股份",
+        "trades_on_d0_cy1": "300006"
+      }
+    },
+    {
+      "md": "20261014_recommendations.md",
+      "d0": "2026-10-14",
+      "buy": "2026-10-15",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300299 富春股份",
+        "trades_on_d0_cy1": "300107"
+      }
+    },
+    {
+      "md": "20261015_recommendations.md",
+      "d0": "2026-10-15",
+      "buy": "2026-10-16",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300111 向日葵",
+        "trades_on_d0_cy1": "300299"
+      }
+    },
+    {
+      "md": "20261016_recommendations.md",
+      "d0": "2026-10-16",
+      "buy": "2026-10-19",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300045 华力创通",
+        "trades_on_d0_cy1": "300111"
+      }
+    },
+    {
+      "md": "20261019_recommendations.md",
+      "d0": "2026-10-19",
+      "buy": "2026-10-20",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301666 大普微-UW",
+        "trades_on_d0_cy1": "300045"
+      }
+    },
+    {
+      "md": "20261020_recommendations.md",
+      "d0": "2026-10-20",
+      "buy": "2026-10-21",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300244 迪安诊断",
+        "trades_on_d0_cy1": "301666"
+      }
+    },
+    {
+      "md": "20261021_recommendations.md",
+      "d0": "2026-10-21",
+      "buy": "2026-10-22",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300006 莱美药业",
+        "trades_on_d0_cy1": "300244"
+      }
+    },
+    {
+      "md": "20261022_recommendations.md",
+      "d0": "2026-10-22",
+      "buy": "2026-10-23",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301023 奕帆传动",
+        "trades_on_d0_cy1": "300006"
+      }
+    },
+    {
+      "md": "20261023_recommendations.md",
+      "d0": "2026-10-23",
+      "buy": "2026-10-26",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301660 粤芯半导-U",
+        "trades_on_d0_cy1": "301023"
+      }
+    },
+    {
+      "md": "20261026_recommendations.md",
+      "d0": "2026-10-26",
+      "buy": "2026-10-27",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300949 奥雅股份",
+        "trades_on_d0_cy1": "301660"
+      }
+    },
+    {
+      "md": "20261027_recommendations.md",
+      "d0": "2026-10-27",
+      "buy": "2026-10-28",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301682 宏明电子",
+        "trades_on_d0_cy1": "300949"
+      }
+    },
+    {
+      "md": "20261028_recommendations.md",
+      "d0": "2026-10-28",
+      "buy": "2026-10-29",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "300006 莱美药业",
+        "trades_on_d0_cy1": "301682"
+      }
+    },
+    {
+      "md": "20261029_recommendations.md",
+      "d0": "2026-10-29",
+      "buy": "2026-10-30",
+      "status": "ok",
+      "bad": [],
+      "d0_date_confusion": {
+        "hint": "UI若按涨停日D0点开会看到别票；正确买入日见 buy",
+        "results_cy1": "301079 邵阳液压",
+        "trades_on_d0_cy1": "300006"
+      }
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "d0": "2026-10-22",
+  "d1": "2026-10-23",
+  "status": "NO_TRADE",
+  "reason": "无合格A/B候选或竞价数据不足",
+  "allocation": "A_FIRST_B_FILL",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [],
+  "scan_log_head": [
+    {
+      "code": "002307",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 6.195
+    },
+    {
+      "code": "002535",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.455
+    },
+    {
+      "code": "600261",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -5.556
+    },
+    {
+      "code": "603350",
+      "path": "B",
+      "score": 70.43,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "301502",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 7.407
+    },
+    {
+      "code": "603280",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.635
+    },
+    {
+      "code": "002097",
+      "path": "B",
+      "score": 47.12,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603089",
+      "path": "B",
+      "score": 58.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "600192",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -3.842
+    },
+    {
+      "code": "600698",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.25
+    },
+    {
+      "code": "603528",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -4.189
+    }
+  ],
+  "scan_log_n": 11,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "tdx_quota_stopped": false,
+  "generated_at": "2026-10-28T15:26:03",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00"
+}

@@ -1,0 +1,759 @@
+{
+  "last_run": {
+    "date": "2026-07-31",
+    "buy_sync": {
+      "synced": 2,
+      "created": 2,
+      "updated": 0,
+      "source": "stock_py_md",
+      "md_path": "/Users/admin/new_stock/stock-quant-select/01_量化模型/首板战法/results/20260730_recommendations.md",
+      "d0": "2026-07-30",
+      "records": [
+        {
+          "date": "2026-07-31",
+          "stock_code": "001309",
+          "stock_name": "德明利",
+          "rank": 1
+        },
+        {
+          "date": "2026-07-31",
+          "stock_code": "000566",
+          "stock_name": "海南海药",
+          "rank": 2
+        }
+      ],
+      "removed_extra": []
+    },
+    "buy_enriched": 1,
+    "sell_enriched": 1,
+    "removed_open_limit": [
+      {
+        "id": 266,
+        "date": "2026-07-31",
+        "code": "001309",
+        "name": "德明利",
+        "note": "open_limit_unfilled"
+      }
+    ],
+    "touched_days": [
+      "2026-07-30",
+      "2026-07-31"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-07-31T17:15:18"
+  },
+  "note": "cleared morning false-complete; awaiting real close run",
+  "last_success_date": "2026-11-02",
+  "last_close_run_date": "2026-11-02",
+  "last_close_run": {
+    "date": "2026-11-02",
+    "program": "stock_v2",
+    "buy_sync": {
+      "created": 0,
+      "updated": 3,
+      "status": "OK"
+    },
+    "buy_enriched": 3,
+    "sell_enriched": 0,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-11-02"
+    ],
+    "recalculated": 3,
+    "finished_at": "2026-11-02T15:06:47",
+    "incomplete": false
+  },
+  "last_run_stock": {
+    "date": "2026-11-02",
+    "program": "stock",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "stock_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/stock-V1/stock-V1（默认原）/results/20261030_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "stock",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "301520",
+          "stock_name": "万邦医药",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "600721",
+          "stock_name": "百花医药",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "stock"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 4,
+    "sell_enriched": 23,
+    "removed_open_limit": [
+      {
+        "id": 1710,
+        "date": "2026-09-07",
+        "code": "000735",
+        "name": "罗牛山",
+        "note": "open_limit_unfilled"
+      },
+      {
+        "id": 1701,
+        "date": "2026-09-16",
+        "code": "002882",
+        "name": "金龙羽",
+        "note": "open_limit_unfilled"
+      },
+      {
+        "id": 1084,
+        "date": "2026-09-18",
+        "code": "301390",
+        "name": "经纬股份",
+        "note": "open_limit_unfilled"
+      }
+    ],
+    "touched_days": [
+      "2026-09-04",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23",
+      "2026-09-24",
+      "2026-09-28",
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 91,
+    "finished_at": "2026-11-02T15:02:47",
+    "incomplete": false
+  },
+  "last_close_run_date_stock": "2026-11-02",
+  "last_close_run_stock": {
+    "date": "2026-11-02",
+    "program": "stock",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "stock_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/stock-V1/stock-V1（默认原）/results/20261030_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "stock",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "301520",
+          "stock_name": "万邦医药",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "600721",
+          "stock_name": "百花医药",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "stock"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 4,
+    "sell_enriched": 23,
+    "removed_open_limit": [
+      {
+        "id": 1710,
+        "date": "2026-09-07",
+        "code": "000735",
+        "name": "罗牛山",
+        "note": "open_limit_unfilled"
+      },
+      {
+        "id": 1701,
+        "date": "2026-09-16",
+        "code": "002882",
+        "name": "金龙羽",
+        "note": "open_limit_unfilled"
+      },
+      {
+        "id": 1084,
+        "date": "2026-09-18",
+        "code": "301390",
+        "name": "经纬股份",
+        "note": "open_limit_unfilled"
+      }
+    ],
+    "touched_days": [
+      "2026-09-04",
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-21",
+      "2026-09-22",
+      "2026-09-23",
+      "2026-09-24",
+      "2026-09-28",
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 91,
+    "finished_at": "2026-11-02T15:02:47",
+    "incomplete": false
+  },
+  "last_run_slow": {
+    "date": "2026-11-02",
+    "program": "slow",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "slow_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/Stock（低价）/results/20261030_slow_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "slow",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "300030",
+          "stock_name": "阳普医疗",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "000716",
+          "stock_name": "黑芝麻",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "slow"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-28",
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:04:27",
+    "incomplete": false
+  },
+  "last_close_run_slow": {
+    "date": "2026-11-02",
+    "program": "slow",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "slow_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/Stock（低价）/results/20261030_slow_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "slow",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "300030",
+          "stock_name": "阳普医疗",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "000716",
+          "stock_name": "黑芝麻",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "slow"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-28",
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:04:27",
+    "incomplete": false
+  },
+  "last_run_up": {
+    "date": "2026-11-02",
+    "program": "up",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "buy_date": "2026-11-02",
+      "d0": "2026-10-30",
+      "source": "up_py_json",
+      "json_path": "/Users/admin/stock_quant_select/首板战法/up/strength_limit_up_result.json",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "002636",
+          "stock_name": "金安国纪",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "603200",
+          "stock_name": "上海洗霸",
+          "rank": 2
+        }
+      ],
+      "stocks": [
+        "002636 金安国纪",
+        "603200 上海洗霸"
+      ]
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:05:37",
+    "incomplete": false
+  },
+  "last_close_run_up": {
+    "date": "2026-11-02",
+    "program": "up",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "buy_date": "2026-11-02",
+      "d0": "2026-10-30",
+      "source": "up_py_json",
+      "json_path": "/Users/admin/stock_quant_select/首板战法/up/strength_limit_up_result.json",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "002636",
+          "stock_name": "金安国纪",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "603200",
+          "stock_name": "上海洗霸",
+          "rank": 2
+        }
+      ],
+      "stocks": [
+        "002636 金安国纪",
+        "603200 上海洗霸"
+      ]
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:05:37",
+    "incomplete": false
+  },
+  "last_morning_sync_up": {
+    "synced": 2,
+    "created": 0,
+    "updated": 2,
+    "buy_date": "2026-11-02",
+    "d0": "2026-10-30",
+    "source": "up_py_json",
+    "json_path": "/Users/admin/stock_quant_select/首板战法/up/strength_limit_up_result.json",
+    "records": [
+      {
+        "date": "2026-11-02",
+        "stock_code": "002636",
+        "stock_name": "金安国纪",
+        "rank": 1
+      },
+      {
+        "date": "2026-11-02",
+        "stock_code": "603200",
+        "stock_name": "上海洗霸",
+        "rank": 2
+      }
+    ],
+    "stocks": [
+      "002636 金安国纪",
+      "603200 上海洗霸"
+    ],
+    "date": "2026-11-02",
+    "phase": "morning_sync"
+  },
+  "last_morning_sync_date_up": "2026-11-02",
+  "last_morning_sync_slow": {
+    "synced": 2,
+    "created": 0,
+    "updated": 2,
+    "source": "slow_py_md",
+    "md_path": "/Users/admin/stock_quant_select/首板战法/Stock（低价）/results/20261030_slow_recommendations.md",
+    "d0": "2026-10-30",
+    "program": "slow",
+    "records": [
+      {
+        "date": "2026-11-02",
+        "stock_code": "300030",
+        "stock_name": "阳普医疗",
+        "rank": 1
+      },
+      {
+        "date": "2026-11-02",
+        "stock_code": "000716",
+        "stock_name": "黑芝麻",
+        "rank": 2
+      }
+    ],
+    "rank_placeholders": {
+      "ok": true,
+      "added": 0,
+      "date": "2026-11-02",
+      "program": "slow"
+    },
+    "removed_extra": [],
+    "date": "2026-11-02",
+    "phase": "morning_sync"
+  },
+  "last_morning_sync_date_slow": "2026-11-02",
+  "last_morning_verify": {
+    "date": "2026-10-28",
+    "phase": "14:30_verify",
+    "check": {
+      "slow": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "up": {
+        "ready": true,
+        "reason": "ok"
+      }
+    },
+    "retry": null
+  },
+  "last_morning_verify_date": "2026-10-28",
+  "last_morning_produce_date": "2026-11-02",
+  "last_ensure_slow_up": {
+    "date": "2026-11-02",
+    "label": "14:30_verify",
+    "programs": {
+      "slow": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "up": {
+        "ready": true,
+        "reason": "ok"
+      }
+    },
+    "produce": null
+  },
+  "last_close_run_date_up": "2026-11-02",
+  "last_morning_retry_8:50_primary_date": "2026-11-02",
+  "last_morning_retry_9:30_verify_date": "2026-11-02",
+  "last_morning_retry_10:30_verify_date": "2026-11-02",
+  "last_morning_retry_12:30_verify_date": "2026-11-02",
+  "last_morning_retry_14:30_verify_date": "2026-11-02",
+  "last_morning_retry_7:50_up_early_date": "2026-11-02",
+  "last_run_stock_updata": {
+    "date": "2026-11-02",
+    "program": "stock_updata",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "stock_updata_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/Stock-V1（水下）/results/20261030_stock_updata_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "stock_updata",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "301132",
+          "stock_name": "满坤科技",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "300030",
+          "stock_name": "阳普医疗",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "stock_updata"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:03:39",
+    "incomplete": false
+  },
+  "last_close_run_stock_updata": {
+    "date": "2026-11-02",
+    "program": "stock_updata",
+    "buy_sync": {
+      "synced": 2,
+      "created": 0,
+      "updated": 2,
+      "source": "stock_updata_py_md",
+      "md_path": "/Users/admin/stock_quant_select/首板战法/Stock-V1（水下）/results/20261030_stock_updata_recommendations.md",
+      "d0": "2026-10-30",
+      "program": "stock_updata",
+      "records": [
+        {
+          "date": "2026-11-02",
+          "stock_code": "301132",
+          "stock_name": "满坤科技",
+          "rank": 1
+        },
+        {
+          "date": "2026-11-02",
+          "stock_code": "300030",
+          "stock_name": "阳普医疗",
+          "rank": 2
+        }
+      ],
+      "rank_placeholders": {
+        "ok": true,
+        "added": 0,
+        "date": "2026-11-02",
+        "program": "stock_updata"
+      },
+      "removed_extra": []
+    },
+    "buy_enriched": 2,
+    "sell_enriched": 2,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-10-30",
+      "2026-11-02"
+    ],
+    "recalculated": 4,
+    "finished_at": "2026-11-02T15:03:39",
+    "incomplete": false
+  },
+  "last_close_run_date_stock_updata": "2026-11-02",
+  "last_close_run_date_slow": "2026-11-02",
+  "last_sell_retry_ts_slow": 1792743870.723262,
+  "sell_retry_count_slow_2026-10-23": 1,
+  "last_sell_retry_ts_stock": 1793352294.30927,
+  "sell_retry_count_stock_2026-10-27": 1,
+  "last_ui_tabs_ensure": {
+    "date": "2026-11-02",
+    "label": "14:30_verify",
+    "programs": {
+      "stock": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "stock_updata": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "stock_v2": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "slow": {
+        "ready": true,
+        "reason": "ok"
+      },
+      "up": {
+        "ready": true,
+        "reason": "ok"
+      }
+    },
+    "boards": {
+      "ready": true,
+      "reason": "already_done"
+    },
+    "ready": true,
+    "slow_up": {
+      "date": "2026-11-02",
+      "label": "14:30_verify",
+      "programs": {
+        "slow": {
+          "ready": true,
+          "reason": "ok"
+        },
+        "up": {
+          "ready": true,
+          "reason": "ok"
+        }
+      },
+      "produce": null
+    },
+    "tabs": {
+      "stock": true,
+      "stock_v2": true,
+      "stock_updata": true,
+      "slow": true,
+      "up": true,
+      "主板": true,
+      "创业板": true
+    }
+  },
+  "last_ui_tabs_ensure_date": "2026-11-02",
+  "last_ui_tabs_ensure_label": "14:30_verify",
+  "last_run_stock_v2": {
+    "date": "2026-11-02",
+    "program": "stock_v2",
+    "buy_sync": {
+      "created": 0,
+      "updated": 3,
+      "status": "OK"
+    },
+    "buy_enriched": 3,
+    "sell_enriched": 0,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-11-02"
+    ],
+    "recalculated": 3,
+    "finished_at": "2026-11-02T15:06:47",
+    "incomplete": false
+  },
+  "stock_notify_attempts_2026-10-29": 1,
+  "last_stock_notify_try_ts": 1793495204.575886,
+  "last_morning_sync_stock": {
+    "synced": 2,
+    "created": 2,
+    "updated": 0,
+    "source": "stock_py_md",
+    "md_path": "/Users/admin/stock_quant_select/stock-quant-select/01_量化模型/首板战法/stock/results/20261028_recommendations.md",
+    "d0": "2026-10-28",
+    "program": "stock",
+    "records": [
+      {
+        "date": "2026-10-29",
+        "stock_code": "300006",
+        "stock_name": "莱美药业",
+        "rank": 1
+      },
+      {
+        "date": "2026-10-29",
+        "stock_code": "002696",
+        "stock_name": "百洋股份",
+        "rank": 2
+      }
+    ],
+    "removed_extra": [],
+    "date": "2026-10-29",
+    "phase": "morning_sync"
+  },
+  "last_morning_sync_date_stock": "2026-10-29",
+  "last_morning_sync_stock_updata": {
+    "synced": 2,
+    "created": 2,
+    "updated": 0,
+    "source": "stock_updata_py_md",
+    "md_path": "/Users/admin/stock_quant_select/stock-quant-select/01_量化模型/首板战法/stock_updata/results/20261028_stock_updata_recommendations.md",
+    "d0": "2026-10-28",
+    "program": "stock_updata",
+    "records": [
+      {
+        "date": "2026-10-29",
+        "stock_code": "300291",
+        "stock_name": "百纳千成",
+        "rank": 1
+      },
+      {
+        "date": "2026-10-29",
+        "stock_code": "301080",
+        "stock_name": "百普赛斯",
+        "rank": 2
+      }
+    ],
+    "removed_extra": [],
+    "date": "2026-10-29",
+    "phase": "morning_sync"
+  },
+  "last_morning_sync_date_stock_updata": "2026-10-29",
+  "stock_notify_attempts_2026-10-30": 4,
+  "last_top2_push_date": "2026-11-02",
+  "last_close_run_date_stock_v2": "2026-11-02",
+  "last_close_run_stock_v2": {
+    "date": "2026-11-02",
+    "program": "stock_v2",
+    "buy_sync": {
+      "created": 0,
+      "updated": 3,
+      "status": "OK"
+    },
+    "buy_enriched": 3,
+    "sell_enriched": 0,
+    "removed_open_limit": [],
+    "touched_days": [
+      "2026-11-02"
+    ],
+    "recalculated": 3,
+    "finished_at": "2026-11-02T15:06:47",
+    "incomplete": false
+  },
+  "last_v2_top2_push_date": "2026-10-30",
+  "last_weekly_push_monday": "2026-10-26",
+  "last_v2_weekly_push_monday": "2026-10-26",
+  "notify_pause_note": "2026-10-30 用户制止批量补发；待确认周结果拆条口径后再单次发送",
+  "sell_retry_count_stock_2026-10-30": 1,
+  "stock_notify_attempts_2026-10-31": 1,
+  "stock_notify_attempts_2026-11-01": 1,
+  "last_chinext_top2_push_date": "2026-11-02"
+}

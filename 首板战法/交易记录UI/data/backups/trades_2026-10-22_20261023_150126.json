@@ -1,0 +1,31 @@
+[
+  {
+    "id": 372,
+    "date": "2026-10-22",
+    "program": "slow",
+    "stock_code": "601999",
+    "stock_name": "出版传媒",
+    "buy_price": 8.25,
+    "sell_price_935": null,
+    "sell_price_1315": null,
+    "sell_price_half_935": null,
+    "sell_price_half_1315": null,
+    "sell_price_batch_avg": null,
+    "sell_date": "2026-10-26",
+    "hold_days": 4,
+    "pnl_morning": null,
+    "pnl_afternoon": null,
+    "pnl_morning_half": null,
+    "pnl_afternoon_half": null,
+    "pnl_batch_morning": null,
+    "pnl_batch_afternoon": null,
+    "pnl_batch_total": null,
+    "pnl_batch_total_half": null,
+    "is_second_board": true,
+    "rank": 1,
+    "skip_reason": "2026-10-23 09:35 分钟价缺失; 2026-10-26 尚未开盘; 2026-10-23 13:15 分钟价缺失",
+    "notes": null,
+    "sell_date_935": null,
+    "sell_date_1315": null
+  }
+]

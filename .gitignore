@@ -88,3 +88,13 @@ daily_data/
 API_KEY.md
 github_upload_config.txt
 .env
+**/.env
+**/.env.*
+!**/.env.example
+**/*token.md
+**/.pages_sync_token
+**/*.pid
+**/__pycache__/
+**/*.pyc
+**/*logs/
+**/*.log

@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>涨停回头低吸 · 选股交易记录</title>
+  <style>
+    :root {
+      --sky: #3b82f6; --bg: #f3f4f6; --card: #fff; --text: #1f2937; --muted: #6b7280;
+      --line: #e5e7eb; --profit: #dc2626; --loss: #16a34a;
+      --shadow: 0 8px 24px rgba(59,130,246,.12);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; background: var(--bg); color: var(--text); }
+    .topbar {
+      background: linear-gradient(120deg,#93c5fd,#60a5fa 45%,#3b82f6); color:#fff;
+      padding:14px 20px; display:flex; justify-content:space-between; gap:16px; align-items:flex-start;
+      box-shadow:0 10px 30px rgba(59,130,246,.28);
+    }
+    .topbar h1 { margin:0; font-size:18px; font-weight:700; }
+    .topbar .hint { font-size:12px; opacity:.92; margin-top:4px; line-height:1.45; }
+    .topbar .ver-status {
+      margin-top:8px; display:inline-flex; align-items:center;
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+      border-radius:999px; padding:4px 12px; font-size:12px; font-weight:650;
+    }
+    .top-actions {
+      display:grid; grid-template-columns:repeat(3, max-content); gap:6px;
+      flex-shrink:0; align-content:start; justify-items:stretch;
+    }
+    .top-actions button {
+      border:1px solid rgba(255,255,255,.42); background:rgba(255,255,255,.18); color:#fff;
+      border-radius:8px; padding:6px 10px; font:inherit; font-size:12px; font-weight:650;
+      cursor:pointer; line-height:1.2; white-space:nowrap; text-align:center;
+    }
+    .top-actions button:hover { background:rgba(255,255,255,.3); }
+    @media (max-width:900px){
+      .topbar { flex-wrap:wrap; }
+      .top-actions { grid-template-columns:repeat(2, max-content); }
+    }
+    .wrap { padding:16px 20px 40px; }
+    .tabs { display:flex; gap:10px; margin-bottom:14px; justify-content:center; flex-wrap:wrap; }
+    .tab {
+      border:1px solid #dbeafe; background:#fff; color:var(--muted); padding:10px 24px;
+      border-radius:999px; font:inherit; font-weight:700; cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,.04);
+    }
+    .tab.active { background:linear-gradient(135deg,#60a5fa,#3b82f6); color:#fff; border-color:transparent; }
+    .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:10px; margin-bottom:14px; }
+    .stat { background:#fff; border-radius:14px; padding:12px 10px; box-shadow:var(--shadow); border:1px solid #eff6ff; text-align:center; }
+    .stat .value { font-size:18px; font-weight:800; }
+    .stat .value.pos { color:var(--profit); }
+    .stat .value.neg { color:var(--loss); }
+    .stat .label { margin-top:4px; font-size:11px; color:var(--muted); }
+    .date-nav {
+      display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:12px;
+      background:#fff; border-radius:12px; padding:10px 14px; border:1px solid #eff6ff; box-shadow:var(--shadow);
+    }
+    .date-nav button { border:1px solid var(--line); background:#fff; border-radius:8px; padding:6px 12px; cursor:pointer; font:inherit; }
+    .date-nav .cur { font-weight:800; font-size:16px; color:#1d4ed8; min-width:120px; text-align:center; }
+    .toolbar {
+      display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px;
+      background:#fff; border-radius:16px; padding:12px 14px; box-shadow:var(--shadow); border:1px solid #eff6ff;
+    }
+    .search-box { flex:1; min-width:160px; position:relative; }
+    .search-box input {
+      width:100%; padding:9px 12px 9px 34px; border:1px solid var(--line); border-radius:10px; font:inherit; background:#f9fafb;
+    }
+    .search-box::before { content:"⌕"; position:absolute; left:11px; top:50%; transform:translateY(-50%); color:var(--muted); }
+    .toolbar select, .toolbar button {
+      font:inherit; border-radius:10px; border:1px solid var(--line); padding:8px 12px; background:#fff; cursor:pointer;
+    }
+    .toolbar button.primary {
+      background:linear-gradient(135deg,#2563eb,#1d4ed8)!important; border-color:#1d4ed8!important; color:#fff!important; font-weight:700;
+    }
+    .day-switch { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; padding:10px 14px; background:#fff; border-radius:12px; border:1px solid #eff6ff; }
+    .day-chip { min-width:36px; height:32px; border-radius:8px; border:1px solid #dbeafe; background:#f8fafc; cursor:pointer; font-weight:700; font-size:12px; }
+    .day-chip.active { background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none; }
+    .table-card { background:#fff; border-radius:16px; box-shadow:var(--shadow); border:1px solid #eff6ff; overflow:hidden; }
+    .table-wrap { overflow:auto; max-height:calc(100vh - 400px); }
+    table { border-collapse:collapse; width:max-content; min-width:100%; font-size:12.5px; }
+    th, td { padding:9px 10px; white-space:nowrap; text-align:center; border-bottom:1px solid var(--line); vertical-align:middle; }
+    th { position:sticky; top:0; z-index:3; background:#e5e7eb; font-weight:700; }
+    tbody tr:nth-child(even) td { background:#f9fafb; }
+    tbody tr:hover td { background:#eff6ff!important; }
+    td.stock-cell { text-align:left!important; min-width:120px; padding-left:14px; }
+    .stock-link { color:#1d4ed8; font-weight:700; text-decoration:none; }
+    .stock-link:hover { text-decoration:underline; }
+    .code { color:var(--muted); font-size:11px; margin-top:2px; }
+    .pos { color:var(--profit); font-weight:700; }
+    .neg { color:var(--loss); font-weight:700; }
+    .badge { display:inline-flex; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+    .badge-obs { background:#ecfdf5; color:#047857; }
+    .badge-watch { background:#fef3c7; color:#b45309; }
+    .badge-bought { background:#ede9fe; color:#6d28d9; }
+    .badge-exp { background:#f3f4f6; color:#6b7280; }
+    .badge-hold { background:#fef3c7; color:#b45309; }
+    .badge-sold { background:#dbeafe; color:#1d4ed8; }
+    .badge-stop { background:#fee2e2; color:#b91c1c; }
+    .ops { display:inline-flex; gap:6px; }
+    .icon-btn { width:30px; height:30px; border-radius:9px; border:none; cursor:pointer; font-size:13px; }
+    .icon-btn.edit { background:#dbeafe; color:#1d4ed8; }
+    .icon-btn.del { background:#fee2e2; color:#dc2626; }
+    .icon-btn.add { background:#ffedd5; color:#c2410c; }
+    .icon-btn.sell { background:#dcfce7; color:#15803d; }
+    .icon-btn.watch { background:#fef9c3; color:#a16207; font-size:11px; width:auto; padding:0 8px; font-weight:700; }
+    .empty { padding:56px 20px; text-align:center; color:var(--muted); }
+    .pager { display:flex; justify-content:space-between; padding:10px 14px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+    .pager button { border:1px solid var(--line); background:#fff; border-radius:8px; padding:5px 10px; cursor:pointer; }
+    .modal-mask { display:none; position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:50; align-items:center; justify-content:center; padding:16px; }
+    .modal-mask.show { display:flex; }
+    .modal { background:#fff; width:min(780px,100%); max-height:90vh; overflow:auto; border-radius:18px; padding:20px; }
+    .modal h2 { margin:0 0 14px; color:#1d4ed8; font-size:18px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .form-grid label { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+    .form-grid input, .form-grid select { font:inherit; font-size:14px; border:1px solid var(--line); border-radius:8px; padding:8px 10px; }
+    .form-actions { margin-top:16px; display:flex; gap:8px; justify-content:flex-end; }
+    .btn-primary { background:linear-gradient(135deg,#60a5fa,#3b82f6); border:none; color:#fff; border-radius:10px; padding:8px 14px; cursor:pointer; font-weight:700; }
+    .btn-ghost { background:#fff; border:1px solid var(--line); border-radius:10px; padding:8px 14px; cursor:pointer; }
+    .toast { position:fixed; right:18px; bottom:18px; background:#1e3a8a; color:#fff; padding:11px 16px; border-radius:10px; opacity:0; transition:.2s; z-index:99; }
+    .toast.show { opacity:1; }
+    .loading-mask { position:fixed; inset:0; background:rgba(15,23,42,.45); display:none; align-items:center; justify-content:center; z-index:200; }
+    .loading-mask.show { display:flex; }
+    .loading-box { background:#fff; border-radius:14px; padding:22px 28px; text-align:center; }
+    .spin { width:28px; height:28px; margin:0 auto 12px; border:3px solid #dbeafe; border-top-color:#2563eb; border-radius:50%; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:700px){ .form-grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>涨停回头低吸 · 三层筛选</h1>
+      <div class="hint">涨停池（首道）→ 观察池（D3–D5 低吸区间 / 可手工加入）→ 持有池（仅从观察池买入）</div>
+      <div class="hint" id="metaLine">任务状态加载中…</div>
+      <div class="ver-status" id="verHint">当前 V1 · data/</div>
+    </div>
+    <div class="top-actions">
+      <button type="button" onclick="runScan()">拉取近5日涨停</button>
+      <button type="button" onclick="runPromote()">自动入观察池</button>
+      <button type="button" onclick="runUpdateMa()">刷新均线</button>
+      <button type="button" onclick="runRefreshBoards()">回填板块</button>
+      <button type="button" onclick="runBuyCheck()">买入检测</button>
+      <button type="button" onclick="runSellCheck()">卖出检测</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="tabs ver-tabs" id="verTabs" style="margin-bottom:8px;">
+      <button class="tab active" id="verV1" type="button" onclick="setVersion('v1')">V1</button>
+      <button class="tab" id="verV2" type="button" onclick="setVersion('v2')">V2</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tabZt" type="button" onclick="setPool('zt')">涨停池</button>
+      <button class="tab" id="tabWatch" type="button" onclick="setPool('watch')">观察池</button>
+      <button class="tab" id="tabPos" type="button" onclick="setPool('pos')">买入持有池</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="date-nav" id="dateNav">
+      <button type="button" onclick="shiftDate(-1)">‹ 上一交易日</button>
+      <div class="cur" id="curDate">—</div>
+      <button type="button" onclick="shiftDate(1)">下一交易日 ›</button>
+      <select id="dateJump" onchange="jumpDate(this.value)" style="margin-left:8px"></select>
+    </div>
+
+    <div class="day-switch" id="daySwitch">
+      <label style="font-size:13px;color:var(--muted);font-weight:650">观察日线</label>
+      <div id="dayChips"></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
+      <select id="dateFilter" style="display:none"><option value="">全部日期</option></select>
+      <select id="industry"><option value="">行业板块</option></select>
+      <select id="concept"><option value="">概念板块</option></select>
+      <select id="statusFilter"><option value="">状态</option></select>
+      <select id="autoFilter" style="display:none">
+        <option value="">添加方式</option>
+        <option value="1">自动添加</option>
+        <option value="0">手动添加</option>
+      </select>
+      <select id="profitFilter" style="display:none">
+        <option value="">盈亏</option><option value="1">盈利</option><option value="0">亏损</option>
+      </select>
+      <button type="button" onclick="reload()">查询</button>
+      <button type="button" onclick="resetFilters()">重置</button>
+      <button class="primary" type="button" onclick="openCreate()">+ 新增</button>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div class="empty" id="empty" style="display:none">暂无数据</div>
+      </div>
+      <div class="pager" id="pager" style="display:none">
+        <div><span id="pageInfo">0 条</span>
+          <select id="pageSize"><option value="20">20</option><option value="40" selected>40</option><option value="100">100</option></select>
+        </div>
+        <div>
+          <button type="button" onclick="goPage(1)">首页</button>
+          <button type="button" onclick="goPage(page-1)">上一页</button>
+          <button type="button" onclick="goPage(page+1)">下一页</button>
+          <button type="button" onclick="goPage(totalPages)">末页</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <h2 id="modalTitle">新增</h2>
+      <div class="form-grid" id="formGrid"></div>
+      <div class="form-actions">
+        <button class="btn-ghost" type="button" onclick="closeModal()">取消</button>
+        <button class="btn-primary" type="button" onclick="saveModal()">保存</button>
+      </div>
+    </div>
+  </div>
+  <div class="loading-mask" id="loading"><div class="loading-box"><div class="spin"></div><div id="loadingText">处理中…</div></div></div>
+  <div class="toast" id="toast"></div>
+
+<script>
+  const MAX_OBS_DAYS = {{ max_obs_days }};
+  const FIELD_CN = {
+    stock_name:"股票名称", stock_code:"股票代码", limit_up_date:"涨停日期",
+    buy_date:"买入日期", buy_price:"买入价", sell_date:"卖出日期", sell_price:"卖出价",
+    position_pct:"仓位%", stop_loss_price:"止损价", stop_loss_pnl:"止损收益%",
+    profit_rate:"收益率%", stop_loss_ma25_pnl:"25日线止损%", stop_loss_ma30_pnl:"30日线止损%",
+    concept_board:"概念板块", industry_board:"行业板块", t1_open:"涨停后一日开盘",
+    ma10:"10日线", ma20:"20日线", ma25:"25日线", ma30:"30日线", notes:"备注", status:"状态",
+    add_price:"补仓价", add_date:"补仓日期", add_pct:"补仓仓位%", sell_reason:"卖出原因", watch_id:"观察池ID",
+  };
+
+  let pool = "zt";
+  let profile = localStorage.getItem("zt_profile") || "v1";
+  let rows = [], pageRows = [];
+  let editing = null;
+  let globalViewDay = 1;
+  let ztDate = "";
+  let ztDates = [];
+  let page = 1, pageSize = 40, totalPages = 1;
+  let filterOpts = {};
+
+  function setVersion(v){
+    profile = (v === "v2") ? "v2" : "v1";
+    localStorage.setItem("zt_profile", profile);
+    document.getElementById("verV1").classList.toggle("active", profile==="v1");
+    document.getElementById("verV2").classList.toggle("active", profile==="v2");
+    document.getElementById("verHint").textContent = profile==="v2"
+      ? "当前 V2 · data_v2/ · PAPER · D4主窗/D5补充 · 关补仓"
+      : "当前 V1 · data/";
+    page = 1; ztDate = ""; rows = [];
+    loadFilterOptions().then(()=>reload());
+    loadMeta();
+  }
+
+  const SHARED_COLS = [
+    { key:"limit_up_date", label:"涨停日期" },
+    { key:"stock_name", label:"股票名称" },
+    { key:"concept_board", label:"概念板块" },
+    { key:"industry_board", label:"行业板块" },
+    { key:"t1_open", label:"涨停后一日开盘" },
+    { key:"view_adj_day", label:"观察日" },
+    { key:"ma10", label:"10日线" }, { key:"ma20", label:"20日线" },
+    { key:"ma25", label:"25日线" }, { key:"ma30", label:"30日线" },
+    { key:"last_price", label:"当日收盘" },
+    { key:"adj_day", label:"调整天" },
+    { key:"in_dip_zone", label:"低吸区间" },
+    { key:"status", label:"状态" },
+    { key:"_ops", label:"操作" },
+  ];
+  const WATCH_COLS = [
+    { key:"limit_up_date", label:"涨停日期" },
+    { key:"stock_name", label:"股票名称" },
+    { key:"is_auto_added", label:"是否自动添加" },
+    { key:"concept_board", label:"概念板块" },
+    { key:"industry_board", label:"行业板块" },
+    { key:"t1_open", label:"涨停后一日开盘" },
+    { key:"view_adj_day", label:"观察日" },
+    { key:"ma10", label:"10日线" }, { key:"ma20", label:"20日线" },
+    { key:"ma25", label:"25日线" }, { key:"ma30", label:"30日线" },
+    { key:"last_price", label:"当日收盘" },
+    { key:"adj_day", label:"调整天" },
+    { key:"in_dip_zone", label:"低吸区间" },
+    { key:"status", label:"状态" },
+    { key:"_ops", label:"操作" },
+  ];
+  const POS_COLS = [
+    { key:"limit_up_date", label:"涨停日期" }, { key:"stock_name", label:"股票名称" },
+    { key:"concept_board", label:"概念板块" }, { key:"industry_board", label:"行业板块" },
+    { key:"t1_open", label:"涨停后一日开盘" },
+    { key:"ma10", label:"10日线" }, { key:"ma20", label:"20日线" },
+    { key:"ma25", label:"25日线" }, { key:"ma30", label:"30日线" },
+    { key:"buy_date", label:"买入日期" }, { key:"buy_price", label:"买入价" },
+    { key:"position_pct", label:"仓位%" },
+    { key:"stop_loss_price", label:"止损价(-6%)" },
+    { key:"stop_loss_pnl", label:"止损收益%" },
+    { key:"stop_loss_ma25_pnl", label:"25日线止损%" },
+    { key:"stop_loss_ma30_pnl", label:"30日线止损%" },
+    { key:"sell_date", label:"卖出日期" }, { key:"sell_price", label:"卖出价" },
+    { key:"profit_rate", label:"收益率%" }, { key:"is_profit", label:"是否盈利" },
+    { key:"hold_days", label:"持仓天" }, { key:"status", label:"状态" }, { key:"_ops", label:"操作" },
+  ];
+
+  function baiduUrl(code){ return `https://finance.baidu.com/stock/ab-${String(code||"").padStart(6,"0")}`; }
+  function toast(msg){ const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); setTimeout(()=>el.classList.remove("show"),2200); }
+  function setLoading(on,text){ document.getElementById("loading").classList.toggle("show",!!on); if(text) document.getElementById("loadingText").textContent=text; }
+  function withProfile(url){
+    const u = new URL(url, window.location.origin);
+    u.searchParams.set("profile", profile || "v1");
+    return u.pathname + u.search;
+  }
+  async function api(url, opts){
+    opts = opts || {};
+    let body = opts.body;
+    if(body && typeof body === "string"){
+      try{
+        const o = JSON.parse(body);
+        o.profile = profile || "v1";
+        body = JSON.stringify(o);
+      }catch(e){}
+    }
+    const res = await fetch(withProfile(url), { ...opts, body, headers:{"Content-Type":"application/json", ...(opts.headers||{})} });
+    const js = await res.json();
+    if(!js.success) throw new Error(js.error||"请求失败");
+    return js.data;
+  }
+
+  function setPool(p){
+    pool = p; page = 1;
+    document.getElementById("tabZt").classList.toggle("active", p==="zt");
+    document.getElementById("tabWatch").classList.toggle("active", p==="watch");
+    document.getElementById("tabPos").classList.toggle("active", p==="pos");
+    document.getElementById("dateNav").style.display = p==="zt" ? "flex" : "none";
+    document.getElementById("dateFilter").style.display = p==="zt" ? "none" : "";
+    document.getElementById("daySwitch").style.display = (p==="zt"||p==="watch") ? "flex" : "none";
+    document.getElementById("profitFilter").style.display = p==="pos" ? "" : "none";
+    document.getElementById("autoFilter").style.display = p==="watch" ? "" : "none";
+    document.getElementById("pager").style.display = p==="zt" ? "none" : "flex";
+    fillStatusOptions();
+    fillDateFilter();
+    reload();
+  }
+
+  function fillStatusOptions(){
+    const sel = document.getElementById("statusFilter");
+    const cur = sel.value;
+    const opts = pool==="zt"
+      ? [["","状态"],["in_pool","在池"],["watched","已观察"],["expired","已失效"]]
+      : pool==="watch"
+        ? [["","状态"],["watching","观察中"],["bought","已买入"],["expired","已失效"]]
+        : [["","状态"],["holding","持仓中"],["sold","已卖出"],["stopped","已止损"]];
+    sel.innerHTML = opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join("");
+    sel.value = cur;
+  }
+
+  function fillDateFilter(){
+    const sel = document.getElementById("dateFilter");
+    const jump = document.getElementById("dateJump");
+    const cur = sel.value;
+    const dates = pool==="watch" ? (filterOpts.watch_dates||[]) : (filterOpts.pos_dates||[]);
+    sel.innerHTML = `<option value="">全部日期</option>` + dates.map(d=>`<option value="${d}">${d}</option>`).join("");
+    if(dates.includes(cur)) sel.value = cur;
+    jump.innerHTML = (ztDates||[]).map(d=>`<option value="${d}">${d}</option>`).join("");
+    if(ztDate) jump.value = ztDate;
+  }
+
+  function renderDayChips(){
+    const box = document.getElementById("dayChips");
+    box.innerHTML = "";
+    for(let d=1; d<=MAX_OBS_DAYS; d++){
+      const b=document.createElement("button");
+      b.type="button"; b.className="day-chip"+(d===globalViewDay?" active":"");
+      b.textContent="D"+d;
+      b.onclick=()=>batchViewDay(d);
+      box.appendChild(b);
+    }
+  }
+
+  async function batchViewDay(d){
+    globalViewDay = d; renderDayChips();
+    if(!rows.length) return;
+    const ep = pool==="watch" ? "watch" : "limitup";
+    setLoading(true, `切换 D${d}…`);
+    try{
+      for(const r of rows){
+        await api(`/api/${ep}/${r.id}/view-day`, { method:"POST", body: JSON.stringify({view_adj_day:d}) });
+      }
+      await reload();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+
+  function shiftDate(delta){
+    // dates 近→远；delta=-1 更旧(index+1)，delta=+1 更新(index-1)
+    if(!ztDates.length) return;
+    let i = ztDates.indexOf(ztDate);
+    if(i < 0) i = 0;
+    const ni = i - delta;
+    if(ni < 0 || ni >= ztDates.length){ toast("没有更多日期"); return; }
+    ztDate = ztDates[ni];
+    document.getElementById("curDate").textContent = ztDate;
+    document.getElementById("dateJump").value = ztDate;
+    reload();
+  }
+  function jumpDate(d){ if(!d) return; ztDate=d; document.getElementById("curDate").textContent=d; reload(); }
+
+  async function loadFilterOptions(){
+    try{
+      filterOpts = await api("/api/filters/options");
+      ztDates = filterOpts.zt_dates || [];
+      const ind=document.getElementById("industry"), con=document.getElementById("concept");
+      const iv=ind.value, cv=con.value;
+      ind.innerHTML = `<option value="">行业板块</option>`+(filterOpts.industries||[]).map(x=>`<option value="${x}">${x}</option>`).join("");
+      con.innerHTML = `<option value="">概念板块</option>`+(filterOpts.concepts||[]).map(x=>`<option value="${x}">${x}</option>`).join("");
+      ind.value=iv; con.value=cv;
+      fillDateFilter();
+      if(pool==="zt"){
+        if(!ztDate && ztDates.length) ztDate = ztDates[0];
+        document.getElementById("curDate").textContent = ztDate || "暂无";
+        document.getElementById("dateJump").value = ztDate;
+      }
+    }catch(_){}
+  }
+
+  async function loadMeta(){
+    try{
+      const m = await api("/api/meta");
+      const parts=[];
+      if(m.last_scan) parts.push(`扫描 ${m.last_scan}(+${m.scan_added||0})`);
+      if(m.last_promote!=null) parts.push(`晋升观察 ${m.last_promote}`);
+      if(m.last_ma_refresh) parts.push(`均线 ${m.last_ma_refresh}`);
+      document.getElementById("metaLine").textContent = parts.join(" · ") || "尚未执行任务";
+    }catch(_){}
+  }
+
+  function qs(){
+    const p = new URLSearchParams();
+    const kw = document.getElementById("keyword").value.trim();
+    const ind = document.getElementById("industry").value;
+    const con = document.getElementById("concept").value;
+    const st = document.getElementById("statusFilter").value;
+    if(kw) p.set("keyword", kw);
+    if(ind) p.set("industry", ind);
+    if(con) p.set("concept", con);
+    if(st) p.set("status", st);
+    if(pool==="zt" && ztDate) p.set("date", ztDate);
+    if(pool!=="zt"){
+      const d = document.getElementById("dateFilter").value;
+      if(d) p.set("date", d);
+    }
+    if(pool==="pos"){
+      const pf = document.getElementById("profitFilter").value;
+      if(pf) p.set("is_profit", pf);
+    }
+    if(pool==="watch"){
+      const af = document.getElementById("autoFilter").value;
+      if(af) p.set("is_auto_added", af);
+    }
+    return p.toString();
+  }
+
+  function resetFilters(){
+    document.getElementById("keyword").value="";
+    document.getElementById("dateFilter").value="";
+    document.getElementById("industry").value="";
+    document.getElementById("concept").value="";
+    document.getElementById("statusFilter").value="";
+    document.getElementById("profitFilter").value="";
+    document.getElementById("autoFilter").value="";
+    page=1; reload();
+  }
+
+  async function reload(){
+    setLoading(true,"加载中…");
+    try{
+      if(pool==="zt"){
+        const data = await api(`/api/limitup?${qs()}`);
+        rows = data.items || [];
+        ztDates = data.dates || ztDates;
+        ztDate = data.date || ztDate;
+        document.getElementById("curDate").textContent = ztDate || "暂无";
+      } else if(pool==="watch"){
+        rows = await api(`/api/watch?${qs()}`);
+      } else {
+        rows = await api(`/api/position?${qs()}`);
+      }
+      renderStats();
+      renderTable();
+      await loadMeta();
+      await loadFilterOptions();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+
+  function goPage(p){
+    totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+    page = Math.min(Math.max(1,p), totalPages);
+    renderTable();
+  }
+
+  function renderStats(){
+    const box = document.getElementById("stats");
+    const num = (v)=> (v==null||v===""||Number.isNaN(Number(v))) ? null : Number(v);
+    const sum = (arr)=> arr.reduce((a,b)=>a+b,0);
+    const avg = (arr)=> arr.length ? sum(arr)/arr.length : null;
+    const fmtN = (v,d=2)=> v==null?"—":Number(v).toFixed(d);
+    const fmtPct = (v)=> v==null?"—":`${Number(v).toFixed(2)}%`;
+
+    if(pool==="zt"){
+      const prices = rows.map(r=>num(r.last_price)).filter(v=>v!=null);
+      box.innerHTML = `
+        <div class="stat"><div class="value">${rows.length}</div><div class="label">${ztDate||"—"} 涨停</div></div>
+        <div class="stat"><div class="value">${rows.filter(r=>r.status==="in_pool").length}</div><div class="label">在池待观察</div></div>
+        <div class="stat"><div class="value">${rows.filter(r=>r.in_dip_zone).length}</div><div class="label">已入低吸区间</div></div>
+        <div class="stat"><div class="value">${fmtN(avg(prices),2)}</div><div class="label">均价</div></div>
+        <div class="stat"><div class="value">${ztDates.length}</div><div class="label">涨停日期数</div></div>`;
+    } else if(pool==="watch"){
+      const autoN = rows.filter(r=>r.is_auto_added===true || (r.is_auto_added==null && r.watch_source==="auto")).length;
+      const dips = rows.filter(r=>r.in_dip_zone).length;
+      const prices = rows.map(r=>num(r.last_price)).filter(v=>v!=null);
+      box.innerHTML = `
+        <div class="stat"><div class="value">${rows.length}</div><div class="label">观察记录</div></div>
+        <div class="stat"><div class="value">${rows.filter(r=>r.status==="watching").length}</div><div class="label">观察中</div></div>
+        <div class="stat"><div class="value">${dips}</div><div class="label">低吸区间</div></div>
+        <div class="stat"><div class="value">${autoN}</div><div class="label">自动添加</div></div>
+        <div class="stat"><div class="value">${fmtN(avg(prices),2)}</div><div class="label">均价</div></div>`;
+    } else {
+      const holding = rows.filter(r=>r.status==="holding");
+      const sold = rows.filter(r=>r.status==="sold");
+      const stopped = rows.filter(r=>r.status==="stopped");
+      const closed = rows.filter(r=>r.status==="sold"||r.status==="stopped");
+      const closedRates = closed.map(r=>num(r.profit_rate)).filter(v=>v!=null);
+      const holdRates = holding.map(r=>num(r.profit_rate)).filter(v=>v!=null);
+      const wins = closedRates.filter(v=>v>0).length;
+      const holdDays = rows.map(r=>num(r.hold_days)).filter(v=>v!=null);
+      const buySum = rows.map(r=>num(r.buy_price)).filter(v=>v!=null);
+      box.innerHTML = `
+        <div class="stat"><div class="value">${holding.length}</div><div class="label">持仓中</div></div>
+        <div class="stat"><div class="value">${sold.length}</div><div class="label">已卖出</div></div>
+        <div class="stat"><div class="value">${stopped.length}</div><div class="label">已止损</div></div>
+        <div class="stat"><div class="value">${closed.length?((wins/closed.length)*100).toFixed(0)+'%':"—"}</div><div class="label">胜率</div></div>
+        <div class="stat"><div class="value ${avg(closedRates)>0?"pos":(avg(closedRates)<0?"neg":"")}">${fmtPct(avg(closedRates))}</div><div class="label">已结均收益</div></div>
+        <div class="stat"><div class="value ${sum(closedRates)>0?"pos":(sum(closedRates)<0?"neg":"")}">${fmtPct(sum(closedRates))}</div><div class="label">已结累计%</div></div>
+        <div class="stat"><div class="value ${avg(holdRates)>0?"pos":(avg(holdRates)<0?"neg":"")}">${fmtPct(avg(holdRates))}</div><div class="label">持仓浮动均%</div></div>
+        <div class="stat"><div class="value">${fmtN(avg(holdDays),1)}</div><div class="label">平均持仓天</div></div>
+        <div class="stat"><div class="value">${rows.length}</div><div class="label">当前筛选</div></div>`;
+    }
+  }
+
+  function statusBadge(st){
+    const map = {
+      in_pool:["badge-obs","在池"], watched:["badge-watch","已观察"], expired:["badge-exp","已失效"],
+      watching:["badge-watch","观察中"], bought:["badge-bought","已买入"],
+      holding:["badge-hold","持仓中"], sold:["badge-sold","已卖出"], stopped:["badge-stop","已止损"],
+      observing:["badge-obs","观察中"],
+    };
+    const [c,t]=map[st]||["badge-exp",st||"—"];
+    return `<span class="badge ${c}">${t}</span>`;
+  }
+  function fmt(v){ if(v==null||v==="") return "—"; if(typeof v==="number") return Number.isInteger(v)?v:Number(v).toFixed(3); return v; }
+
+  function renderTable(){
+    const cols = pool==="pos" ? POS_COLS : (pool==="watch" ? WATCH_COLS : SHARED_COLS);
+    pageSize = Number(document.getElementById("pageSize").value||40);
+    if(pool==="zt"){ pageRows = rows; }
+    else {
+      totalPages = Math.max(1, Math.ceil(rows.length/pageSize));
+      if(page>totalPages) page=totalPages;
+      pageRows = rows.slice((page-1)*pageSize, page*pageSize);
+      document.getElementById("pageInfo").textContent = `${rows.length} 条 · ${page}/${totalPages}`;
+    }
+    document.getElementById("thead").innerHTML = `<tr>${cols.map(c=>`<th>${c.label}</th>`).join("")}</tr>`;
+    document.getElementById("empty").style.display = rows.length ? "none" : "block";
+    document.getElementById("tbody").innerHTML = pageRows.map(r=>{
+      return `<tr>`+cols.map(c=>{
+        if(c.key==="_ops") return `<td>${opsHtml(r)}</td>`;
+        if(c.key==="stock_name") return `<td class="stock-cell"><a class="stock-link" href="${baiduUrl(r.stock_code)}" target="_blank" rel="noopener">${r.stock_name||"—"}</a><div class="code">${r.stock_code||""}</div></td>`;
+        if(c.key==="status") return `<td>${statusBadge(r.status)}</td>`;
+        if(c.key==="in_dip_zone") return `<td>${r.in_dip_zone?"是":"否"}</td>`;
+        if(c.key==="is_auto_added"){
+          const auto = r.is_auto_added===true || (r.is_auto_added==null && r.watch_source==="auto");
+          return `<td>${auto?"是":"否"}</td>`;
+        }
+        if(c.key==="is_profit") return `<td class="${r.is_profit?"pos":"neg"}">${r.is_profit?"是":(r.profit_rate==null?"—":"否")}</td>`;
+        if(c.key==="profit_rate"||c.key==="stop_loss_pnl"||c.key==="stop_loss_ma25_pnl"||c.key==="stop_loss_ma30_pnl"){
+          const v=r[c.key]; if(v==null||v==="") return `<td>—</td>`;
+          return `<td class="${v>0?"pos":"neg"}">${Number(v).toFixed(2)}%</td>`;
+        }
+        if(c.key==="view_adj_day"){
+          let opts=""; for(let d=1;d<=MAX_OBS_DAYS;d++) opts+=`<option value="${d}" ${Number(r.view_adj_day)===d?"selected":""}>D${d}</option>`;
+          return `<td><select onchange="rowViewDay(${r.id}, this.value)">${opts}</select></td>`;
+        }
+        if(c.key==="stop_loss_price") return `<td class="neg">${fmt(r.stop_loss_price)}</td>`;
+        return `<td>${fmt(r[c.key])}</td>`;
+      }).join("")+`</tr>`;
+    }).join("");
+  }
+
+  function opsHtml(r){
+    if(pool==="zt"){
+      const canWatch = r.status!=="watched";
+      return `<div class="ops">
+        ${canWatch?`<button class="icon-btn watch" title="加入观察池" onclick="toWatch(${r.id})">加入观察</button>`:""}
+        <button class="icon-btn edit" onclick="openEdit(${r.id})">✎</button>
+        <button class="icon-btn del" onclick="removeRow(${r.id})">✕</button>
+      </div>`;
+    }
+    if(pool==="watch"){
+      return `<div class="ops">
+        ${r.status==="watching"?`<button class="icon-btn add" title="买入持有" onclick="openBuyFromWatch(${r.id})">买</button>`:""}
+        <button class="icon-btn edit" onclick="openEdit(${r.id})">✎</button>
+        <button class="icon-btn del" onclick="removeRow(${r.id})">✕</button>
+      </div>`;
+    }
+    return `<div class="ops">
+      <button class="icon-btn edit" onclick="openEdit(${r.id})">✎</button>
+      ${r.status==="holding"?`<button class="icon-btn add" onclick="openAdd(${r.id})">＋</button>
+      <button class="icon-btn sell" onclick="openSell(${r.id})">¥</button>`:""}
+      <button class="icon-btn del" onclick="removeRow(${r.id})">✕</button>
+    </div>`;
+  }
+
+  async function rowViewDay(id, day){
+    const ep = pool==="watch"?"watch":"limitup";
+    try{ await api(`/api/${ep}/${id}/view-day`,{method:"POST",body:JSON.stringify({view_adj_day:Number(day)})}); await reload(); }
+    catch(e){ toast(e.message); }
+  }
+
+  async function toWatch(id){
+    if(!confirm("确认加入观察池？")) return;
+    setLoading(true,"加入观察池…");
+    try{
+      await api(`/api/limitup/${id}/to-watch`, { method:"POST", body: JSON.stringify({force:true}) });
+      toast("已加入观察池");
+      await reload();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+
+  function openCreate(){
+    editing = { pool, id:null };
+    document.getElementById("modalTitle").textContent = pool==="zt"?"新增涨停":(pool==="watch"?"新增观察":"新增买入(须在观察池)");
+    const g = document.getElementById("formGrid");
+    if(pool==="pos"){
+      g.innerHTML = `
+        <label>${FIELD_CN.watch_id}<input id="f_watch_id" type="number" placeholder="观察池记录ID" /></label>
+        <label>${FIELD_CN.stock_name}<input id="f_stock_name" placeholder="或填名称(须已在观察池)" /></label>
+        <label>${FIELD_CN.buy_date}<input id="f_buy_date" type="date" /></label>
+        <label>${FIELD_CN.buy_price}<input id="f_buy_price" type="number" step="0.001" /></label>
+        <label>${FIELD_CN.position_pct}<input id="f_position_pct" type="number" value="50" /></label>`;
+    } else {
+      g.innerHTML = `
+        <label>${FIELD_CN.stock_name}<input id="f_stock_name" /></label>
+        <label>${FIELD_CN.stock_code}<input id="f_stock_code" placeholder="6位代码" /></label>
+        <label>${FIELD_CN.limit_up_date}<input id="f_limit_up_date" type="date" value="${ztDate||""}" /></label>`;
+    }
+    document.getElementById("modal").classList.add("show");
+  }
+
+  function openBuyFromWatch(id){
+    editing = { pool:"buyWatch", id };
+    const r = rows.find(x=>x.id===id);
+    document.getElementById("modalTitle").textContent = `从观察池买入 #${id}`;
+    document.getElementById("formGrid").innerHTML = `
+      <label>${FIELD_CN.stock_name}<input id="f_stock_name" value="${r?.stock_name||""}" readonly /></label>
+      <label>${FIELD_CN.buy_date}<input id="f_buy_date" type="date" value="${new Date().toISOString().slice(0,10)}" /></label>
+      <label>${FIELD_CN.buy_price}<input id="f_buy_price" type="number" step="0.001" value="${r?.last_price??""}" /></label>
+      <label>${FIELD_CN.position_pct}<input id="f_position_pct" type="number" value="50" /></label>`;
+    document.getElementById("modal").classList.add("show");
+  }
+
+  function openEdit(id){
+    const r = rows.find(x=>x.id===id); if(!r) return;
+    editing = { pool, id };
+    document.getElementById("modalTitle").textContent = `编辑 #${id}`;
+    const fields = pool==="pos"
+      ? ["stock_name","limit_up_date","concept_board","industry_board","buy_date","buy_price","stop_loss_price","stop_loss_pnl","sell_date","sell_price","position_pct","notes","status"]
+      : ["stock_name","limit_up_date","concept_board","industry_board","t1_open","ma10","ma20","ma25","ma30","notes","status"];
+    document.getElementById("formGrid").innerHTML = fields.map(k=>{
+      const type = k.includes("date")?"date":(["ma10","ma20","ma25","ma30","t1_open","buy_price","sell_price","stop_loss_price","stop_loss_pnl","position_pct"].includes(k)?"number":"text");
+      return `<label>${FIELD_CN[k]||k}<input id="f_${k}" type="${type}" step="0.001" value="${r[k]??""}" /></label>`;
+    }).join("");
+    document.getElementById("modal").classList.add("show");
+  }
+
+  function openAdd(id){
+    editing={pool:"add",id};
+    document.getElementById("modalTitle").textContent=`补仓 #${id}`;
+    document.getElementById("formGrid").innerHTML=`
+      <label>${FIELD_CN.add_price}<input id="f_add_price" type="number" step="0.001" /></label>
+      <label>${FIELD_CN.add_date}<input id="f_add_date" type="date" value="${new Date().toISOString().slice(0,10)}" /></label>
+      <label>${FIELD_CN.add_pct}<input id="f_add_pct" type="number" value="50" /></label>`;
+    document.getElementById("modal").classList.add("show");
+  }
+  function openSell(id){
+    editing={pool:"sell",id};
+    document.getElementById("modalTitle").textContent=`卖出 #${id}`;
+    document.getElementById("formGrid").innerHTML=`
+      <label>${FIELD_CN.sell_price}<input id="f_sell_price" type="number" step="0.001" /></label>
+      <label>${FIELD_CN.sell_date}<input id="f_sell_date" type="date" value="${new Date().toISOString().slice(0,10)}" /></label>
+      <label>${FIELD_CN.sell_reason}<input id="f_sell_reason" value="manual" /></label>`;
+    document.getElementById("modal").classList.add("show");
+  }
+  function closeModal(){ document.getElementById("modal").classList.remove("show"); editing=null; }
+
+  async function saveModal(){
+    if(!editing) return;
+    setLoading(true,"保存中…");
+    try{
+      if(editing.pool==="add"){
+        await api(`/api/position/${editing.id}/add`,{method:"POST",body:JSON.stringify({
+          add_price:Number(document.getElementById("f_add_price").value),
+          add_date:document.getElementById("f_add_date").value,
+          add_pct:Number(document.getElementById("f_add_pct").value||50),
+        })});
+      } else if(editing.pool==="sell"){
+        await api(`/api/position/${editing.id}/sell`,{method:"POST",body:JSON.stringify({
+          sell_price:Number(document.getElementById("f_sell_price").value),
+          sell_date:document.getElementById("f_sell_date").value,
+          sell_reason:document.getElementById("f_sell_reason").value,
+        })});
+      } else if(editing.pool==="buyWatch"){
+        await api("/api/position",{method:"POST",body:JSON.stringify({
+          watch_id: editing.id,
+          stock_name: document.getElementById("f_stock_name").value,
+          buy_date: document.getElementById("f_buy_date").value,
+          buy_price: Number(document.getElementById("f_buy_price").value),
+          position_pct: Number(document.getElementById("f_position_pct").value||50),
+        })});
+      } else if(editing.id==null){
+        if(pool==="pos"){
+          await api("/api/position",{method:"POST",body:JSON.stringify({
+            watch_id: document.getElementById("f_watch_id").value||null,
+            stock_name: document.getElementById("f_stock_name").value,
+            buy_date: document.getElementById("f_buy_date").value,
+            buy_price: Number(document.getElementById("f_buy_price").value),
+            position_pct: Number(document.getElementById("f_position_pct").value||50),
+          })});
+        } else {
+          const body = {
+            stock_name: document.getElementById("f_stock_name").value,
+            stock_code: document.getElementById("f_stock_code")?.value||"",
+            limit_up_date: document.getElementById("f_limit_up_date").value,
+          };
+          await api(pool==="watch"?"/api/watch":"/api/limitup",{method:"POST",body:JSON.stringify(body)});
+        }
+      } else {
+        const patch={};
+        document.getElementById("formGrid").querySelectorAll("input").forEach(inp=>{
+          const k=inp.id.replace(/^f_/,"");
+          let v=inp.value; if(inp.type==="number") v=v===""?null:Number(v);
+          patch[k]=v;
+        });
+        const ep = pool==="zt"?"limitup":(pool==="watch"?"watch":"position");
+        await api(`/api/${ep}/${editing.id}`,{method:"PUT",body:JSON.stringify(patch)});
+      }
+      closeModal(); toast("已保存"); await reload();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+
+  async function removeRow(id){
+    if(!confirm(`确认删除 #${id}？`)) return;
+    const ep = pool==="zt"?"limitup":(pool==="watch"?"watch":"position");
+    try{ await api(`/api/${ep}/${id}`,{method:"DELETE"}); toast("已删除"); await reload(); }
+    catch(e){ toast(e.message); }
+  }
+
+  async function runScan(){
+    setLoading(true,"拉取近5个交易日涨停（较慢）…");
+    try{
+      const r = await api("/api/scan",{method:"POST",body:JSON.stringify({days:5, skip_soft_filters:false})});
+      toast(`涨停新增 ${r.added}，自动晋升观察 ${r.promote?.promoted||0}`);
+      ztDate = (r.days&&r.days[0]) || ztDate;
+      await reload();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+  async function runPromote(){
+    setLoading(true,"自动筛选入观察池…");
+    try{
+      const r = await api("/api/promote-watch",{method:"POST",body:"{}"});
+      toast(`晋升 ${r.promoted} 只`);
+      await reload();
+    }catch(e){ toast(e.message); }
+    finally{ setLoading(false); }
+  }
+  async function runUpdateMa(){
+    setLoading(true,"刷新均线…");
+    try{
+      const r=await api("/api/update-ma",{method:"POST",body:"{}"});
+      if(r.touched!=null) toast(`V2 刷新 ${r.touched} 条`);
+      else toast(`涨停${r.limitup}/观察${r.watch}/持有${r.position}`);
+      await reload();
+    }
+    catch(e){ toast(e.message); } finally{ setLoading(false); }
+  }
+  async function runRefreshBoards(){
+    setLoading(true,"回填板块…");
+    try{ const r=await api("/api/refresh-boards",{method:"POST",body:"{}"}); toast(`已回填 ${r.updated}`); await reload(); }
+    catch(e){ toast(e.message); } finally{ setLoading(false); }
+  }
+  async function runBuyCheck(){
+    setLoading(true,"买入检测(仅观察池)…");
+    try{ const r=await api("/api/jobs/buy-check",{method:"POST",body:"{}"}); toast(`动作 ${(r.actions||[]).length}`); await reload(); }
+    catch(e){ toast(e.message); } finally{ setLoading(false); }
+  }
+  async function runSellCheck(){
+    setLoading(true,"卖出检测…");
+    try{ const r=await api("/api/jobs/sell-check",{method:"POST",body:"{}"}); toast(`动作 ${(r.actions||[]).length}`); await reload(); }
+    catch(e){ toast(e.message); } finally{ setLoading(false); }
+  }
+
+  document.getElementById("dateFilter").addEventListener("change",()=>{page=1;reload();});
+  document.getElementById("autoFilter").addEventListener("change",()=>{page=1;reload();});
+  document.getElementById("pageSize").addEventListener("change",()=>{page=1;renderTable();});
+  document.getElementById("keyword").addEventListener("keydown",e=>{ if(e.key==="Enter"){page=1;reload();} });
+
+  fillStatusOptions();
+  renderDayChips();
+  document.getElementById("verV1").classList.toggle("active", profile==="v1");
+  document.getElementById("verV2").classList.toggle("active", profile==="v2");
+  document.getElementById("verHint").textContent = profile==="v2"
+    ? "当前 V2 · data_v2/ · PAPER · D4主窗/D5补充 · 关补仓"
+    : "当前 V1 · data/";
+  reload();
+</script>
+</body>
+</html>

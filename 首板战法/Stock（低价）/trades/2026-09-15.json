@@ -1,0 +1,30 @@
+[
+  {
+    "id": 341,
+    "date": "2026-09-15",
+    "program": "slow",
+    "stock_code": "002141",
+    "stock_name": "贤丰控股",
+    "buy_price": 6.97,
+    "sell_price_935": 6.5,
+    "sell_price_1315": 6.75,
+    "sell_price_half_935": 6.5,
+    "sell_price_half_1315": 6.75,
+    "sell_price_batch_avg": 6.62,
+    "sell_date": "2026-09-16",
+    "hold_days": 1,
+    "pnl_morning": -6.74,
+    "pnl_afternoon": -3.16,
+    "pnl_morning_half": -3.37,
+    "pnl_afternoon_half": -1.58,
+    "pnl_batch_morning": -6.74,
+    "pnl_batch_afternoon": -3.16,
+    "pnl_batch_total": -4.95,
+    "pnl_batch_total_half": -2.48,
+    "is_second_board": false,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": null,
+    "board": "主板"
+  }
+]

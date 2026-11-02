@@ -1,0 +1,51 @@
+{
+  "mode": "buy_signals",
+  "date": "2026-07-28",
+  "stock_code": "000799",
+  "stock_name": "酒鬼酒",
+  "buy_price": 34.99,
+  "buy_time": "14:50",
+  "ma10": 35.57,
+  "ma10_slope_pct": 1.759,
+  "stop_loss_price": 35.21,
+  "take_profit_price1": 35.69,
+  "take_profit_price2": 36.74,
+  "predicted_next_open": 36.22,
+  "predicted_sell_price": 35.93,
+  "expected_profit_pct": 2.68,
+  "risk_reward_ratio": 0,
+  "volume": 412628,
+  "prev_volume": 507865,
+  "score": 100,
+  "match_type": "strict",
+  "conditions_met": [
+    "收阴线",
+    "历史放量大阳线",
+    "缩量",
+    "回调至10日线",
+    "MA10向上"
+  ],
+  "conditions_detail": [
+    "当日阴线跌幅: -0.57%",
+    "放量大阳线: 涨幅9.19%, 放量1.77倍, 9天前",
+    "缩量比例: 0.81",
+    "距离MA10: -1.63%",
+    "MA10斜率: 1.759%"
+  ],
+  "scan_time": "2026-07-28 11:02:44",
+  "message": "推荐股票: 000799 酒鬼酒",
+  "backup_stock": {
+    "stock_code": "000069",
+    "stock_name": "华侨城A",
+    "buy_price": 23.51,
+    "predicted_sell_price": 24.18,
+    "expected_profit_pct": 2.85,
+    "score": 80,
+    "conditions_met": [
+      "历史放量大阳线",
+      "缩量",
+      "回调至10日线",
+      "MA10向上"
+    ]
+  }
+}

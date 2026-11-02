@@ -22,11 +22,12 @@ jobs:
         run: |
           pip install akshare pandas requests baostock flask
 
-      - name: 发送 Up 推送
+      - name: 发送 Up 推送（2026-10-29 起暂停 PushPlus，见 通知规范）
         env:
           PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
           PUSHPLUS_TOPIC: ${{ secrets.PUSHPLUS_TOPIC }}
         run: |
-          cd "01_量化模型/首板战法/每日交易记录"
+          echo "up PushPlus 已暂停（01_量化模型/通知规范/PushPlus通知规范.md §3）"
+          cd "01_量化模型/首板战法/每日交易记录/jobs"
           python3 send_push_notify.py --program up --sync-only || true
           python3 send_push_notify.py --program up

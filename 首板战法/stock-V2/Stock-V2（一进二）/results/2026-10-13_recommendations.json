@@ -1,0 +1,229 @@
+{
+  "d0": "2026-10-12",
+  "d1": "2026-10-13",
+  "status": "OK",
+  "reason": null,
+  "allocation": "A2_B2_COMPARE",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [
+    {
+      "trade_date": "2026-10-13",
+      "d0_date": "2026-10-12",
+      "code": "300006",
+      "name": "莱美药业",
+      "board": "创业板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-13T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 3.659,
+      "auction_turnover_pct": 0.7936,
+      "auction_amount": 56724240.0,
+      "auction_amount_to_d0_ratio": 0.04253706351056369,
+      "auction_volume_shares": 8341800.0,
+      "d0_turnover_pct": 19.33885955810547,
+      "first_seal_time": "093000",
+      "open_board_count": 8,
+      "max_streak_30td": 1,
+      "runup_30td": 0.2888,
+      "projected_d1_runup": 0.5462,
+      "projected_d2_runup": 0.8546,
+      "score_components": {
+        "d0_turnover": 2.644561767578125,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 5.0,
+        "open_board": 2.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 64.26,
+      "selection_reason": "path=A score=64.26",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "A1",
+      "rank": 1
+    },
+    {
+      "trade_date": "2026-10-13",
+      "d0_date": "2026-10-12",
+      "code": "001231",
+      "name": "农心科技",
+      "board": "主板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-13T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 4.881,
+      "auction_turnover_pct": 3.5743,
+      "auction_amount": 46478544.0,
+      "auction_amount_to_d0_ratio": 0.2414587650059141,
+      "auction_volume_shares": 1730400.0,
+      "d0_turnover_pct": 15.525607109069824,
+      "first_seal_time": "132333",
+      "open_board_count": 1,
+      "max_streak_30td": 1,
+      "runup_30td": 0.2277,
+      "projected_d1_runup": 0.3504,
+      "projected_d2_runup": 0.4856,
+      "score_components": {
+        "d0_turnover": 13.77358341217041,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 2.0,
+        "open_board": 5.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 59.29,
+      "selection_reason": "path=A score=59.29",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 2,
+      "slot": "A2",
+      "rank": 2
+    },
+    {
+      "trade_date": "2026-10-13",
+      "d0_date": "2026-10-12",
+      "code": "600831",
+      "name": "广电网络",
+      "board": "主板",
+      "path": "B",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-13T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 1.023,
+      "auction_turnover_pct": 0.6132,
+      "auction_amount": 17054125.0,
+      "auction_amount_to_d0_ratio": 0.11072314290719783,
+      "auction_volume_shares": 4317500.0,
+      "d0_turnover_pct": 5.595211982727051,
+      "first_seal_time": "092501",
+      "open_board_count": 1,
+      "max_streak_30td": 1,
+      "runup_30td": 0.1884,
+      "projected_d1_runup": 0.307,
+      "projected_d2_runup": 0.4377,
+      "score_components": {
+        "d0_turnover": 4.464089870452881,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 10.0,
+        "open_board": 10.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 61.16,
+      "selection_reason": "path=B score=61.16",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 82.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "B1",
+      "rank": 3
+    }
+  ],
+  "scan_log_head": [
+    {
+      "code": "600831",
+      "path": "B",
+      "score": 61.16,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "300006",
+      "path": "A",
+      "score": 64.26,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603032",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -3.036
+    },
+    {
+      "code": "002441",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3304
+    },
+    {
+      "code": "002576",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.4718
+    },
+    {
+      "code": "002531",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.2746
+    },
+    {
+      "code": "002990",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3328
+    },
+    {
+      "code": "301419",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.2929
+    },
+    {
+      "code": "603500",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.283
+    },
+    {
+      "code": "002908",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -4.239
+    },
+    {
+      "code": "001231",
+      "path": "A",
+      "score": 59.29,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603336",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0826
+    },
+    {
+      "code": "603968",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.607
+    },
+    {
+      "code": "002591",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -5.447
+    }
+  ],
+  "scan_log_n": 14,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "a_scored_n": 2,
+  "b_scored_n": 1,
+  "tdx_quota_stopped": false,
+  "generated_at": "2026-10-29T19:01:16",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00",
+  "late": false
+}

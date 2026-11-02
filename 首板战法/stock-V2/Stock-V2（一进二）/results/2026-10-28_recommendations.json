@@ -1,0 +1,102 @@
+{
+  "d0": "2026-10-27",
+  "d1": "2026-10-28",
+  "status": "NO_TRADE",
+  "reason": "无合格A/B候选或竞价数据不足",
+  "allocation": "A_FIRST_B_FILL",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [],
+  "scan_log_head": [
+    {
+      "code": "002284",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "601566",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "600303",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "001400",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "600715",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "002187",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "603376",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "002249",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "301479",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "300539",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "000888",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "002205",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "603370",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "002823",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "300504",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "603037",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    },
+    {
+      "code": "002623",
+      "reject": "DATA_UNAVAILABLE",
+      "field": "auction"
+    }
+  ],
+  "scan_log_n": 17,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "generated_at": "2026-10-28T14:50:23",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00"
+}

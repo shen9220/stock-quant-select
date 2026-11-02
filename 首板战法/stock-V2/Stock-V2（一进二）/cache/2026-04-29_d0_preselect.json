@@ -1,0 +1,12 @@
+{
+  "d0": "2026-04-28",
+  "d1": "2026-04-29",
+  "status": "NO_TRADE",
+  "reason": "D0涨停池为空",
+  "pool_first": true,
+  "candidates": [],
+  "rejects": [],
+  "candidate_count": 0,
+  "reject_count": 0,
+  "generated_at": "2026-10-29T18:23:03"
+}

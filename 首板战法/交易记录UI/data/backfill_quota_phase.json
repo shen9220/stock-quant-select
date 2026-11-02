@@ -1,0 +1,17 @@
+{
+  "phase": "probe",
+  "probe_days_per_day": 7,
+  "stable_days_per_day": 10,
+  "probe": {
+    "baostock_reverse": 3,
+    "tencent_forward": 2,
+    "ths_gap": 2
+  },
+  "stable": {
+    "baostock_reverse": 4,
+    "tencent_forward": 3,
+    "ths_gap": 3
+  },
+  "clean_runs_to_stable": 5,
+  "note": "probe 合计约7天/日；连续5次四批全成功可手动改 phase 为 stable"
+}

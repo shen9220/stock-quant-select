@@ -1,0 +1,63 @@
+{
+  "lane": "sohu",
+  "src": "sohu",
+  "finished_at": "2026-10-27T15:57:58.306864",
+  "results": [
+    {
+      "date": "2026-10-12",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-30",
+      "status": "ok",
+      "filled": 3,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-24",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-21",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-16",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-11",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-08",
+      "status": "ok",
+      "filled": 4,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-03",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    }
+  ]
+}

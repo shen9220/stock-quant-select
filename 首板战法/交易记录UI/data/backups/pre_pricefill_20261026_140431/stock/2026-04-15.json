@@ -1,0 +1,30 @@
+[
+  {
+    "id": 132,
+    "date": "2026-04-15",
+    "stock_code": "300857",
+    "stock_name": "协创数据",
+    "buy_price": 280.19,
+    "sell_price_935": 293.82,
+    "sell_price_1315": 310.5,
+    "sell_price_half_935": 293.82,
+    "sell_price_half_1315": 310.5,
+    "sell_price_batch_avg": 302.16,
+    "sell_date": "2026-04-16",
+    "hold_days": 1,
+    "pnl_morning": 4.86,
+    "pnl_afternoon": 10.82,
+    "pnl_morning_half": 2.43,
+    "pnl_afternoon_half": 5.41,
+    "pnl_batch_morning": 4.86,
+    "pnl_batch_afternoon": 10.82,
+    "pnl_batch_total": 7.84,
+    "pnl_batch_total_half": 3.92,
+    "is_second_board": false,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": null,
+    "program": "stock",
+    "board": "创业板"
+  }
+]

@@ -1,0 +1,33 @@
+amount_yuan,auction_time,buyorsell,code,date,date_match_request,error,has_0925,has_0925_or_26,n,note,ok,price,rows_total,scanned_ticks,source,time_head,unit_note,volume_hands,volume_shares
+,,,000001,2026-10-27,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,em_trends2,,,,
+,,,000001,2026-10-27,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,ak_pre_min_em,,,,
+8636201.0,09:25:00,2,000001,2026-10-27,,,,,,,True,11.27,,4763,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,7663.0,766300.0
+,,,000001,2026-10-27,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,600000,2026-10-27,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,em_trends2,,,,
+,,,600000,2026-10-27,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,ak_pre_min_em,,,,
+2834540.0,09:25:00,2,600000,2026-10-27,,,,,,,True,9.56,,4678,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,2965.0,296500.0
+,,,600000,2026-10-27,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,300750,2026-10-27,,,False,,,无09:25行（通常从09:30起）,False,,1188,,em_trends2,,,,
+,,,300750,2026-10-27,False,,,True,239,仅当返回日=请求日才可用于该日；历史日通常不可用,False,,,,ak_pre_min_em,"['2026-10-28 09:15:00', '2026-10-28 09:16:00', '2026-10-28 09:17:00']",,,
+153094680.0,09:25:00,2,300750,2026-10-27,,,,,,,True,238.8,,4879,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,6411.0,641100.0
+,,,300750,2026-10-27,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,002594,2026-10-27,,,False,,,无09:25行（通常从09:30起）,False,,1188,,em_trends2,,,,
+,,,002594,2026-10-27,False,,,True,239,仅当返回日=请求日才可用于该日；历史日通常不可用,False,,,,ak_pre_min_em,"['2026-10-28 09:15:00', '2026-10-28 09:16:00', '2026-10-28 09:17:00']",,,
+9399300.0,09:25:00,2,002594,2026-10-27,,,,,,,True,82.45,,4765,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,1140.0,114000.0
+,,,002594,2026-10-27,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,000001,2026-10-20,,,False,,,无09:25行（通常从09:30起）,False,,1188,,em_trends2,,,,
+,,,000001,2026-10-20,False,,,True,239,仅当返回日=请求日才可用于该日；历史日通常不可用,False,,,,ak_pre_min_em,"['2026-10-28 09:15:00', '2026-10-28 09:16:00', '2026-10-28 09:17:00']",,,
+6282934.0,09:25:00,2,000001,2026-10-20,,,,,,,True,11.62,,4675,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,5407.0,540700.0
+,,,000001,2026-10-20,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,600000,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,em_trends2,,,,
+,,,600000,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,ak_pre_min_em,,,,
+1691712.0,09:25:00,2,600000,2026-10-20,,,,,,,True,9.79,,4325,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,1728.0,172800.0
+,,,600000,2026-10-20,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,300750,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,em_trends2,,,,
+,,,300750,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,ak_pre_min_em,,,,
+161600370.0,09:25:00,2,300750,2026-10-20,,,,,,,True,268.35,,4880,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,6022.0,602200.0
+,,,300750,2026-10-20,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,
+,,,002594,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,em_trends2,,,,
+,,,002594,2026-10-20,,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",,,,,False,,,,ak_pre_min_em,,,,
+7605168.0,09:25:00,2,002594,2026-10-20,,,,,,,True,83.39,,4709,mootdx_history_tick,,vol=手; amount=price*vol*100 推算,912.0,91200.0
+,,,002594,2026-10-20,,not_today,,,,仅当日实时；不能查历史日,False,,,,tencent_qt,,,,

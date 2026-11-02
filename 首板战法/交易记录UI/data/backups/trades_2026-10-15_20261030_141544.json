@@ -1,0 +1,33 @@
+[
+  {
+    "id": 19,
+    "date": "2026-10-15",
+    "program": "stock_v2",
+    "stock_code": "001299",
+    "stock_name": "美能能源",
+    "board": "主板",
+    "buy_price": null,
+    "sell_price_935": null,
+    "sell_price_1315": null,
+    "sell_price_half_935": null,
+    "sell_price_half_1315": null,
+    "sell_price_batch_avg": null,
+    "sell_date": null,
+    "hold_days": null,
+    "pnl_morning": null,
+    "pnl_afternoon": null,
+    "pnl_morning_half": null,
+    "pnl_afternoon_half": null,
+    "pnl_batch_morning": null,
+    "pnl_batch_afternoon": null,
+    "pnl_batch_total": null,
+    "pnl_batch_total_half": null,
+    "is_second_board": null,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": "V2 B1 score=60.83 gap=0.824 thr=N",
+    "path": "B",
+    "path_rank": 1,
+    "slot": "B1"
+  }
+]

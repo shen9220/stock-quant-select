@@ -1,0 +1,60 @@
+{
+  "run_id": "163002_run_v2_cf7824f7",
+  "profile": "v2",
+  "program": "run_v2",
+  "phase": "hold",
+  "slot": "morning",
+  "asof": "2026-10-29",
+  "args": {
+    "scan_days": 8,
+    "skip_soft": false,
+    "force": true
+  },
+  "ok": true,
+  "error": null,
+  "summary": {
+    "asof": "2026-10-29",
+    "phase": "hold",
+    "ok": true,
+    "paper": true,
+    "profile": "v2",
+    "buy_actions": 0,
+    "buy_types": {},
+    "sell_actions": 0,
+    "sell_types": {}
+  },
+  "result": {
+    "asof": "2026-10-29",
+    "phase": "hold",
+    "profile": "v2",
+    "paper": true,
+    "steps": {
+      "sell": {
+        "ok": true,
+        "asof": "2026-10-29",
+        "slot": "morning",
+        "actions": [],
+        "profile": "v2"
+      },
+      "buy": {
+        "ok": true,
+        "asof": "2026-10-29",
+        "slot": "morning",
+        "actions": [],
+        "paper": true,
+        "profile": "v2"
+      }
+    },
+    "ok": true
+  },
+  "result_truncated": false,
+  "triggered_by": "cli",
+  "strategy_version": "V2.3",
+  "experiment_id": "V2_MAIN",
+  "started_at": "2026-10-29T16:30:02",
+  "finished_at": "2026-10-29T16:30:02",
+  "host": "MacBook-Air.local",
+  "pid": 31721,
+  "extra": {},
+  "detail_path": "data_v2/runs/2026-10-29/163002_run_v2_cf7824f7.json"
+}

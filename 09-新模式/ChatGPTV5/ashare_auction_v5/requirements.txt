@@ -1,0 +1,4 @@
+akshare>=1.16
+pandas>=2.0
+
+exchange-calendars

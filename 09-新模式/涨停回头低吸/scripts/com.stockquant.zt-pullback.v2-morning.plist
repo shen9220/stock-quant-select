@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.stockquant.zt-pullback.v2-morning</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/admin/stock_quant_select/stock-quant-select/09-新模式/涨停回头低吸/scripts/morning_v2_entry.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>42</integer></dict>
+        <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>42</integer></dict>
+        <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>42</integer></dict>
+        <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>42</integer></dict>
+        <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>9</integer><key>Minute</key><integer>42</integer></dict>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/admin/stock_quant_select/stock-quant-select/09-新模式/涨停回头低吸</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+        <key>DISABLE_BAOSTOCK</key>
+        <string>1</string>
+        <key>TZ</key>
+        <string>Asia/Shanghai</string>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/admin/stock_quant_select/stock-quant-select/09-新模式/涨停回头低吸/data_v2/morning_logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/admin/stock_quant_select/stock-quant-select/09-新模式/涨停回头低吸/data_v2/morning_logs/launchd.err.log</string>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

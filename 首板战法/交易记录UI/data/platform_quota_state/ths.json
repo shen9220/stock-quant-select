@@ -1,0 +1,11 @@
+{
+  "night_id": "2026-11-01_night",
+  "night_count": 5,
+  "day_id": "2026-11-02",
+  "day_count": 5,
+  "hour_id": "2026-11-02T09",
+  "hour_count": 4,
+  "stopped": false,
+  "stop_reason": "",
+  "last_request_at": "2026-11-02T09:25:42.618369"
+}

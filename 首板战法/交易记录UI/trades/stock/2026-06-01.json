@@ -1,0 +1,29 @@
+[
+  {
+    "id": 115,
+    "date": "2026-06-01",
+    "stock_code": "002251",
+    "stock_name": "步步高",
+    "buy_price": 4.61,
+    "sell_price_935": 4.86,
+    "sell_price_1315": 4.75,
+    "sell_price_half_935": 4.86,
+    "sell_price_half_1315": 4.75,
+    "sell_price_batch_avg": 4.8,
+    "sell_date": "2026-06-02",
+    "hold_days": 1,
+    "pnl_morning": 5.42,
+    "pnl_afternoon": 3.04,
+    "pnl_morning_half": 2.71,
+    "pnl_afternoon_half": 1.52,
+    "pnl_batch_morning": 5.42,
+    "pnl_batch_afternoon": 3.04,
+    "pnl_batch_total": 4.23,
+    "pnl_batch_total_half": 2.12,
+    "is_second_board": false,
+    "rank": 2,
+    "skip_reason": null,
+    "notes": null,
+    "program": "stock"
+  }
+]

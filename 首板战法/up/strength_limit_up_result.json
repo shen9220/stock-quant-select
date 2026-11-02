@@ -1,0 +1,700 @@
+{
+  "analysis_date": "2026-11-02",
+  "model": "强度首板战法",
+  "strategy": "连续涨停1天，早盘集合竞价买入，次日收盘前全部卖出",
+  "position": "每次买入50%（五层仓）",
+  "total_stocks": 46,
+  "qualified_count": 37,
+  "all_stocks": [
+    {
+      "stock_code": "603703",
+      "stock_name": "盛洋科技",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 1.837587594985962,
+        "amount": 91126637,
+        "pct_change": 10.036831855773926,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603131",
+      "stock_name": "上海沪工",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 3.208073139190674,
+        "amount": 189684437,
+        "pct_change": 10.031347274780273,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600261",
+      "stock_name": "阳光照明",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 2.509378671646118,
+        "amount": 137021270,
+        "pct_change": 9.946236610412598,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000897",
+      "stock_name": "津滨发展",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.680219888687134,
+        "amount": 79671038,
+        "pct_change": 10.179640769958496,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "001219",
+      "stock_name": "青岛食品",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 24.89775276184082,
+        "amount": 944077296,
+        "pct_change": 9.983452796936035,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002365",
+      "stock_name": "永安药业",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.046631336212158,
+        "amount": 121532523,
+        "pct_change": 9.982014656066895,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "605169",
+      "stock_name": "洪通燃气",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 1.0165801048278809,
+        "amount": 36625271,
+        "pct_change": 9.9827880859375,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603029",
+      "stock_name": "天鹅股份",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.016012668609619,
+        "amount": 58698389,
+        "pct_change": 10.006854057312012,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000716",
+      "stock_name": "黑芝麻",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.14885950088501,
+        "amount": 160219355,
+        "pct_change": 10.084033966064453,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002275",
+      "stock_name": "桂林三金",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 4.183451175689697,
+        "amount": 352306512,
+        "pct_change": 9.985315322875977,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "001287",
+      "stock_name": "中电港",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.09209680557251,
+        "amount": 627563344,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "003032",
+      "stock_name": "传智教育",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 6.637020111083984,
+        "amount": 185619135,
+        "pct_change": 10.055248260498047,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600285",
+      "stock_name": "羚锐制药",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.569282054901123,
+        "amount": 443598704,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603587",
+      "stock_name": "地素时尚",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 1.1923964023590088,
+        "amount": 71902101,
+        "pct_change": 9.974424362182617,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000525",
+      "stock_name": "红太阳",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.029860496520996,
+        "amount": 297493344,
+        "pct_change": 10.049019813537598,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000410",
+      "stock_name": "沈阳机床",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.375016450881958,
+        "amount": 247683590,
+        "pct_change": 10.040983200073242,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600215",
+      "stock_name": "派斯林",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 9.45138931274414,
+        "amount": 270423120,
+        "pct_change": 10.017271041870117,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002432",
+      "stock_name": "九安医疗",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.64849853515625,
+        "amount": 1131924960,
+        "pct_change": 9.994132995605469,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "301187",
+      "stock_name": "欧圣电气",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.149001359939575,
+        "amount": 130823087,
+        "pct_change": 20.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "601083",
+      "stock_name": "锦江航运",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 10.347550392150879,
+        "amount": 277469552,
+        "pct_change": 10.031596183776855,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000417",
+      "stock_name": "合百集团",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.099573135375977,
+        "amount": 223359313,
+        "pct_change": 10.038609504699707,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000676",
+      "stock_name": "智度股份",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.49078893661499,
+        "amount": 536148624,
+        "pct_change": 9.983360290527344,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603273",
+      "stock_name": "天元智能",
+      "score": 50.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.7616658210754395,
+        "amount": 89574536,
+        "pct_change": 10.014103889465332,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603198",
+      "stock_name": "迎驾贡酒",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 1.1099694967269897,
+        "amount": 389942144,
+        "pct_change": 9.99258041381836,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600189",
+      "stock_name": "泉阳泉",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 4.0474629402160645,
+        "amount": 247458657,
+        "pct_change": 9.950248718261719,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000596",
+      "stock_name": "古井贡酒",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.5609841346740723,
+        "amount": 991055664,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000995",
+      "stock_name": "皇台酒业",
+      "score": 67.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 28.784521102905273,
+        "amount": 707748112,
+        "pct_change": 10.007758140563965,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002086",
+      "stock_name": "东方海洋",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 27.177654266357422,
+        "amount": 1190255120,
+        "pct_change": 10.116731643676758,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002582",
+      "stock_name": "好想你",
+      "score": 67.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 17.721927642822266,
+        "amount": 598338240,
+        "pct_change": 9.966776847839355,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002636",
+      "stock_name": "金安国纪",
+      "score": 75.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 9.19564151763916,
+        "amount": 4080057728,
+        "pct_change": 10.001727104187012,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "605058",
+      "stock_name": "澳弘电子",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 10.683065414428711,
+        "amount": 726294112,
+        "pct_change": 10.002188682556152,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "300030",
+      "stock_name": "阳普医疗",
+      "score": 62.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 18.8035888671875,
+        "amount": 354017376,
+        "pct_change": 20.032840728759766,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002172",
+      "stock_name": "澳洋健康",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 29.99041175842285,
+        "amount": 1288513792,
+        "pct_change": 10.055866241455078,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603233",
+      "stock_name": "大参林",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.0289461612701416,
+        "amount": 476049184,
+        "pct_change": 9.989142417907715,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002088",
+      "stock_name": "鲁阳节能",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.3680639266967773,
+        "amount": 127306984,
+        "pct_change": 9.943181991577148,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "301132",
+      "stock_name": "满坤科技",
+      "score": 67.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 17.295894622802734,
+        "amount": 835104928,
+        "pct_change": 20.008560180664062,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002652",
+      "stock_name": "扬子新材",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 5.029215335845947,
+        "amount": 94010169,
+        "pct_change": 10.14084529876709,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "301520",
+      "stock_name": "万邦医药",
+      "score": 67.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 43.53730773925781,
+        "amount": 822522624,
+        "pct_change": 20.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600510",
+      "stock_name": "黑牡丹",
+      "score": 60.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 3.2468018531799316,
+        "amount": 207917673,
+        "pct_change": 10.051107406616211,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600721",
+      "stock_name": "百花医药",
+      "score": 67.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 25.314638137817383,
+        "amount": 911678864,
+        "pct_change": 9.955257415771484,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600113",
+      "stock_name": "浙江东日",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.2778830528259277,
+        "amount": 217709460,
+        "pct_change": 10.008935928344727,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "603200",
+      "stock_name": "上海洗霸",
+      "score": 75.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 13.217681884765625,
+        "amount": 1150479968,
+        "pct_change": 9.995746612548828,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "000568",
+      "stock_name": "泸州老窖",
+      "score": 65.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 2.8119354248046875,
+        "amount": 3116403392,
+        "pct_change": 10.005709648132324,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "600258",
+      "stock_name": "首旅酒店",
+      "score": 70.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 6.5230207443237305,
+        "amount": 882301168,
+        "pct_change": 10.0,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "605338",
+      "stock_name": "巴比食品",
+      "score": 0,
+      "not_qualified": true,
+      "reason": "前一日已涨停，属于连板",
+      "details": {
+        "turnover": 6.460170269012451,
+        "amount": 309524512,
+        "pct_change": 10.010537147521973,
+        "zt_reason": "未知"
+      }
+    },
+    {
+      "stock_code": "002946",
+      "stock_name": "新乳业",
+      "score": 55.0,
+      "score_type": "简单评分",
+      "not_qualified": false,
+      "details": {
+        "turnover": 1.694021224975586,
+        "amount": 219927971,
+        "pct_change": 10.013908386230469,
+        "zt_reason": "未知"
+      }
+    }
+  ],
+  "top_stocks": [
+    {
+      "rank": 1,
+      "stock_code": "002636",
+      "stock_name": "金安国纪",
+      "score": 75.0,
+      "score_type": "简单评分",
+      "current_price": 63.68,
+      "market_cap": 0.0,
+      "pe_ratio": 0.0,
+      "turnover": 9.19564151763916,
+      "amount": 4080057728.0,
+      "zt_reason": "未知",
+      "trading_advice": {
+        "buy_price": 63.68,
+        "stop_loss": 60.5,
+        "target_profit_up": 68.77,
+        "target_profit_down": 61.77,
+        "forecast_up_pct": 8.0,
+        "forecast_down_pct": -3.0,
+        "position": "50%",
+        "buy_time": "早盘集合竞价附近（9:25）",
+        "sell_time": "次日收盘前"
+      },
+      "details": {
+        "涨停数据": {
+          "score": 50,
+          "details": {
+            "成交额": "40.80亿",
+            "换手率": "9.20%",
+            "涨幅": "10.00%"
+          }
+        },
+        "热点题材": {
+          "score": 15,
+          "reason": "未知"
+        },
+        "基本信息": {
+          "score": 10,
+          "details": {
+            "股价": "未知",
+            "市值": "未知"
+          }
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "stock_code": "603200",
+      "stock_name": "上海洗霸",
+      "score": 75.0,
+      "score_type": "简单评分",
+      "current_price": 51.72,
+      "market_cap": 0.0,
+      "pe_ratio": 0.0,
+      "turnover": 13.217681884765625,
+      "amount": 1150479968.0,
+      "zt_reason": "未知",
+      "trading_advice": {
+        "buy_price": 51.72,
+        "stop_loss": 49.13,
+        "target_profit_up": 55.86,
+        "target_profit_down": 50.17,
+        "forecast_up_pct": 8.0,
+        "forecast_down_pct": -3.0,
+        "position": "50%",
+        "buy_time": "早盘集合竞价附近（9:25）",
+        "sell_time": "次日收盘前"
+      },
+      "details": {
+        "涨停数据": {
+          "score": 50,
+          "details": {
+            "成交额": "11.50亿",
+            "换手率": "13.22%",
+            "涨幅": "10.00%"
+          }
+        },
+        "热点题材": {
+          "score": 15,
+          "reason": "未知"
+        },
+        "基本信息": {
+          "score": 10,
+          "details": {
+            "股价": "未知",
+            "市值": "未知"
+          }
+        }
+      }
+    }
+  ]
+}

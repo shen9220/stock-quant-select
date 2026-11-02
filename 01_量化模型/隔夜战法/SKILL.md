@@ -9,7 +9,8 @@ dependency:
 ---
 
 # 量化选股模型
-运行：python scripts/stock_quant_select.py --date 2026-04-24
+运行：python deep.py --date 2026-07-28
+（亦可用 stock_quant_select.py；deep.py 为实时活跃股优选版，禁止造假数据）
 
 ## 任务目标
 本 Skill 用于执行量化选股策略，通过多技术指标筛选，每日从全市场A股中选出最符合策略的单一股票。
@@ -48,14 +49,14 @@ dependency:
 
 调用示例：
 ```bash
-# 使用默认参数执行选股（默认当日）
-python scripts/stock_quant_select.py
+# 使用默认参数执行选股（默认最近交易日）
+python deep.py
 
-# 指定历史日期执行选股
-python scripts/stock_quant_select.py --date 2024-01-15
+# 指定历史日期
+python deep.py --date 2024-01-15
 
-# 自定义参数
-python scripts/stock_quant_select.py --date 2024-01-15 --ma10-diff 0.03 --big-rise-threshold 0.07 --output my_result.json
+# 自定义参数（扩大扫描/放宽带宽）
+python deep.py --date 2024-01-15 --ma10-diff 0.03 --max-stocks 600 --output my_result.json
 ```
 
 **2. 查看选股结果**
@@ -87,6 +88,9 @@ python scripts/stock_quant_select.py --date 2024-01-15 --ma10-diff 0.03 --big-ri
 | --volume-multiple | 放量倍数 | 1.5 |
 | --lookback-days | 历史回看天数 | 20 |
 | --limit-up-threshold | 涨停板阈值 | 0.095（9.5%） |
+| --max-stocks | 按成交额扫描前 N 只活跃收跌股 | 400 |
+| --min-amount | 最低成交额（元） | 5e7（5000万） |
+| --top-n | 输出前 N 只 | 1 |
 
 ## 使用示例
 
@@ -107,16 +111,16 @@ python scripts/stock_quant_select.py --date 2024-01-15 --ma10-diff 0.03 --big-ri
 
 ## 资源索引
 
-- 脚本：见 [scripts/stock_quant_select.py](scripts/stock_quant_select.py)（用途：执行量化选股，支持命令行参数）
+- 主脚本：[deep.py](deep.py)（实时活跃股扫描，对齐 stock.py 重试/日历）
+- 备用：[stock_quant_select.py](stock_quant_select.py)
 
 ## 注意事项
 
-- 脚本执行需要网络连接（获取A股数据）
-- 首次运行可能较慢（需要下载全市场数据）
+- 需要网络；数据源为东财实时行情 + 前复权日线
+- 默认按成交额扫描前 400 只「当日收跌」活跃股，避免冷门老登占满算力
+- **禁止硬编码股池与随机造假 K 线**；无命中则 `score=0`、`demo_data=false`
+- ST / 科创板 688 / 北交所已过滤
 - 选股结果仅供参考，不构成投资建议
-- 实盘交易需结合市场环境和个人风险承受能力
-- ST股票和停牌股票已自动过滤
-- 若当日无符合所有条件的股票，结果中 score 为 0
 
 ## 策略逻辑说明
 

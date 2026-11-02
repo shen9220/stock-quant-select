@@ -1,0 +1,21 @@
+{
+  "lane": "qq",
+  "src": "qq",
+  "finished_at": "2026-10-30T17:26:47.955451",
+  "results": [
+    {
+      "date": "2026-08-19",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    },
+    {
+      "date": "2026-08-17",
+      "status": "ok",
+      "filled": 2,
+      "hold": 0,
+      "fail": 0
+    }
+  ]
+}

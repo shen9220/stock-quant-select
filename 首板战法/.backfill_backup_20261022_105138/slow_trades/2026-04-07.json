@@ -1,0 +1,29 @@
+[
+  {
+    "id": 117,
+    "date": "2026-04-07",
+    "program": "slow",
+    "stock_code": "600488",
+    "stock_name": "津药药业",
+    "buy_price": 7.3,
+    "sell_price_935": 8.44,
+    "sell_price_1315": 7.21,
+    "sell_price_half_935": 8.44,
+    "sell_price_half_1315": 7.21,
+    "sell_price_batch_avg": 7.82,
+    "sell_date": "2026-04-08",
+    "hold_days": 1,
+    "pnl_morning": 15.62,
+    "pnl_afternoon": -1.23,
+    "pnl_morning_half": 7.81,
+    "pnl_afternoon_half": -0.61,
+    "pnl_batch_morning": 15.62,
+    "pnl_batch_afternoon": -1.23,
+    "pnl_batch_total": 7.19,
+    "pnl_batch_total_half": 3.6,
+    "is_second_board": true,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": null
+  }
+]

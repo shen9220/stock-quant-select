@@ -1,0 +1,136 @@
+{
+  "d0": "2026-10-21",
+  "d1": "2026-10-22",
+  "status": "NO_TRADE",
+  "reason": "无合格A/B候选或竞价数据不足",
+  "allocation": "A_FIRST_B_FILL",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [],
+  "scan_log_head": [
+    {
+      "code": "603138",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 10.013
+    },
+    {
+      "code": "002086",
+      "path": "B",
+      "score": 61.51,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "301102",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -6.223
+    },
+    {
+      "code": "600715",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3343
+    },
+    {
+      "code": "600252",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.2192
+    },
+    {
+      "code": "002591",
+      "path": "B",
+      "score": 64.39,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603330",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.6349
+    },
+    {
+      "code": "600838",
+      "path": "B",
+      "score": 59.47,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "001201",
+      "path": "B",
+      "score": 65.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "002792",
+      "path": "A",
+      "score": 61.63,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603629",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.2176
+    },
+    {
+      "code": "002639",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.34
+    },
+    {
+      "code": "600202",
+      "path": "A",
+      "score": 74.9,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "000518",
+      "path": "B",
+      "score": 48.27,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "002368",
+      "path": "B",
+      "score": 56.88,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "301159",
+      "path": "B",
+      "score": 71.15,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "300296",
+      "path": "A",
+      "score": 54.9,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603999",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.2251
+    },
+    {
+      "code": "000788",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3059
+    },
+    {
+      "code": "002112",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.6749
+    }
+  ],
+  "scan_log_n": 20,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "tdx_quota_stopped": false,
+  "generated_at": "2026-10-28T15:29:36",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00"
+}

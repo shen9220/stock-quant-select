@@ -1,0 +1,12 @@
+{
+  "lane": "qq",
+  "src": "qq",
+  "finished_at": "2026-10-31T14:04:21.837281",
+  "results": [
+    {
+      "date": "2026-07-30",
+      "status": "quota_stop",
+      "msg": "QUOTA_STOP platform=tencent kind=hour used=64 limit=64"
+    }
+  ]
+}

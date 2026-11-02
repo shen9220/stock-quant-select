@@ -1,51 +1,102 @@
 {
-  "mode": "buy_signals",
-  "date": "2026-04-27",
-  "stock_code": "000807",
-  "stock_name": "云铝股份",
-  "buy_price": 35.58,
-  "buy_time": "14:50",
-  "ma10": 35.81,
-  "ma10_slope_pct": 1.814,
-  "stop_loss_price": 35.45,
-  "take_profit_price1": 36.29,
-  "take_profit_price2": 37.36,
-  "predicted_next_open": 36.87,
-  "predicted_sell_price": 36.39,
-  "expected_profit_pct": 2.27,
-  "risk_reward_ratio": 6.45,
-  "volume": 386668,
-  "prev_volume": 453725,
-  "score": 100,
-  "match_type": "strict",
-  "conditions_met": [
-    "收阴线",
-    "历史放量大阳线",
-    "缩量",
-    "回调至10日线",
-    "MA10向上"
-  ],
-  "conditions_detail": [
-    "当日阴线跌幅: -1.82%",
-    "放量大阳线: 涨幅9.29%, 放量1.91倍, 5天前",
-    "缩量比例: 0.85",
-    "距离MA10: -0.65%",
-    "MA10斜率: 1.814%"
-  ],
-  "scan_time": "2026-04-27 09:16:45",
-  "message": "推荐股票: 000807 云铝股份",
-  "backup_stock": {
-    "stock_code": "000001",
-    "stock_name": "平安银行",
-    "buy_price": 31.93,
-    "predicted_sell_price": 32.79,
-    "expected_profit_pct": 2.71,
-    "score": 80,
-    "conditions_met": [
-      "历史放量大阳线",
+  "select_date": "2026-07-28",
+  "model": "隔夜战法-缩量回踩MA10",
+  "data_source": "akshare realtime (stock_zh_a_spot_em + stock_zh_a_hist)",
+  "demo_data": false,
+  "params": {
+    "ma10_diff": 0.02,
+    "big_rise_threshold": 0.06,
+    "volume_multiple": 1.5,
+    "lookback_days": 20,
+    "limit_up_threshold": 0.095,
+    "max_stocks": 400,
+    "min_amount": 50000000.0
+  },
+  "scanned": 400,
+  "total_found": 11,
+  "score": 100.67,
+  "recommendation": {
+    "stock_code": "002414",
+    "stock_name": "高德红外",
+    "score": 100.67,
+    "buy_price": 13.81,
+    "ma10": 13.798000000000002,
+    "ma10_slope": 0.021000000000000796,
+    "volume": 629200.0,
+    "prev_volume": 1487762.0,
+    "pct_change": -3.43,
+    "amount_spot": 871390413.0,
+    "conditions": [
+      "收阴线",
+      "历史放量大阳线或涨停板",
       "缩量",
       "回调至10日线",
       "MA10向上"
-    ]
-  }
+    ],
+    "conditions_detail": {
+      "当日阴线跌幅": "-1.36%",
+      "放量大阳线": "涨停涨幅9.99%, 放量3.12倍, 12天前",
+      "缩量比例": "0.42",
+      "距离MA10": "0.09%",
+      "MA10斜率": "0.152%"
+    },
+    "trading_advice": {
+      "buy_price": 13.81,
+      "buy_time": "尾盘/14:50 附近（隔夜）",
+      "stop_loss": 13.66,
+      "take_profit_2pct": 14.09,
+      "take_profit_5pct": 14.5,
+      "ma10": 13.8,
+      "ma5": 14.01,
+      "next_day_rules": [
+        "次日开盘价 < MA10 → 立即止损",
+        "盘中冲高 2% → 止盈；冲高回落破分时均线 → 卖出",
+        "10:00 未触发 → 强制卖出",
+        "早盘涨停或突破 MA5 → 可持有至尾盘"
+      ]
+    }
+  },
+  "candidates": [
+    {
+      "stock_code": "002414",
+      "stock_name": "高德红外",
+      "score": 100.67,
+      "buy_price": 13.81,
+      "ma10": 13.798000000000002,
+      "ma10_slope": 0.021000000000000796,
+      "volume": 629200.0,
+      "prev_volume": 1487762.0,
+      "pct_change": -3.43,
+      "amount_spot": 871390413.0,
+      "conditions": [
+        "收阴线",
+        "历史放量大阳线或涨停板",
+        "缩量",
+        "回调至10日线",
+        "MA10向上"
+      ],
+      "conditions_detail": {
+        "当日阴线跌幅": "-1.36%",
+        "放量大阳线": "涨停涨幅9.99%, 放量3.12倍, 12天前",
+        "缩量比例": "0.42",
+        "距离MA10": "0.09%",
+        "MA10斜率": "0.152%"
+      },
+      "trading_advice": {
+        "buy_price": 13.81,
+        "buy_time": "尾盘/14:50 附近（隔夜）",
+        "stop_loss": 13.66,
+        "take_profit_2pct": 14.09,
+        "take_profit_5pct": 14.5,
+        "ma10": 13.8,
+        "ma5": 14.01,
+        "next_day_rules": [
+          "次日开盘价 < MA10 → 立即止损",
+          "盘中冲高 2% → 止盈；冲高回落破分时均线 → 卖出",
+          "10:00 未触发 → 强制卖出",
+          "早盘涨停或突破 MA5 → 可持有至尾盘"
+        ]
+      }
+    }
+  ]
 }

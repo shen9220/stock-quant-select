@@ -1,0 +1,19 @@
+{
+  "lane": "sina",
+  "src": "sina",
+  "finished_at": "2026-11-01T13:06:15.356576",
+  "results": [
+    {
+      "date": "2026-10-30",
+      "status": "ok",
+      "filled": 0,
+      "hold": 3,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-24",
+      "status": "quota_stop",
+      "msg": "QUOTA_STOP platform=sina kind=hour used=32 limit=32"
+    }
+  ]
+}

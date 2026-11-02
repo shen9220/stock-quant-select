@@ -1,0 +1,48 @@
+{
+  "phase": "forward",
+  "gap_deadline": "2025-08-24",
+  "gap_dates_done": [
+    "2025-08-04"
+  ],
+  "reverse_week_index": 1,
+  "reverse_day_offset": 0,
+  "max_days_per_run": 1,
+  "tx_interval_sec": 0.85,
+  "ths_interval_sec": 1.2,
+  "last_run": "2026-11-02 15:00:09",
+  "last_error": "invalid syntax (stock_UI.py, line 670)",
+  "adaptive": {
+    "enabled": true,
+    "probe_runs_remaining": 0,
+    "current_quota": 1,
+    "target_quota": 3,
+    "min_quota": 1,
+    "clean_runs": 0,
+    "runs_for_upgrade": 2,
+    "last_run_metrics": {
+      "planned_days": 0,
+      "done_days": 0,
+      "errors": 0,
+      "pressure": false,
+      "pressure_reasons": [],
+      "duration_sec": 4.6
+    }
+  },
+  "risk": {
+    "consecutive_failures": 1,
+    "paused_until": null,
+    "pressure_events": 65
+  },
+  "night": {
+    "last_run_metrics": {
+      "planned_days": 3,
+      "done_days": 3,
+      "errors": 0,
+      "pressure": false,
+      "pressure_reasons": [],
+      "duration_sec": 670.1
+    }
+  },
+  "last_night_run": "2026-08-25 03:11:11",
+  "forward_cursor_d0": "2025-06-26"
+}

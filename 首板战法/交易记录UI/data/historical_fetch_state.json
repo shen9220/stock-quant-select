@@ -1,0 +1,28 @@
+{
+  "range": {
+    "start": "2025-01-01",
+    "end": "2025-12-31"
+  },
+  "programs": {
+    "stock": {
+      "cursor_d0": "2025-01-01",
+      "completed": [],
+      "note": "优先补全 2025 全年；已有 8-12 月部分数据会自动跳过"
+    },
+    "slow": {
+      "cursor_d0": "2025-01-01",
+      "completed": [],
+      "paused_until_stock_2025_done": true
+    },
+    "up": {
+      "cursor_d0": "2025-01-01",
+      "completed": [],
+      "paused_until_stock_2025_done": true
+    }
+  },
+  "last_run": null,
+  "stats": {
+    "total_days": 0,
+    "total_api_calls": 0
+  }
+}

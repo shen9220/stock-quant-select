@@ -1,0 +1,29 @@
+[
+  {
+    "id": 232,
+    "date": "2026-08-03",
+    "program": "slow",
+    "stock_code": "000892",
+    "stock_name": "欢瑞世纪",
+    "buy_price": 3.9,
+    "sell_price_935": 3.82,
+    "sell_price_1315": 4.17,
+    "sell_price_half_935": 3.82,
+    "sell_price_half_1315": 4.17,
+    "sell_price_batch_avg": 4.0,
+    "sell_date": "2026-08-04",
+    "hold_days": 1,
+    "pnl_morning": -2.05,
+    "pnl_afternoon": 6.92,
+    "pnl_morning_half": -1.02,
+    "pnl_afternoon_half": 3.46,
+    "pnl_batch_morning": -2.05,
+    "pnl_batch_afternoon": 6.92,
+    "pnl_batch_total": 2.44,
+    "pnl_batch_total_half": 1.22,
+    "is_second_board": false,
+    "rank": 1,
+    "skip_reason": null,
+    "notes": null
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 233,
+    "date": "2026-01-12",
+    "stock_code": "002017",
+    "stock_name": "东信和平",
+    "buy_price": 25.86,
+    "sell_price_935": 29.0,
+    "sell_price_1315": 27.44,
+    "sell_price_half_935": 29.0,
+    "sell_price_half_1315": 27.44,
+    "sell_price_batch_avg": 28.22,
+    "sell_date": "2026-01-13",
+    "hold_days": 1,
+    "pnl_morning": 12.14,
+    "pnl_afternoon": 6.11,
+    "pnl_morning_half": 6.07,
+    "pnl_afternoon_half": 3.06,
+    "pnl_batch_morning": 12.14,
+    "pnl_batch_afternoon": 6.11,
+    "pnl_batch_total": 9.12,
+    "pnl_batch_total_half": 4.56,
+    "is_second_board": true,
+    "rank": 2,
+    "skip_reason": null,
+    "notes": null,
+    "program": "stock"
+  }
+]

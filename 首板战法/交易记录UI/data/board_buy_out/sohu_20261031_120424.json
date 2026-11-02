@@ -1,0 +1,12 @@
+{
+  "lane": "sohu",
+  "src": "sohu",
+  "finished_at": "2026-10-31T12:04:24.671348",
+  "results": [
+    {
+      "date": "2026-08-11",
+      "status": "quota_stop",
+      "msg": "QUOTA_STOP platform=sohu kind=hour used=48 limit=48"
+    }
+  ]
+}

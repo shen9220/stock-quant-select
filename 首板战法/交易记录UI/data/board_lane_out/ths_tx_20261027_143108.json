@@ -1,0 +1,17 @@
+{
+  "lane": "ths_tx",
+  "zt": "ths",
+  "hist": "tx",
+  "finished_at": "2026-10-27T14:31:08.082711",
+  "results": [
+    {
+      "date": "2026-09-30",
+      "status": "ok",
+      "msg": "[ok] 2026-09-30 主板 2 / 创业板 2 → 新建 3 更新 1"
+    },
+    {
+      "date": "2026-09-29",
+      "status": "skip_done"
+    }
+  ]
+}

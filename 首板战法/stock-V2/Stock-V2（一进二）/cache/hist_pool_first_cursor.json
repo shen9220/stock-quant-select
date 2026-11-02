@@ -1,0 +1,11 @@
+{
+  "d1": "2026-01-05",
+  "updated_at": "2026-10-29T18:24:47",
+  "phase": "skip",
+  "pool": {
+    "status": "fields_sparse",
+    "n": 33,
+    "sparse": true,
+    "turnover_positive": 0
+  }
+}

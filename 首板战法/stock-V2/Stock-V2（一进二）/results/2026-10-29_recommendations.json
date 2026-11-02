@@ -1,0 +1,67 @@
+{
+  "d0": "2026-10-28",
+  "d1": "2026-10-29",
+  "status": "OK",
+  "allocation": "A2_B2_COMPARE",
+  "mode": "live",
+  "recommendations": [
+    {
+      "trade_date": "2026-10-29",
+      "code": "603337",
+      "name": "杰克科技",
+      "path": "A",
+      "path_rank": 1,
+      "slot": "A1",
+      "rank": 1,
+      "score_total": 82.74,
+      "auction_gap_pct": 4.444,
+      "above_threshold": true,
+      "candidate_status": "SELECTED",
+      "restored_from": "trades_backup_20261029_180857"
+    },
+    {
+      "trade_date": "2026-10-29",
+      "code": "000554",
+      "name": "泰山石油",
+      "path": "A",
+      "path_rank": 2,
+      "slot": "A2",
+      "rank": 2,
+      "score_total": 75.67,
+      "auction_gap_pct": 3.62,
+      "above_threshold": true,
+      "candidate_status": "SELECTED",
+      "restored_from": "trades_backup_20261029_180857"
+    },
+    {
+      "trade_date": "2026-10-29",
+      "code": "603533",
+      "name": "掌阅科技",
+      "path": "B",
+      "path_rank": 1,
+      "slot": "B1",
+      "rank": 3,
+      "score_total": 87.77,
+      "auction_gap_pct": 1.07,
+      "above_threshold": true,
+      "candidate_status": "SELECTED",
+      "restored_from": "trades_backup_20261029_180857"
+    },
+    {
+      "trade_date": "2026-10-29",
+      "code": "002962",
+      "name": "五方光电",
+      "path": "B",
+      "path_rank": 2,
+      "slot": "B2",
+      "rank": 4,
+      "score_total": 85.83,
+      "auction_gap_pct": 0.624,
+      "above_threshold": true,
+      "candidate_status": "SELECTED",
+      "restored_from": "trades_backup_20261029_180857"
+    }
+  ],
+  "generated_at": "2026-10-30T09:41:00",
+  "note": "restored after hist backfill wrongly overwrote live morning (杰克科技→振邦智能)"
+}

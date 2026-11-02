@@ -1,0 +1,270 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+主板/创业板 tab 买价多源编排（搜狐 / 腾讯QQ / 腾讯ak）。
+
+- 多轨并行，轨内单线程；日期互不重叠
+- 只写 buy_price（D1 开盘）；历史分钟卖价仍受 baostock 黑名单限制
+- 时间窗：见 lib/backfill_window.py（统一每日 10:00→次日 00:00）
+"""
+from __future__ import annotations
+
+import os
+import sys
+
+_JOBS_DIR = os.path.dirname(os.path.abspath(__file__))
+_BASE_DIR = os.path.dirname(_JOBS_DIR)
+_LIB_DIR = os.path.join(_BASE_DIR, "lib")
+for _p in (_BASE_DIR, _LIB_DIR, _JOBS_DIR, os.path.dirname(_BASE_DIR)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+from runtime_paths import BASE_DIR, ROOT_DIR, DATA_DIR, ensure_sys_path  # noqa: E402
+ensure_sys_path()
+_HERE = _JOBS_DIR
+
+import argparse
+import fcntl
+import os
+import subprocess
+import sys
+import time
+from datetime import datetime, timedelta
+
+
+import board_buy_sources as bbs  # noqa: E402
+from platform_gate import is_stopped, quota_status  # noqa: E402
+from stock_UI import _list_day_files, _load_day, _safe_float  # noqa: E402
+
+
+def _clamp_until(until: str, src: str) -> str:
+    from backfill_window import default_until  # noqa: WPS433
+
+    _ = src
+    plat = default_until()
+    g = datetime.strptime(until, "%Y-%m-%d %H:%M")
+    p = datetime.strptime(plat, "%Y-%m-%d %H:%M")
+    return min(g, p).strftime("%Y-%m-%d %H:%M")
+
+
+def _alive_lanes(lanes: list[dict], *, force: bool) -> list[dict]:
+    from backfill_window import filter_lanes_by_reserve  # noqa: WPS433
+
+    alive = [ln for ln in lanes if not is_stopped(ln["src"])]
+    if force:
+        return alive
+    return filter_lanes_by_reserve(alive)
+
+LOCK_FILE = os.path.join(BASE_DIR, "data", "board_buy_night.lock")
+LOG_DIR = os.path.join(BASE_DIR, "data", "board_price_logs")
+PYTHON = "/usr/local/bin/python3"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+
+def log(msg: str) -> None:
+    line = f"[{datetime.now():%F %T}] {msg}"
+    print(line, flush=True)
+    with open(os.path.join(LOG_DIR, f"{datetime.now():%Y-%m-%d}.log"), "a", encoding="utf-8") as f:
+        f.write(line + "\n")
+
+
+def _quiet() -> str | None:
+    from backfill_window import quiet_reason  # noqa: WPS433
+    return quiet_reason()
+
+
+def list_todo_days(start: str = "2026-01-01") -> list[str]:
+    """当前阶段的日期。阶段 = 最近一个未补完的「月 + 板」，创业板先于主板。"""
+    from board_phase import FLOOR, phase_days, trade_board
+
+    floor = start if start > FLOOR else FLOOR
+    items: list[tuple[str, str, str]] = []
+    for fn in _list_day_files("stock"):
+        day = fn[:-5]
+        if day < floor:
+            continue
+        trades = _load_day(day, "stock")
+        need_boards: set[str] = set()
+        for t in trades:
+            if t.get("board_rank") is None or t.get("is_board_placeholder"):
+                continue
+            if "买不进" in str(t.get("skip_reason") or ""):
+                continue
+            if not str(t.get("stock_code") or "").strip():
+                continue
+            if _safe_float(t.get("buy_price")) is None:
+                need_boards.add(trade_board(t))
+        for board in need_boards:
+            items.append((day[:7], board, day))
+    _month, _board, days = phase_days(items)
+    return days
+
+
+def current_phase(start: str = "2026-01-01") -> tuple[str, str]:
+    from board_phase import FLOOR, phase_days, trade_board
+
+    floor = start if start > FLOOR else FLOOR
+    items: list[tuple[str, str, str]] = []
+    for fn in _list_day_files("stock"):
+        day = fn[:-5]
+        if day < floor:
+            continue
+        trades = _load_day(day, "stock")
+        need_boards: set[str] = set()
+        for t in trades:
+            if t.get("board_rank") is None or t.get("is_board_placeholder"):
+                continue
+            if "买不进" in str(t.get("skip_reason") or ""):
+                continue
+            if not str(t.get("stock_code") or "").strip():
+                continue
+            if _safe_float(t.get("buy_price")) is None:
+                need_boards.add(trade_board(t))
+        for board in need_boards:
+            items.append((day[:7], board, day))
+    month, board, _days = phase_days(items)
+    return month, board
+
+
+def assign(todo: list[str], lanes: list[dict], per_lane: int) -> dict[str, list[str]]:
+    out = {ln["id"]: [] for ln in lanes}
+    if not lanes:
+        return out
+    idx = 0
+    for d in todo:
+        tried = 0
+        while tried < len(lanes):
+            ln = lanes[idx % len(lanes)]
+            idx += 1
+            tried += 1
+            if len(out[ln["id"]]) < per_lane:
+                out[ln["id"]].append(d)
+                break
+        if all(len(out[ln["id"]]) >= per_lane for ln in lanes):
+            break
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--per-lane", type=int, default=3, help="每轨每轮天数（保守，不赶工）")
+    ap.add_argument("--rounds", type=int, default=80)
+    ap.add_argument("--until", default="")
+    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--status", action="store_true")
+    ap.add_argument("--start", default="2026-01-01")
+    # 默认 sohu+qq：腾讯只开一条买轨，与卖价腾讯分钟共用 tencent 门禁（禁止同平台并发）
+    ap.add_argument("--lanes", default="sohu,qq", help="逗号分隔 sohu,qq,tx,em（qq/tx 同属腾讯门禁，勿同时开）")
+    args = ap.parse_args()
+
+    wanted = [x.strip() for x in args.lanes.split(",") if x.strip()]
+    lanes = [ln for ln in bbs.list_buy_lanes() if ln["id"] in wanted]
+    todo = list_todo_days(args.start)
+    if args.status:
+        print(f"待补买价日期 {len(todo)} | 分轨 {[ln['id'] for ln in lanes]}")
+        print("最近:", ", ".join(todo[:12]), ("…" if len(todo) > 12 else ""))
+        qs = quota_status()
+        for p, st in qs.items():
+            print(
+                f"  quota[{p}] night {st['night_used']}/{st['night_limit']} "
+                f"hour {st['hour_used']}/{st['hour_limit']} "
+                f"interval={st['min_interval_sec']}s stopped={st['stopped']}"
+            )
+        return
+
+    if _quiet() and not args.force:
+        log(f"拒绝启动：{_quiet()}")
+        return
+
+    until = args.until
+    if not until:
+        from backfill_window import default_until  # noqa: WPS433
+        until = default_until()
+    elif len(until) <= 5:
+        hh, mm = map(int, until.split(":"))
+        target = datetime.now().replace(hour=hh, minute=mm, second=0, microsecond=0)
+        if target <= datetime.now():
+            target += timedelta(days=1)
+        until = target.strftime("%Y-%m-%d %H:%M")
+
+    os.makedirs(os.path.dirname(LOCK_FILE), exist_ok=True)
+    fd = os.open(LOCK_FILE, os.O_CREAT | os.O_RDWR)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        os.close(fd)
+        log("另一买价编排器运行中，跳过")
+        return
+
+    phase_m, phase_b = current_phase(args.start)
+    log(f"=== buy night start lanes={[ln['id'] for ln in lanes]} "
+        f"phase={phase_m} {phase_b} todo_days={len(todo)} "
+        f"per_lane={args.per_lane} until={until} ===")
+    try:
+        for r in range(1, max(1, args.rounds) + 1):
+            if _quiet() and not args.force:
+                log("进入安静窗，停止")
+                break
+            if datetime.now() >= datetime.strptime(until, "%Y-%m-%d %H:%M"):
+                log(f"硬停 {until}")
+                break
+            todo = list_todo_days(args.start)
+            phase_m, phase_b = current_phase(args.start)
+            if not todo:
+                log("买价待补为空，收工")
+                break
+            log(f"round{r} phase={phase_m} {phase_b} days={todo[:6]}")
+            alive = _alive_lanes(lanes, force=args.force)
+            if not alive:
+                log("买价分轨全部不可用（配额或早盘预留），本轮收工")
+                break
+            asg = assign(todo, alive, args.per_lane)
+            procs = []
+            lane_stops: list[datetime] = []
+            for ln in alive:
+                dates = asg.get(ln["id"]) or []
+                if not dates:
+                    continue
+                ln_until = _clamp_until(until, ln["src"])
+                ln_stop = datetime.strptime(ln_until, "%Y-%m-%d %H:%M")
+                if datetime.now() >= ln_stop:
+                    log(f"round{r} skip {ln['id']}: until={ln_until} already passed")
+                    continue
+                lane_stops.append(ln_stop)
+                cmd = [
+                    PYTHON, os.path.join(_HERE, "board_buy_lane_worker.py"),
+                    "--lane", ln["id"], "--src", ln["src"],
+                    "--dates", ",".join(dates),
+                    "--until", ln_until,
+                    "--board", phase_b,
+                ]
+                log(
+                    f"round{r} spawn {ln['id']} dates={dates} "
+                    f"until={ln_until} quota={quota_status(ln['src'])}"
+                )
+                procs.append(subprocess.Popen(cmd, cwd=_HERE))
+            if not procs:
+                break
+            hard = min(lane_stops) if lane_stops else datetime.strptime(until, "%Y-%m-%d %H:%M")
+            while procs:
+                procs = [p for p in procs if p.poll() is None]
+                if not procs:
+                    break
+                if datetime.now() >= hard:
+                    for p in procs:
+                        p.terminate()
+                    time.sleep(2)
+                    for p in procs:
+                        if p.poll() is None:
+                            p.kill()
+                    procs = []
+                    break
+                time.sleep(3)
+            log(f"round{r} 完成，剩余日期≈{len(list_todo_days(args.start))}")
+    finally:
+        fcntl.flock(fd, fcntl.LOCK_UN)
+        os.close(fd)
+        log("=== buy night end ===")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 154,
+    "date": "2026-05-06",
+    "stock_code": "002929",
+    "stock_name": "润建股份",
+    "buy_price": 64.3,
+    "sell_price_935": 76.3,
+    "sell_price_1315": 76.8,
+    "sell_price_half_935": 76.3,
+    "sell_price_half_1315": 76.8,
+    "sell_price_batch_avg": 76.55,
+    "sell_date": "2026-05-07",
+    "hold_days": 1,
+    "pnl_morning": 18.66,
+    "pnl_afternoon": 19.44,
+    "pnl_morning_half": 9.33,
+    "pnl_afternoon_half": 9.72,
+    "pnl_batch_morning": 18.66,
+    "pnl_batch_afternoon": 19.44,
+    "pnl_batch_total": 19.05,
+    "pnl_batch_total_half": 9.53,
+    "is_second_board": false,
+    "rank": 2,
+    "skip_reason": "2026-05-08 13:15仍涨停，滚到2026-05-11",
+    "notes": null,
+    "program": "stock"
+  }
+]

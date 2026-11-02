@@ -1,0 +1,360 @@
+{
+  "d0": "2026-09-29",
+  "d1": "2026-09-30",
+  "status": "OK",
+  "reason": null,
+  "allocation": "A2_B2_COMPARE",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [
+    {
+      "trade_date": "2026-09-30",
+      "d0_date": "2026-09-29",
+      "code": "603328",
+      "name": "依顿电子",
+      "board": "主板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-09-30T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 3.878,
+      "auction_turnover_pct": 0.0,
+      "auction_amount": 26022000.0,
+      "auction_amount_to_d0_ratio": 0.0,
+      "auction_volume_shares": 1734800.0,
+      "d0_turnover_pct": 0.0,
+      "first_seal_time": null,
+      "open_board_count": null,
+      "max_streak_30td": null,
+      "runup_30td": null,
+      "projected_d1_runup": null,
+      "projected_d2_runup": null,
+      "score_components": {
+        "d0_turnover": 0.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 2.0,
+        "open_board": 5.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 42.0,
+      "selection_reason": "path=A score=42.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "A1",
+      "rank": 1
+    },
+    {
+      "trade_date": "2026-09-30",
+      "d0_date": "2026-09-29",
+      "code": "605198",
+      "name": "安德利",
+      "board": "主板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-09-30T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 3.273,
+      "auction_turnover_pct": 0.0,
+      "auction_amount": 5209344.0,
+      "auction_amount_to_d0_ratio": 0.0,
+      "auction_volume_shares": 76800.0,
+      "d0_turnover_pct": 0.0,
+      "first_seal_time": null,
+      "open_board_count": null,
+      "max_streak_30td": null,
+      "runup_30td": null,
+      "projected_d1_runup": null,
+      "projected_d2_runup": null,
+      "score_components": {
+        "d0_turnover": 0.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 2.0,
+        "open_board": 5.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 42.0,
+      "selection_reason": "path=A score=42.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 2,
+      "slot": "A2",
+      "rank": 2
+    },
+    {
+      "trade_date": "2026-09-30",
+      "d0_date": "2026-09-29",
+      "code": "605058",
+      "name": "澳弘电子",
+      "board": "主板",
+      "path": "B",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-09-30T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 0.0,
+      "auction_turnover_pct": 0.0,
+      "auction_amount": 29978800.0,
+      "auction_amount_to_d0_ratio": 0.0,
+      "auction_volume_shares": 503000.0,
+      "d0_turnover_pct": 0.0,
+      "first_seal_time": null,
+      "open_board_count": null,
+      "max_streak_30td": null,
+      "runup_30td": null,
+      "projected_d1_runup": null,
+      "projected_d2_runup": null,
+      "score_components": {
+        "d0_turnover": 0.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 3.0,
+        "open_board": 10.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 43.0,
+      "selection_reason": "path=B score=43.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 82.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "B1",
+      "rank": 3
+    },
+    {
+      "trade_date": "2026-09-30",
+      "d0_date": "2026-09-29",
+      "code": "600189",
+      "name": "泉阳泉",
+      "board": "主板",
+      "path": "B",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-09-30T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 0.999,
+      "auction_turnover_pct": 0.0,
+      "auction_amount": 15794869.999999998,
+      "auction_amount_to_d0_ratio": 0.0,
+      "auction_volume_shares": 1735700.0,
+      "d0_turnover_pct": 0.0,
+      "first_seal_time": null,
+      "open_board_count": null,
+      "max_streak_30td": null,
+      "runup_30td": null,
+      "projected_d1_runup": null,
+      "projected_d2_runup": null,
+      "score_components": {
+        "d0_turnover": 0.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 3.0,
+        "open_board": 10.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 43.0,
+      "selection_reason": "path=B score=43.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 82.0,
+      "above_threshold": false,
+      "path_rank": 2,
+      "slot": "B2",
+      "rank": 4
+    }
+  ],
+  "scan_log_head": [
+    {
+      "code": "603322",
+      "path": "A",
+      "score": 32.96,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "605388",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.97
+    },
+    {
+      "code": "603630",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "301560",
+      "path": "B",
+      "score": 40.24,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "600825",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.989
+    },
+    {
+      "code": "600325",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "002799",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 10.066
+    },
+    {
+      "code": "605058",
+      "path": "B",
+      "score": 43.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603188",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "600241",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.955
+    },
+    {
+      "code": "002494",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "600189",
+      "path": "B",
+      "score": 43.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603602",
+      "path": "B",
+      "score": 43.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "000678",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -8.788
+    },
+    {
+      "code": "000607",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "603980",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "002242",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 10.035
+    },
+    {
+      "code": "002882",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "603200",
+      "path": "B",
+      "score": 39.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "605303",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 10.019
+    },
+    {
+      "code": "301513",
+      "path": "A",
+      "score": 30.12,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "600982",
+      "path": "A",
+      "score": 39.32,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603328",
+      "path": "A",
+      "score": 42.0,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "000036",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "002244",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -4.968
+    },
+    {
+      "code": "605198",
+      "path": "A",
+      "score": 42.0,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603949",
+      "path": "B",
+      "score": 43.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "601238",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 10.0
+    },
+    {
+      "code": "601811",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.0
+    },
+    {
+      "code": "002074",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 6.311
+    }
+  ],
+  "scan_log_n": 30,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "a_scored_n": 5,
+  "b_scored_n": 6,
+  "tdx_quota_stopped": false,
+  "generated_at": "2026-10-30T11:05:32",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00",
+  "late": false
+}

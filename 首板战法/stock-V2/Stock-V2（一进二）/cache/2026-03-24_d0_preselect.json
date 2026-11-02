@@ -1,0 +1,110 @@
+{
+  "d0": "2026-03-23",
+  "d1": "2026-03-24",
+  "status": "OK",
+  "reason": null,
+  "pool_first": true,
+  "candidates": [
+    {
+      "code": "600149",
+      "name": "廊坊发展",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "603727",
+      "name": "博迈科",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "600376",
+      "name": "首开股份",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "002309",
+      "name": "中利集团",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "002218",
+      "name": "拓日新能",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "600758",
+      "name": "辽宁能源",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "000703",
+      "name": "恒逸石化",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "主板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    },
+    {
+      "code": "300385",
+      "name": "雪浪环境",
+      "d0": "2026-03-23",
+      "d1": "2026-03-24",
+      "d0_pct": 0.0,
+      "d0_amount": 0.0,
+      "d0_turnover_pct": 0.0,
+      "board": "创业板",
+      "pool_first": true,
+      "note": "轻量池：未做连板/换手硬过滤，待后续阶段"
+    }
+  ],
+  "rejects": [],
+  "reject_count": 0,
+  "candidate_count": 8,
+  "generated_at": "2026-10-29T17:28:56",
+  "note": "V2_POOL_FIRST lightweight preselect"
+}

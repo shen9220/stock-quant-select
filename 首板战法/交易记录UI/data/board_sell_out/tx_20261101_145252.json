@@ -1,0 +1,12 @@
+{
+  "lane": "tx",
+  "src": "tx",
+  "finished_at": "2026-11-01T14:52:52.459223",
+  "results": [
+    {
+      "date": "2026-09-28",
+      "status": "quota_stop",
+      "msg": "QUOTA_STOP platform=tencent kind=hour used=64 limit=64"
+    }
+  ]
+}

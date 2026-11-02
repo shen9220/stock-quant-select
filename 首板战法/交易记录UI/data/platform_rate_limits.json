@@ -1,0 +1,111 @@
+{
+  "_doc": "全平台请求上限规范。铁律：实际可用=硬上限×soft_cap_pct；到软上限必须关停该平台。tdx/mootdx=70%，其余默认=80%。",
+  "_iron_rule": "各平台必须设 soft_cap_pct；通达信/mootdx 最高 70% 停；其它平台最高 80% 停。禁止顶满硬上限。",
+  "sohu": {
+    "label": "搜狐财经 hisHq",
+    "official_limit": null,
+    "basis": "非官方网页接口，无公开配额；按防爬经验保守封顶",
+    "min_interval_sec": 2.0,
+    "max_per_hour": 60,
+    "max_per_night": 200,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "立即关停本夜 sohu，次日再开"
+  },
+  "tencent": {
+    "label": "腾讯财经（ifzq日线/mkline分钟/ak hist_tx 共用）",
+    "official_limit": null,
+    "basis": "公开经验：单个K线入口约600次后触发限流；本规范硬顶按2/3留余量",
+    "ref_soft_ceiling": 600,
+    "min_interval_sec": 2.5,
+    "max_per_hour": 80,
+    "max_per_night": 400,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "立即关停本夜 tencent，次日再开"
+  },
+  "sina": {
+    "label": "新浪财经分钟K",
+    "official_limit": null,
+    "basis": "网页接口，高频易429/封IP；AkShare亦建议低并发；本规范从严",
+    "min_interval_sec": 3.0,
+    "max_per_hour": 40,
+    "max_per_night": 150,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "立即关停本夜 sina，次日再开"
+  },
+  "em": {
+    "label": "东财买价轨（默认不启用）",
+    "min_interval_sec": 3.0,
+    "max_per_hour": 30,
+    "max_per_night": 80,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "enabled": false
+  },
+  "eastmoney": {
+    "label": "东财涨停池/日线kline（Stage A/B；与买价轨 em 分账）",
+    "official_limit": null,
+    "basis": "网页/推送接口易断连；保守夜班与小时顶；实际≤80%",
+    "min_interval_sec": 3.0,
+    "max_per_hour": 40,
+    "max_per_night": 120,
+    "max_per_day": 400,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "mark_rate_limited(eastmoney)，当日/当夜停；改走 ths/tencent"
+  },
+  "ths": {
+    "label": "同花顺涨停池 dataapi limit_up_pool",
+    "official_limit": null,
+    "basis": "历史名单可用、字段常稀疏；防爬保守；实际≤80%",
+    "min_interval_sec": 2.0,
+    "max_per_hour": 50,
+    "max_per_night": 150,
+    "max_per_day": 300,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "mark_rate_limited(ths)，当夜停；回退磁盘缓存"
+  },
+  "baostock": {
+    "label": "Baostock（证券宝）",
+    "official_limit": null,
+    "basis": "曾有黑名单/限流；保守日顶；实际≤80%",
+    "min_interval_sec": 1.5,
+    "max_per_hour": 200,
+    "max_per_day": 800,
+    "max_per_night": 0,
+    "soft_cap_pct": 0.80,
+    "hard_stop": true,
+    "on_429_or_ban": "立即 mark_rate_limited(baostock)，当日停；写 BAOSTOCK_PAUSED",
+    "iron_rule": "实际请求 ≤ floor(上限×80%)"
+  },
+  "tdx": {
+    "label": "通达信/mootdx/pytdx 历史分笔（共用，禁封号）",
+    "aliases_note": "mootdx、pytdx、通达信 一律走 platform=tdx",
+    "official_limit": null,
+    "basis": "无公开官方日配额；社区经验：单连接间隔≥0.5s、防单服狂打。本仓硬顶保守设定，铁律实际只用 soft_cap_pct",
+    "min_interval_sec": 1.0,
+    "max_per_hour": 600,
+    "max_per_day": 2000,
+    "max_per_night": 0,
+    "soft_cap_pct": 0.70,
+    "hard_stop": true,
+    "on_429_or_ban": "立即 mark_rate_limited(tdx)，当日停跑；禁止换号硬撞",
+    "hist_window": "11:00-14:30",
+    "iron_rule": "日+小时双软上限同时生效：日≤floor(2000×70%)=1400，时≤floor(600×70%)=420；先撞先停；宁停勿封"
+  },
+  "night_window": {
+    "start": "15:30",
+    "end": "04:50",
+    "quiet": ["05:00-09:30", "15:00-15:25"]
+  },
+  "v2_hist_window": {
+    "start": "11:00",
+    "end": "14:30",
+    "platform": "tdx",
+    "until_date": "2026-01-01",
+    "order": "desc"
+  }
+}

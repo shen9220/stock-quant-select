@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>北京 3.5 日游 · 执行版攻略</title>
+<style>
+  :root {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --card: rgba(255, 255, 255, 0.78);
+    --line: rgba(148, 163, 184, 0.28);
+    --ok: #059669;
+    --warn: #d97706;
+    --danger: #e11d48;
+    --day1: #0d9488;
+    --day1-bg: #ecfdf5;
+    --day1-deep: #0f766e;
+    --day2: #f59e0b;
+    --day2-bg: #fffbeb;
+    --day2-deep: #b45309;
+    --day3: #6366f1;
+    --day3-bg: #eef2ff;
+    --day3-deep: #4338ca;
+    --day4: #06b6d4;
+    --day4-bg: #ecfeff;
+    --day4-deep: #0e7490;
+    --shadow: 0 10px 30px rgba(15, 23, 42, 0.08), 0 2px 8px rgba(15, 23, 42, 0.04);
+    --shadow-3d: 0 18px 40px rgba(15, 23, 42, 0.12), 0 4px 12px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,0.85);
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 70% 45% at 0% 0%, #a7f3d0aa, transparent 55%),
+      radial-gradient(ellipse 55% 40% at 100% 5%, #bae6fd99, transparent 50%),
+      radial-gradient(ellipse 50% 35% at 50% 100%, #c7d2fe88, transparent 45%),
+      linear-gradient(165deg, #f0fdfa 0%, #f0f9ff 42%, #eef2ff 100%);
+    background-attachment: fixed;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 100px; }
+
+  /* Hero 3D */
+  header.hero {
+    position: relative;
+    padding: 28px 26px 24px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.92), rgba(240,253,250,0.75));
+    box-shadow: var(--shadow-3d);
+    border: 1px solid rgba(255,255,255,0.9);
+    transform: perspective(900px) rotateX(1.5deg);
+    margin-bottom: 18px;
+    overflow: hidden;
+  }
+  header.hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 40%, rgba(255,255,255,0.55) 50%, transparent 60%);
+    pointer-events: none;
+  }
+  header.hero::after {
+    content: "";
+    position: absolute; right: -40px; top: -40px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, #5eead466, transparent 70%);
+    filter: blur(2px);
+  }
+  .eyebrow {
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--day1-deep); font-weight: 700; margin-bottom: 8px;
+  }
+  h1 {
+    font-size: clamp(26px, 5vw, 38px); margin: 0 0 8px;
+    letter-spacing: -0.03em;
+    background: linear-gradient(120deg, #0f766e, #0284c7 55%, #6366f1);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--muted); font-size: 14px; max-width: 640px; margin: 0; position: relative; z-index: 1; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; position: relative; z-index: 1; }
+  .pill {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid var(--line); color: var(--muted);
+    box-shadow: 0 4px 12px rgba(15,23,42,0.06), inset 0 1px 0 #fff;
+  }
+  .pill.hot { background: linear-gradient(145deg, #fff1f2, #ffe4e6); border-color: #fecdd3; color: var(--danger); font-weight: 700; }
+  .pill.ok { background: linear-gradient(145deg, #ecfdf5, #d1fae5); border-color: #a7f3d0; color: var(--ok); font-weight: 600; }
+
+  /* Sticky tabs */
+  .tabs-shell {
+    position: sticky; top: 10px; z-index: 50;
+    margin-bottom: 20px;
+    padding: 8px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: 0 12px 32px rgba(15,23,42,0.1), inset 0 1px 0 #fff;
+  }
+  .tabs {
+    display: flex; gap: 6px; overflow-x: auto;
+    scrollbar-width: none; -ms-overflow-style: none;
+    padding: 2px;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex: 0 0 auto;
+    border: none; cursor: pointer;
+    padding: 10px 12px; border-radius: 14px;
+    font-size: 12px; font-weight: 600; font-family: inherit;
+    color: var(--muted);
+    background: transparent;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
+    white-space: nowrap;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab-btn .num {
+    width: 20px; height: 20px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+    background: #e2e8f0; color: #475569;
+  }
+  .tab-btn:hover {
+    color: var(--ink);
+    background: rgba(255,255,255,0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(15,23,42,0.08);
+  }
+  .tab-btn.active {
+    color: #fff;
+    background: linear-gradient(145deg, #14b8a6, #0d9488);
+    box-shadow: 0 10px 22px rgba(13,148,136,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    transform: translateY(-2px);
+  }
+  .tab-btn.active .num { background: rgba(255,255,255,0.28); color: #fff; }
+  .tab-btn[data-day="1"].active { background: linear-gradient(145deg, #2dd4bf, #0d9488); box-shadow: 0 10px 22px rgba(13,148,136,0.35); }
+  .tab-btn[data-day="2"].active { background: linear-gradient(145deg, #fbbf24, #d97706); box-shadow: 0 10px 22px rgba(217,119,6,0.35); }
+  .tab-btn[data-day="3"].active { background: linear-gradient(145deg, #818cf8, #4f46e5); box-shadow: 0 10px 22px rgba(79,70,229,0.35); }
+  .tab-btn[data-day="4"].active { background: linear-gradient(145deg, #22d3ee, #0891b2); box-shadow: 0 10px 22px rgba(8,145,178,0.35); }
+
+  /* Panels */
+  .panel { display: none; animation: riseIn 0.35s ease; }
+  .panel.active { display: block; }
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .panel-card {
+    background: var(--card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: var(--radius);
+    padding: 20px 18px 18px;
+    box-shadow: var(--shadow-3d);
+    position: relative;
+  }
+  .panel-card::before {
+    content: "";
+    position: absolute; left: 16px; right: 16px; top: 0; height: 3px;
+    border-radius: 0 0 6px 6px;
+    background: linear-gradient(90deg, #5eead4, #38bdf8, #a5b4fc);
+    opacity: 0.9;
+  }
+  .day-panel.d1 .panel-card { background: linear-gradient(160deg, rgba(255,255,255,0.9), var(--day1-bg)); }
+  .day-panel.d1 .panel-card::before { background: linear-gradient(90deg, #5eead4, #14b8a6); }
+  .day-panel.d2 .panel-card { background: linear-gradient(160deg, rgba(255,255,255,0.9), var(--day2-bg)); }
+  .day-panel.d2 .panel-card::before { background: linear-gradient(90deg, #fde68a, #f59e0b); }
+  .day-panel.d3 .panel-card { background: linear-gradient(160deg, rgba(255,255,255,0.9), var(--day3-bg)); }
+  .day-panel.d3 .panel-card::before { background: linear-gradient(90deg, #c7d2fe, #6366f1); }
+  .day-panel.d4 .panel-card { background: linear-gradient(160deg, rgba(255,255,255,0.9), var(--day4-bg)); }
+  .day-panel.d4 .panel-card::before { background: linear-gradient(90deg, #a5f3fc, #06b6d4); }
+
+  .day-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px;
+    margin-bottom: 10px;
+    box-shadow: 0 6px 14px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+  .d1 .day-badge { background: #ccfbf1; color: var(--day1-deep); }
+  .d2 .day-badge { background: #fef3c7; color: var(--day2-deep); }
+  .d3 .day-badge { background: #e0e7ff; color: var(--day3-deep); }
+  .d4 .day-badge { background: #cffafe; color: var(--day4-deep); }
+
+  h2 {
+    font-size: 20px; margin: 0 0 14px;
+    letter-spacing: -0.02em;
+  }
+  h3 { font-size: 15px; margin: 16px 0 8px; }
+  .card {
+    background: rgba(255,255,255,0.72);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 12px;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.06), inset 0 1px 0 #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 14px 28px rgba(15,23,42,0.1), inset 0 1px 0 #fff;
+  }
+  .alert {
+    border-left: 4px solid var(--danger);
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    padding: 14px 16px; border-radius: 0 14px 14px 0;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 18px rgba(225,29,72,0.08);
+  }
+  .alert.warn {
+    border-left-color: var(--warn);
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    box-shadow: 0 8px 18px rgba(217,119,6,0.08);
+  }
+  .alert.ok {
+    border-left-color: var(--ok);
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    box-shadow: 0 8px 18px rgba(5,150,105,0.08);
+  }
+  .alert strong { color: var(--danger); }
+  .alert.warn strong { color: var(--warn); }
+  .alert.ok strong { color: var(--ok); }
+
+  table {
+    width: 100%; border-collapse: separate; border-spacing: 0;
+    font-size: 13px;
+    background: rgba(255,255,255,0.75);
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 8px 20px rgba(15,23,42,0.05);
+  }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: rgba(241,245,249,0.9); font-weight: 700; font-size: 12px; color: var(--muted); }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(255,255,255,0.65); }
+
+  .tag {
+    display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 8px;
+    font-weight: 700; margin-right: 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+  .tag.done { background: #d1fae5; color: var(--ok); }
+  .tag.todo { background: #fecdd3; color: var(--danger); }
+  .tag.free { background: #e0e7ff; color: #4338ca; }
+
+  .day-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 6px;
+  }
+  .day-head h2 { margin: 0; }
+  .day-meta { font-size: 13px; color: var(--muted); }
+
+  .timeline { list-style: none; padding: 0; margin: 12px 0 0; }
+  .timeline li {
+    position: relative; padding: 0 0 18px 24px;
+    border-left: 2px solid rgba(148,163,184,0.35); margin-left: 10px;
+  }
+  .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .timeline li::before {
+    content: ""; position: absolute; left: -7px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.9), 0 4px 10px rgba(15,23,42,0.15);
+  }
+  .d1 .timeline li::before { background: linear-gradient(145deg, #5eead4, #0d9488); }
+  .d2 .timeline li::before { background: linear-gradient(145deg, #fcd34d, #d97706); }
+  .d3 .timeline li::before { background: linear-gradient(145deg, #a5b4fc, #4f46e5); }
+  .d4 .timeline li::before { background: linear-gradient(145deg, #67e8f9, #0891b2); }
+
+  .time {
+    font-weight: 800; font-size: 14px; margin-bottom: 2px;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .d1 .time { color: var(--day1-deep); }
+  .d2 .time { color: var(--day2-deep); }
+  .d3 .time { color: var(--day3-deep); }
+  .d4 .time { color: var(--day4-deep); }
+
+  .route {
+    background: rgba(255,255,255,0.65);
+    border-radius: 12px; padding: 12px 14px;
+    font-size: 13px; margin-top: 8px; color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: inset 0 1px 0 #fff, 0 4px 12px rgba(15,23,42,0.04);
+  }
+  .route b { color: var(--ink); }
+  .photo-box {
+    margin-top: 10px; padding: 12px 14px; border-radius: 12px;
+    background: linear-gradient(135deg, rgba(253,242,248,0.9), rgba(255,247,237,0.9));
+    border: 1px dashed #f9a8d4; font-size: 13px;
+    box-shadow: 0 6px 16px rgba(244,114,182,0.1);
+  }
+  .photo-box .title { font-weight: 800; color: #be185d; margin-bottom: 6px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tab-btn .label-short { display: none; }
+  @media (max-width: 720px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .tab-btn { padding: 8px 10px; font-size: 11px; }
+    .tab-btn .label-full { display: none; }
+    .tab-btn .label-short { display: inline; }
+  }
+
+  ul.clean { margin: 8px 0; padding-left: 18px; }
+  ul.clean li { margin-bottom: 4px; }
+  .check { list-style: none; padding: 0; margin: 0; }
+  .check li {
+    padding: 8px 10px; margin-bottom: 6px;
+    background: rgba(255,255,255,0.7);
+    border: 1px solid var(--line); border-radius: 10px; font-size: 14px;
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  .check li::before { content: "☐ "; color: var(--muted); }
+
+  /* Summary stats */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 16px;
+  }
+  .stat {
+    text-align: center; padding: 16px 12px; border-radius: 16px;
+    background: linear-gradient(160deg, #fff, #f0fdfa);
+    border: 1px solid rgba(255,255,255,0.95);
+    box-shadow: 0 12px 28px rgba(15,23,42,0.08), inset 0 1px 0 #fff;
+    transform: perspective(600px) rotateX(4deg);
+    transition: transform 0.2s ease;
+  }
+  .stat:hover { transform: perspective(600px) rotateX(0deg) translateY(-4px); }
+  .stat .val {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(120deg, #0d9488, #0284c7);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .cost-day {
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.9);
+    box-shadow: 0 8px 18px rgba(15,23,42,0.06);
+  }
+  .cost-day.d1 { background: linear-gradient(135deg, #ecfdf5, #fff); }
+  .cost-day.d2 { background: linear-gradient(135deg, #fffbeb, #fff); }
+  .cost-day.d3 { background: linear-gradient(135deg, #eef2ff, #fff); }
+  .cost-day.d4 { background: linear-gradient(135deg, #ecfeff, #fff); }
+  .cost-day h4 { margin: 0 0 8px; font-size: 14px; }
+  .cost-day.d1 h4 { color: var(--day1-deep); }
+  .cost-day.d2 h4 { color: var(--day2-deep); }
+  .cost-day.d3 h4 { color: var(--day3-deep); }
+  .cost-day.d4 h4 { color: var(--day4-deep); }
+  .cost-row {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 13px; padding: 4px 0; color: var(--muted);
+  }
+  .cost-row b { color: var(--ink); font-weight: 700; white-space: nowrap; }
+  .total-bar {
+    margin-top: 14px; padding: 16px 18px; border-radius: 16px;
+    background: linear-gradient(145deg, #0f766e, #0e7490);
+    color: #fff;
+    box-shadow: 0 14px 32px rgba(14,116,144,0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+  .total-bar .big { font-size: 24px; font-weight: 800; }
+  .total-bar .note { font-size: 12px; opacity: 0.85; margin-top: 4px; }
+
+  footer {
+    margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--line);
+    font-size: 12px; color: var(--muted); text-align: center;
+  }
+  .print-btn {
+    position: fixed; right: 16px; bottom: 16px; z-index: 60;
+    background: linear-gradient(145deg, #0f172a, #334155); color: #fff;
+    border: none; border-radius: 999px;
+    padding: 12px 18px; font-size: 13px; cursor: pointer; font-family: inherit;
+    box-shadow: 0 12px 28px rgba(15,23,42,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition: transform 0.15s ease;
+  }
+  .print-btn:hover { transform: translateY(-2px) scale(1.03); }
+
+  ol.tips { margin: 0; padding-left: 18px; }
+  ol.tips li { margin-bottom: 6px; }
+
+  @media print {
+    .print-btn, .tabs-shell { display: none !important; }
+    .panel { display: block !important; margin-bottom: 24px; page-break-inside: avoid; }
+    body { background: #fff; }
+  }
+</style>
+</head>
+<body>
+<button class="print-btn" onclick="window.print()">打印 / 存 PDF</button>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">BEIJING · AUG 27–30 · 执行版</div>
+  <h1>北京 3.5 日游攻略</h1>
+  <p class="sub">Tab 切换模块 · 四日分色 · 含打车时间与费用总结。打开即可对照执行。</p>
+  <div class="pill-row">
+    <span class="pill hot">⚠ 天安门降旗预约 → 立刻约</span>
+    <span class="pill ok">国博 / 故宫 / 天坛等 8 项已约</span>
+    <span class="pill">轻装：相机 + 小包</span>
+  </div>
+</header>
+
+<!-- Tabs -->
+<div class="tabs-shell">
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="p1" role="tab"><span class="num">1</span><span class="label-full">立刻要办</span><span class="label-short">要办</span></button>
+    <button class="tab-btn" data-tab="p2" role="tab"><span class="num">2</span><span class="label-full">票务总表</span><span class="label-short">票务</span></button>
+    <button class="tab-btn" data-tab="p3" role="tab"><span class="num">3</span><span class="label-full">行前准备</span><span class="label-short">准备</span></button>
+    <button class="tab-btn" data-tab="p4" data-day="1" role="tab"><span class="num">4</span><span class="label-full">27 周四</span><span class="label-short">周四</span></button>
+    <button class="tab-btn" data-tab="p5" data-day="2" role="tab"><span class="num">5</span><span class="label-full">28 周五</span><span class="label-short">周五</span></button>
+    <button class="tab-btn" data-tab="p6" data-day="3" role="tab"><span class="num">6</span><span class="label-full">29 周六</span><span class="label-short">周六</span></button>
+    <button class="tab-btn" data-tab="p7" data-day="4" role="tab"><span class="num">7</span><span class="label-full">30 周日</span><span class="label-short">周日</span></button>
+    <button class="tab-btn" data-tab="p8" role="tab"><span class="num">8</span><span class="label-full">拍照总表</span><span class="label-short">拍照</span></button>
+    <button class="tab-btn" data-tab="p9" role="tab"><span class="num">9</span><span class="label-full">费用总结</span><span class="label-short">总结</span></button>
+  </div>
+</div>
+
+<!-- 1 -->
+<section class="panel active" id="p1">
+  <div class="panel-card">
+    <h2>① 立刻要办（容易扑空）</h2>
+    <div class="alert">
+      <strong>最紧急：天安门广场「降旗」时段预约</strong><br>
+      27 号晚看降旗 <b>必须</b>提前实名预约「降旗」时段，未预约无法进广场。<br>
+      · 入口：微信小程序「天安门广场预约参观」/「京通」/ 北京通 APP<br>
+      · 规则：提前 1～7 天约，<b>当天约不了</b>；每日约 <b>12:00</b> 放票<br>
+      · 今天请马上约 <b>8/27 降旗</b>；若约满，明早 12:00 再刷<br>
+      · 入场：身份证原件；降旗约 18:54（以官方当日为准）
+    </div>
+    <div class="alert warn">
+      <strong>也请确认</strong><br>
+      · 鸟巢演唱会票：电子票、入场口、是否禁带相机/充电宝<br>
+      · 返杭车票：车次、检票口、最晚到站时间<br>
+      · 已约景点：截图预约码，核对入场门与时段
+    </div>
+    <div class="alert ok">
+      <strong>已购已约 OK</strong>：国家博物馆、故宫、天坛、中山公园、景山公园、地坛公园、颐和园、雍和宫
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="panel" id="p2">
+  <div class="panel-card">
+    <h2>② 票务 / 预约总表</h2>
+    <table>
+      <thead>
+        <tr><th>项目</th><th>状态</th><th>官方入口</th><th>关键提醒</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>天安门广场（降旗）</td><td><span class="tag todo">待约</span></td><td>天安门广场预约参观</td><td>选「降旗」；带身份证</td></tr>
+        <tr><td>国家博物馆</td><td><span class="tag done">已约</span></td><td>国博官网 / 小程序</td><td>北门入；按时段核验</td></tr>
+        <tr><td>故宫博物院</td><td><span class="tag done">已约</span></td><td>故宫博物院小程序</td><td>午门进、神武门出</td></tr>
+        <tr><td>中山公园</td><td><span class="tag done">已约</span></td><td>畅游公园</td><td>穿园约 15–20 分钟</td></tr>
+        <tr><td>景山公园</td><td><span class="tag done">已约</span></td><td>畅游公园</td><td>南门进北门出；万春亭</td></tr>
+        <tr><td>颐和园</td><td><span class="tag done">已约</span></td><td>畅游公园</td><td>东宫门进、新建宫门出</td></tr>
+        <tr><td>雍和宫</td><td><span class="tag done">已约</span></td><td>雍和宫游客信众服务</td><td>殿内勿拍</td></tr>
+        <tr><td>地坛公园</td><td><span class="tag done">已约</span></td><td>畅游公园</td><td>雍和宫步行约 15 分钟</td></tr>
+        <tr><td>天坛公园</td><td><span class="tag done">已约</span></td><td>畅游公园</td><td>建议联票；核对入口</td></tr>
+        <tr><td>798 / 什刹海 / 太古里</td><td><span class="tag free">免票</span></td><td>—</td><td>无需预约</td></tr>
+        <tr><td>鸟巢演唱会</td><td><span class="tag todo">自查票</span></td><td>购票平台</td><td>安检严；看禁带清单</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="panel" id="p3">
+  <div class="panel-card">
+    <h2>③ 要准备什么</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">证件与票务</h3>
+        <ul class="check">
+          <li>身份证原件</li>
+          <li>各景点预约截图（离线）</li>
+          <li>演唱会票 + 入场须知</li>
+          <li>返程电子客票</li>
+          <li>酒店地址（方便打车）</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">每日随身</h3>
+        <ul class="check">
+          <li>相机 + 电池 + SD 卡</li>
+          <li>充电宝 ≤20000mAh</li>
+          <li>小风扇、伞、纸巾</li>
+          <li>水杯、防晒、润唇膏</li>
+          <li>塑料袋、补妆、口罩</li>
+          <li>舒适走路鞋</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">相机建议</h3>
+        <ul class="clean">
+          <li>广角：中轴、万春亭、十七孔桥</li>
+          <li>中长焦：雕梁、人像</li>
+          <li>雍和宫殿内禁止拍摄</li>
+          <li>降旗时勿举过高挡视线</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">遗忘补充</h3>
+        <ul class="clean">
+          <li><b>天安门降旗预约</b></li>
+          <li>返程最晚到站时间</li>
+          <li>酒店早餐 / 寄存行李</li>
+          <li>创可贴、肠胃药、防暑药</li>
+          <li>演唱会耳机 / 薄外套</li>
+          <li>寄快递纸箱胶带</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 Day1 -->
+<section class="panel day-panel d1" id="p4">
+  <div class="panel-card">
+    <span class="day-badge">DAY 1 · 青绿</span>
+    <div class="day-head">
+      <h2>④ 8/27 周四 · 国博 + 降旗</h2>
+      <span class="day-meta">落地 → 文化重器 → 仪式感</span>
+    </div>
+    <ul class="timeline">
+      <li>
+        <div class="time">09:45–11:20</div>
+        <div><b>落地 → 酒店</b>：T2 对面 P2 滴滴候车区。约 50 分钟 / ¥50，约 11:00 到酒店。</div>
+      </li>
+      <li>
+        <div class="time">11:20–17:20</div>
+        <div><b>国家博物馆</b>：交通约 55 分钟，目标 13:00 入场，游玩约 4.5h。</div>
+        <div class="route"><b>捷径</b>：进馆右手 → 屹立东方 → 南二门右手电梯下负一 → 古代中国 → 逆向明清展厅看凤冠 → 再补人少展厅。</div>
+        <div class="photo-box"><div class="title">📷 国博</div>负一青铜器 / 凤冠特写 / 中庭纵深 / 文创区人像</div>
+      </li>
+      <li>
+        <div class="time">17:30–19:15</div>
+        <div><b>天安门降旗</b>：步行约 20–30 分钟安检。18:00 前到位；降旗约 18:54；亮灯约 19:10。</div>
+        <div class="photo-box"><div class="title">📷 广场</div>国旗杆纵深 / 亮灯后城楼夜景 / 纪念碑剪影</div>
+      </li>
+      <li>
+        <div class="time">19:30–22:00 · 可选</div>
+        <div><b>798</b>：打车约 55–60 分钟。太累可直接回酒店（打车约 40 分钟 / ¥20）。</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5 Day2 -->
+<section class="panel day-panel d2" id="p5">
+  <div class="panel-card">
+    <span class="day-badge">DAY 2 · 琥珀</span>
+    <div class="day-head">
+      <h2>⑤ 8/28 周五 · 皇城 + 颐和园 + 夜景</h2>
+      <span class="day-meta">步数最多一天 · 注意体能</span>
+    </div>
+    <div class="alert warn"><strong>体能提示</strong>：故宫 4h + 景山 + 颐和园 1.5h 很满。颐和园按精简线走，别恋战。</div>
+    <ul class="timeline">
+      <li>
+        <div class="time">06:20–09:00</div>
+        <div>起床早餐 → 7:15 出发中山公园（约 55 分钟）→ 穿园 15–20 分钟 → 8:30 午门排队 → 9:00 入故宫。</div>
+      </li>
+      <li>
+        <div class="time">09:00–13:00</div>
+        <div><b>故宫</b>约 4 小时。</div>
+        <div class="route"><b>中轴</b>：午门 → 太和殿 → 中和 / 保和 → 乾清 / 交泰 / 坤宁 → 御花园 → <b>神武门出</b>。余力再补一侧六宫。</div>
+        <div class="photo-box"><div class="title">📷 故宫</div>午门框景 / 太和殿对称 / 红墙人像 / 御花园光斑</div>
+      </li>
+      <li>
+        <div class="time">13:00–14:20</div>
+        <div><b>景山</b>：南门 → … → <b>万春亭</b> → 北门（约 70 分钟）。</div>
+        <div class="photo-box"><div class="title">📷 王牌</div>万春亭故宫全景鸟瞰</div>
+      </li>
+      <li>
+        <div class="time">14:30–17:00</div>
+        <div><b>颐和园</b>：打车约 40 分钟 / ¥22。只留 1.5h。</div>
+        <div class="route"><b>精简</b>：东宫门 → 仁寿殿 → 乐寿堂 → 佛香阁 → 长廊 → 十七孔桥外观 → 铜牛 → 新建宫门出。</div>
+      </li>
+      <li>
+        <div class="time">17:00–22:00</div>
+        <div><b>什刹海</b>（打车约 30 分钟 / ¥20）→ <b>太古里</b>（地铁约 40 分钟）→ 回酒店（地铁约 55 分钟）。</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6 Day3 -->
+<section class="panel day-panel d3" id="p6">
+  <div class="panel-card">
+    <span class="day-badge">DAY 3 · 靛蓝</span>
+    <div class="day-head">
+      <h2>⑥ 8/29 周六 · 雍和宫 + 演唱会</h2>
+      <span class="day-meta">上午祈福 · 晚上鸟巢</span>
+    </div>
+    <ul class="timeline">
+      <li>
+        <div class="time">06:30–11:00</div>
+        <div>7:30 出发雍和宫（地铁约 1h）→ 8:30 到，排队约 20 分钟 → 游约 1.5–2h。</div>
+        <div class="route"><b>路线</b>：牌楼 → 昭泰门 → 各殿 → <b>万福阁</b> → 北门。殿内勿拍。</div>
+      </li>
+      <li>
+        <div class="time">11:00–12:30</div>
+        <div><b>地坛</b>：步行约 15 分钟，轻松 1h。</div>
+      </li>
+      <li>
+        <div class="time">12:30–15:00</div>
+        <div>回酒店休息化妆（地铁约 70 分钟）。</div>
+      </li>
+      <li>
+        <div class="time">15:00–24:00</div>
+        <div>打车鸟巢约 45 分钟 / ¥35 → 15:30 到 → 18:00 进场 → 21:30 后休息 → 22:00 海底捞 → 约 24:00 回酒店。</div>
+        <div class="photo-box"><div class="title">📷 鸟巢</div>日落前后外立面钢结构；场内看官方是否禁专业相机</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7 Day4 -->
+<section class="panel day-panel d4" id="p7">
+  <div class="panel-card">
+    <span class="day-badge">DAY 4 · 天空青</span>
+    <div class="day-head">
+      <h2>⑦ 8/30 周日 · 天坛 + 返程</h2>
+      <span class="day-meta">收尾经典 · 卡点回杭</span>
+    </div>
+    <div class="alert warn">
+      <strong>返程卡点</strong>：请填写倒推时间。<br>
+      最晚到站：____________　车次：____________　检票口：____________
+    </div>
+    <ul class="timeline">
+      <li>
+        <div class="time">08:00–10:40</div>
+        <div>收拾寄快递 → 约 10:00 退房 → 吃饭 → 10:40 出发天坛。</div>
+      </li>
+      <li>
+        <div class="time">10:40–15:00</div>
+        <div>前往约 70 分钟（公交 35 路或打车）→ 12:00 入天坛 → 约 3h。</div>
+        <div class="route"><b>经典</b>：祈年殿 → 丹陛桥 → 皇穹宇 → 圜丘坛。时间紧只拍祈年殿 + 圜丘。</div>
+        <div class="photo-box"><div class="title">📷 天坛</div>祈年殿正面 / 丹陛桥中轴 / 圜丘对称 / 古柏人像</div>
+      </li>
+      <li>
+        <div class="time">15:00 后</div>
+        <div>打车约 20 分钟 / ¥15 去火车站 → 站内吃饭 → 返杭。</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8 -->
+<section class="panel" id="p8">
+  <div class="panel-card">
+    <h2>⑧ 相机点位速查</h2>
+    <table>
+      <thead><tr><th>优先级</th><th>点位</th><th>怎么拍</th><th>哪天</th></tr></thead>
+      <tbody>
+        <tr><td>★★★★★</td><td>景山万春亭</td><td>故宫鸟瞰，广角/全景</td><td>28 琥珀</td></tr>
+        <tr><td>★★★★★</td><td>太和殿广场</td><td>对称中轴、低机位</td><td>28</td></tr>
+        <tr><td>★★★★☆</td><td>天坛祈年殿</td><td>正面全景 + 仰拍</td><td>30 天空青</td></tr>
+        <tr><td>★★★★☆</td><td>佛香阁 / 十七孔桥</td><td>仰拍阁、侧拍桥</td><td>28</td></tr>
+        <tr><td>★★★★☆</td><td>什刹海银锭桥方向</td><td>黄昏湖面 + 白塔</td><td>28</td></tr>
+        <tr><td>★★★☆☆</td><td>国博凤冠 / 青铜</td><td>关闪光、避反光</td><td>27 青绿</td></tr>
+        <tr><td>★★★☆☆</td><td>天安门亮灯</td><td>降旗后城楼</td><td>27</td></tr>
+        <tr><td>★★★☆☆</td><td>雍和宫牌楼红墙</td><td>院落可拍，殿内禁</td><td>29 靛蓝</td></tr>
+        <tr><td>★★★☆☆</td><td>鸟巢外立面</td><td>日落钢结构</td><td>29</td></tr>
+      </tbody>
+    </table>
+    <div class="card" style="margin-top:14px">
+      <h3 style="margin-top:0">每天出门前 5 问</h3>
+      <ol class="tips">
+        <li>证件 + 预约码是否置顶？</li>
+        <li>相机电池 / 充电宝满电？</li>
+        <li>今日第一站入口核对了吗？</li>
+        <li>硬节点（降旗/演唱会/火车）时间够吗？</li>
+        <li>水、伞、鞋是否轻装到位？</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 9 Summary -->
+<section class="panel" id="p9">
+  <div class="panel-card">
+    <h2>⑨ 行程总结 · 打车时间 & 费用</h2>
+    <p style="color:var(--muted);font-size:14px;margin:0 0 16px">按你原计划估算，门票已买好不计入；餐饮/演唱会票另算。金额为参考，实际以高峰与路况为准。</p>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="val">~¥237</div><div class="lbl">预估打车合计</div></div>
+      <div class="stat"><div class="val">~7.5h</div><div class="lbl">累计打车时长</div></div>
+      <div class="stat"><div class="val">4 天</div><div class="lbl">行程跨度</div></div>
+      <div class="stat"><div class="val">8+</div><div class="lbl">已约核心景点</div></div>
+    </div>
+
+    <div class="cost-day d1">
+      <h4>周四 8/27 · 青绿日</h4>
+      <div class="cost-row"><span>机场 T2 → 酒店</span><b>≈50 分钟 · ¥50</b></div>
+      <div class="cost-row"><span>酒店 → 国博（可地铁/打车）</span><b>≈55 分钟</b></div>
+      <div class="cost-row"><span>国博 → 天安门广场</span><b>步行 ≈20–30 分钟</b></div>
+      <div class="cost-row"><span>798 → 酒店（若去 798）</span><b>≈40 分钟 · ¥20</b></div>
+      <div class="cost-row"><span>当日打车小计（含可选）</span><b>≈ ¥70</b></div>
+    </div>
+
+    <div class="cost-day d2">
+      <h4>周五 8/28 · 琥珀日</h4>
+      <div class="cost-row"><span>酒店 → 中山/故宫（地铁为主）</span><b>≈55 分钟</b></div>
+      <div class="cost-row"><span>景山附近 → 颐和园</span><b>≈40 分钟 · ¥22</b></div>
+      <div class="cost-row"><span>颐和园 → 什刹海</span><b>≈30 分钟 · ¥20</b></div>
+      <div class="cost-row"><span>什刹海 → 太古里</span><b>地铁 ≈40 分钟</b></div>
+      <div class="cost-row"><span>太古里 → 酒店</span><b>地铁 ≈55 分钟</b></div>
+      <div class="cost-row"><span>当日打车小计</span><b>≈ ¥42</b></div>
+    </div>
+
+    <div class="cost-day d3">
+      <h4>周六 8/29 · 靛蓝日</h4>
+      <div class="cost-row"><span>酒店 ↔ 雍和宫 / 地坛</span><b>地铁 ≈1h + 步行 15 分</b></div>
+      <div class="cost-row"><span>地坛 → 酒店</span><b>地铁 ≈70 分钟</b></div>
+      <div class="cost-row"><span>酒店 → 鸟巢</span><b>≈45 分钟 · ¥35</b></div>
+      <div class="cost-row"><span>海底捞 → 酒店</span><b>约 30–40 分钟（估 ¥30）</b></div>
+      <div class="cost-row"><span>当日打车小计</span><b>≈ ¥65</b></div>
+    </div>
+
+    <div class="cost-day d4">
+      <h4>周日 8/30 · 天空青日</h4>
+      <div class="cost-row"><span>酒店 → 天坛</span><b>公交 ≈70 分钟（或打车估 ¥35）</b></div>
+      <div class="cost-row"><span>天坛 → 火车站</span><b>≈20 分钟 · ¥15</b></div>
+      <div class="cost-row"><span>当日交通小计（公交+打车）</span><b>≈ ¥15～50</b></div>
+    </div>
+
+    <div class="total-bar">
+      <div>交通费用总结（打车为主）</div>
+      <div class="big">约 ¥192～¥237</div>
+      <div class="note">不含地铁扫码、餐饮、酒店、演唱会、已购门票。建议随身预备现金/支付额度 ¥300+ 作交通缓冲。798 不去可少约 ¥20；周日天坛改打车则偏上限。</div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin-top:0">时间节奏一览</h3>
+      <table>
+        <thead><tr><th>日期</th><th>主题色</th><th>核心节点</th><th>硬卡点</th></tr></thead>
+        <tbody>
+          <tr><td>27 四</td><td style="color:#0f766e;font-weight:700">青绿</td><td>国博 4.5h</td><td>降旗 ≈18:54（须预约）</td></tr>
+          <tr><td>28 五</td><td style="color:#b45309;font-weight:700">琥珀</td><td>故宫→景山→颐和园</td><td>午门 9:00 入场</td></tr>
+          <tr><td>29 六</td><td style="color:#4338ca;font-weight:700">靛蓝</td><td>雍和宫→地坛→鸟巢</td><td>演唱会 18:00</td></tr>
+          <tr><td>30 日</td><td style="color:#0e7490;font-weight:700">天空青</td><td>天坛→火车站</td><td>返程检票时间</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  基于《北京行.md》整理 · 票务以官方小程序为准 · 费用为行程内打车估算<br>
+  文件：北京3.5日游攻略.html · Tab 切换浏览，可打印存 PDF
+</footer>
+</div>
+
+<script>
+(function () {
+  const buttons = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.panel');
+
+  function activate(id) {
+    buttons.forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-tab') === id);
+    });
+    panels.forEach(function (p) {
+      p.classList.toggle('active', p.id === id);
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      activate(btn.getAttribute('data-tab'));
+    });
+  });
+
+  // keyboard 1-9
+  document.addEventListener('keydown', function (e) {
+    if (e.target.matches('input, textarea')) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 9) activate('p' + n);
+  });
+})();
+</script>
+</body>
+</html>

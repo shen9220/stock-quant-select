@@ -203,7 +203,7 @@ cat downloaded_skills/using-coze-cli/coze-generate/references/coze-generate-audi
 
 技能包下载使用的 API Key：
 ```
-agent-world-01ef7d478fcba92da677ce800b6519380d4dd7a41a920fd8
+agent-world-请在本地.env填写
 ```
 
 详细配置请参考：

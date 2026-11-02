@@ -1,0 +1,48 @@
+---
+description: 腾讯实时行情禁止批量；stock_updata PushPlus 最迟 9:29 必达
+alwaysApply: true
+---
+
+# 铁律 · 腾讯行情 & stock_updata 通知
+
+以后改本仓库相关代码必须遵守，不得例外。
+
+## 1. 腾讯实时行情（`qt.gtimg.cn`）禁止批量
+
+- **禁止** `q=sh600000,sz000001,...` 多代码拼接。
+- **必须** 每次请求 **仅 1 只**，请求之间休眠（建议 ≥0.4s）。
+- 早盘选绿开：按强度序逐只拉取，**凑齐 Top2 绿开立即停止**，不要扫完全市场/全候选。
+- 只用「今开 vs 昨收」，**禁止用现价冒充竞价**。
+- 适用范围：`stock/stock_updata.py`、`09-新模式/涨停回头低吸/services/auction.py`，以及任何新增腾讯实时行情调用。
+
+## 2. stock_updata PushPlus 通知截止
+
+- 仅 **`stock/stock_updata.py`** 负责早盘 PushPlus（回头低吸不推送）。
+- 目标约 **9:28** 发出；**最迟 9:29 必须发送成功**。
+- 失败须短间隔重试，直至成功或超过截止宽限；不得「试一次失败就放弃」导致用户收不到。
+
+## 3. 时间窗（stock_updata / 竞价拉取）
+
+| 时刻 | 动作 |
+|------|------|
+| 9:23 | cron + launchd 触发入口，立刻启 Python 预热 |
+| **9:24:40** | **准时开扫**（Python `_wait_until` 贴秒醒来） |
+| 9:25 | 等今开落地后逐只拉（禁批量） |
+| ≈9:28 | 目标完成选股并推送 |
+| 9:29 | PushPlus 硬截止 |
+
+## 4. 调度可靠性（2026-09-09 事故 · 必须处理成功）
+
+- **根因**：crontab 外层 `>> /tmp/stock_updata_logs/...`，`/tmp` 被清 → 重定向失败 → **脚本零执行**。
+- **强制规范**：
+  1. crontab **禁止**外层重定向到 `/tmp`；只调用入口脚本。
+  2. 入口脚本第一件事 `mkdir -p` 项目内 `每日交易记录/data/stock_updata_logs/`，再 `exec >>` 该目录。
+  3. launchd `StandardOutPath` 也必须指向上述持久目录（安装前先 mkdir）。
+  4. cron（9:23）+ launchd（9:23）双保险，`running.lockdir` 互斥只跑一份。
+  5. **9:24:40 准时开扫**；最迟 9:29 PushPlus 成功。漏跑视为 P0。
+
+## 5. 15:00 收盘卖出同步（水下 = 第四个 Tab）
+
+- `stock_updata` 必须与 `stock`/`slow`/`up` 一样进入 `daily_close_job` 的 `VALID_PROGRAMS` 循环。
+- UI 15:00 调度 + cron `daily_close_cron_entry.sh --all-programs`（15:05）双保险。
+- 卖出为 **T+1**：当日买入 → 次日 15:00 写入 9:35/13:15 卖出价与盈亏。

@@ -1,0 +1,301 @@
+{
+  "d0": "2026-10-20",
+  "d1": "2026-10-21",
+  "status": "OK",
+  "reason": null,
+  "allocation": "A2_B2_COMPARE",
+  "mode": "backfill_mootdx_0925",
+  "recommendations": [
+    {
+      "trade_date": "2026-10-21",
+      "d0_date": "2026-10-20",
+      "code": "603407",
+      "name": "长裕集团",
+      "board": "主板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-21T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 3.624,
+      "auction_turnover_pct": 0.3809,
+      "auction_amount": 6580260.000000001,
+      "auction_amount_to_d0_ratio": 0.036665471742694786,
+      "auction_volume_shares": 131500.0,
+      "d0_turnover_pct": 10.764134407043457,
+      "first_seal_time": "102026",
+      "open_board_count": 0,
+      "max_streak_30td": 1,
+      "runup_30td": -0.1263,
+      "projected_d1_runup": -0.0389,
+      "projected_d2_runup": 0.0572,
+      "score_components": {
+        "d0_turnover": 15.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 5.0,
+        "open_board": 5.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 62.16,
+      "selection_reason": "path=A score=62.16",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "A1",
+      "rank": 1
+    },
+    {
+      "trade_date": "2026-10-21",
+      "d0_date": "2026-10-20",
+      "code": "603341",
+      "name": "龙旗科技",
+      "board": "主板",
+      "path": "A",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-21T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 3.241,
+      "auction_turnover_pct": 0.1845,
+      "auction_amount": 19141700.0,
+      "auction_amount_to_d0_ratio": 0.019557066112444524,
+      "auction_volume_shares": 484600.0,
+      "d0_turnover_pct": 9.741175651550293,
+      "first_seal_time": "100956",
+      "open_board_count": 6,
+      "max_streak_30td": 1,
+      "runup_30td": 0.0233,
+      "projected_d1_runup": 0.1257,
+      "projected_d2_runup": 0.2383,
+      "score_components": {
+        "d0_turnover": 15.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 5.0,
+        "open_board": 2.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 57.0,
+      "selection_reason": "path=A score=57.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 75.0,
+      "above_threshold": false,
+      "path_rank": 2,
+      "slot": "A2",
+      "rank": 2
+    },
+    {
+      "trade_date": "2026-10-21",
+      "d0_date": "2026-10-20",
+      "code": "603386",
+      "name": "骏亚科技",
+      "board": "主板",
+      "path": "B",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-21T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 1.336,
+      "auction_turnover_pct": 0.4887,
+      "auction_amount": 33970200.0,
+      "auction_amount_to_d0_ratio": 0.06301019969051917,
+      "auction_volume_shares": 1544100.0,
+      "d0_turnover_pct": 7.860284805297852,
+      "first_seal_time": "093614",
+      "open_board_count": 0,
+      "max_streak_30td": 1,
+      "runup_30td": 0.5257,
+      "projected_d1_runup": 0.6781,
+      "projected_d2_runup": 0.8461,
+      "score_components": {
+        "d0_turnover": 15.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 10.0,
+        "open_board": 10.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 65.2,
+      "selection_reason": "path=B score=65.2",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 82.0,
+      "above_threshold": false,
+      "path_rank": 1,
+      "slot": "B1",
+      "rank": 3
+    },
+    {
+      "trade_date": "2026-10-21",
+      "d0_date": "2026-10-20",
+      "code": "603400",
+      "name": "华之杰",
+      "board": "主板",
+      "path": "B",
+      "candidate_status": "SELECTED",
+      "data_quality": "VERIFIED",
+      "data_asof": "2026-10-21T09:25:00",
+      "source_ids": [
+        "mootdx_tick_0925"
+      ],
+      "auction_gap_pct": 0.447,
+      "auction_turnover_pct": 0.2134,
+      "auction_amount": 3164630.0,
+      "auction_amount_to_d0_ratio": 0.018553614257107894,
+      "auction_volume_shares": 74200.0,
+      "d0_turnover_pct": 11.550826072692871,
+      "first_seal_time": "130018",
+      "open_board_count": 0,
+      "max_streak_30td": 1,
+      "runup_30td": -0.079,
+      "projected_d1_runup": 0.0132,
+      "projected_d2_runup": 0.1145,
+      "score_components": {
+        "d0_turnover": 15.0,
+        "d0_vol_proxy": 8.0,
+        "first_seal": 3.0,
+        "open_board": 10.0,
+        "theme": 0.0,
+        "mkt": 0.0
+      },
+      "score_total": 58.0,
+      "selection_reason": "path=B score=58.0",
+      "execution_status": "SIGNAL_ONLY",
+      "score_threshold": 82.0,
+      "above_threshold": false,
+      "path_rank": 2,
+      "slot": "B2",
+      "rank": 4
+    }
+  ],
+  "scan_log_head": [
+    {
+      "code": "600661",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.478
+    },
+    {
+      "code": "002076",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 8.072
+    },
+    {
+      "code": "603386",
+      "path": "B",
+      "score": 65.2,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "002347",
+      "reject": "REJECT_GAP_GT_6",
+      "gap": 9.985
+    },
+    {
+      "code": "603236",
+      "path": "A",
+      "score": 54.53,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "300466",
+      "reject": "REJECT_GAP_LT_BMIN",
+      "gap": -4.051
+    },
+    {
+      "code": "603341",
+      "path": "A",
+      "score": 57.0,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "300115",
+      "path": "A",
+      "score": 55.79,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "002881",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3058
+    },
+    {
+      "code": "603407",
+      "path": "A",
+      "score": 62.16,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "001388",
+      "path": "B",
+      "reject": "B_WEAK_AUCTION_ON_LOW_OPEN",
+      "auction_turnover_pct": 0.3952
+    },
+    {
+      "code": "001283",
+      "path": "B",
+      "score": 47.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "300244",
+      "path": "B",
+      "score": 41.63,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "605177",
+      "path": "B",
+      "score": 55.77,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603683",
+      "path": "A",
+      "score": 52.2,
+      "reject": "SCORE_A_LOW"
+    },
+    {
+      "code": "603400",
+      "path": "B",
+      "score": 58.0,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "002940",
+      "path": "B",
+      "score": 54.69,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "002596",
+      "path": "B",
+      "score": 48.14,
+      "reject": "SCORE_B_LOW"
+    },
+    {
+      "code": "603366",
+      "path": "B",
+      "score": 47.31,
+      "reject": "SCORE_B_LOW"
+    }
+  ],
+  "scan_log_n": 19,
+  "a_pool_n": 0,
+  "b_pool_n": 0,
+  "a_scored_n": 5,
+  "b_scored_n": 8,
+  "tdx_quota_stopped": false,
+  "generated_at": "2026-10-29T18:24:15",
+  "push_deadline": "09:28:30",
+  "hard_deadline": "09:29:00",
+  "late": false
+}

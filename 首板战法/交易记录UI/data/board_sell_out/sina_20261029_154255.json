@@ -1,0 +1,14 @@
+{
+  "lane": "sina",
+  "src": "sina",
+  "finished_at": "2026-10-29T15:42:55.738354",
+  "results": [
+    {
+      "date": "2026-10-29",
+      "status": "ok",
+      "filled": 0,
+      "hold": 4,
+      "fail": 0
+    }
+  ]
+}

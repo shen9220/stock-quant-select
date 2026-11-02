@@ -1,0 +1,21 @@
+{
+  "lane": "tx",
+  "src": "tx",
+  "finished_at": "2026-10-30T19:01:56.371840",
+  "results": [
+    {
+      "date": "2026-10-30",
+      "status": "ok",
+      "filled": 0,
+      "hold": 3,
+      "fail": 0
+    },
+    {
+      "date": "2026-09-28",
+      "status": "ok",
+      "filled": 0,
+      "hold": 2,
+      "fail": 0
+    }
+  ]
+}

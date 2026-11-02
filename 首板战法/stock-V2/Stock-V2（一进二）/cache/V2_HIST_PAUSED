@@ -1,0 +1,3 @@
+# V2 历史回补已暂停 — 2026-10-30
+# 原因：优先 V1 results/主板创业板/买卖价回补（用户指令）
+# 恢复：删除本文件，并重新 launchctl bootstrap v2hist agents / 取消 cron PAUSED 注释
