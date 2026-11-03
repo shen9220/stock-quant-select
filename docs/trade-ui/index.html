@@ -768,19 +768,23 @@
 
     .skin-switch {
       display: inline-flex; flex-shrink: 0; align-self: center;
-      border: 1px solid rgba(255,255,255,.5); border-radius: 10px; overflow: hidden;
-      background: rgba(255,255,255,.16);
+      border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+      background: #fff;
     }
     .skin-switch button {
-      border: 0; background: transparent; color: #fff;
+      border: 0; background: transparent; color: var(--text);
       padding: 8px 12px; font: inherit; font-size: 13px; font-weight: 650;
       cursor: pointer; line-height: 1.2;
     }
     .skin-switch button.on {
-      background: rgba(255,255,255,.95); color: #1d4ed8; font-weight: 800;
+      background: #2563eb; color: #fff; font-weight: 800;
     }
+    html[data-skin="night"] .skin-switch {
+      background: #0f172a; border-color: #334155;
+    }
+    html[data-skin="night"] .skin-switch button { color: #e2e8f0; }
     html[data-skin="night"] .skin-switch button.on {
-      background: #020617; color: #e2e8f0;
+      background: #1d4ed8; color: #fff;
     }
 
     html[data-skin="night"] {
@@ -974,34 +978,7 @@
     <div class="top-actions" id="topActionsBoard" style="display:none">
       <button type="button" class="view-toggle active" id="btnBackDetail" onclick="setViewMode('trades')">↩ 返回明细</button>
     </div>
-    <div class="skin-switch" id="skinSwitch" role="group" aria-label="肤色">
-      <button type="button" data-skin="day" class="on" title="白天">白天</button>
-      <button type="button" data-skin="night" title="黑夜">黑夜</button>
-    </div>
   </div>
-  <script>
-    (function () {
-      var root = document.documentElement;
-      var box = document.getElementById("skinSwitch");
-      function paint(skin) {
-        var next = skin === "night" ? "night" : "day";
-        root.setAttribute("data-skin", next);
-        try { localStorage.setItem("trade-ui-skin", next); } catch (e) {}
-        if (!box) return;
-        box.querySelectorAll("button[data-skin]").forEach(function (btn) {
-          btn.classList.toggle("on", btn.getAttribute("data-skin") === next);
-        });
-      }
-      paint(root.getAttribute("data-skin") || "day");
-      if (box) {
-        box.addEventListener("click", function (ev) {
-          var btn = ev.target.closest("button[data-skin]");
-          if (!btn) return;
-          paint(btn.getAttribute("data-skin"));
-        });
-      }
-    })();
-  </script>
 
   <div class="wrap">
     <div class="nav-stack" id="navStack">
@@ -1039,6 +1016,10 @@
     <div id="mainView">
     <div class="toolbar">
       <div class="search-box"><input id="keyword" placeholder="搜索代码 / 名称…" /></div>
+      <div class="skin-switch" role="group" aria-label="肤色">
+        <button type="button" data-skin="day" class="on" title="白天">白天</button>
+        <button type="button" data-skin="night" title="黑夜">黑夜</button>
+      </div>
       <div class="drange" id="dateRange" onclick="event.stopPropagation()">
         <button type="button" class="drange-trigger" id="dateRangeTrigger" onclick="toggleDateRange(event)" title="全部日期（区间）">
           <span id="dateRangeLabel">全部日期 · 本月</span>
@@ -1092,6 +1073,10 @@
 
     <div id="boardView" style="display:none">
       <div class="toolbar" id="boardFilters">
+        <div class="skin-switch" role="group" aria-label="肤色">
+          <button type="button" data-skin="day" class="on" title="白天">白天</button>
+          <button type="button" data-skin="night" title="黑夜">黑夜</button>
+        </div>
         <select id="boardYearFilter" title="年份">
           <option value="">全部年份</option>
         </select>
@@ -1194,6 +1179,25 @@
   </div>
 
   <script>
+    (function () {
+      var root = document.documentElement;
+      function paint(skin) {
+        var next = skin === "night" ? "night" : "day";
+        root.setAttribute("data-skin", next);
+        try { localStorage.setItem("trade-ui-skin", next); } catch (e) {}
+        document.querySelectorAll(".skin-switch button[data-skin]").forEach(function (btn) {
+          btn.classList.toggle("on", btn.getAttribute("data-skin") === next);
+        });
+      }
+      paint(root.getAttribute("data-skin") || "day");
+      document.querySelectorAll(".skin-switch").forEach(function (box) {
+        box.addEventListener("click", function (ev) {
+          var btn = ev.target.closest("button[data-skin]");
+          if (!btn) return;
+          paint(btn.getAttribute("data-skin"));
+        });
+      });
+    })();
     // GitHub Pages：静态脱敏 + 登录解密；本机 Flask（localhost）不走此模式
     window.__PAGES_MODE__ = /github\.io$/i.test(location.hostname)
       || /(?:\?|&)pages=1(?:&|$)/.test(location.search)
