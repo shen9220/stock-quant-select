@@ -1785,6 +1785,7 @@
         if (d.length < 7) return;
         const m = d.slice(0, 7);
         const b = by[m] || (by[m] = pagesEmptyBucket());
+        if (t.is_rank_placeholder || t.is_board_placeholder) return;
         b.count += 1;
         const map = [
           ["pnl_morning", "morning"], ["pnl_morning_half", "morning_half"],
@@ -2756,7 +2757,7 @@
         return t.is_second_board === true ? `<span class="badge badge-yes">是</span>`
            : (t.is_second_board === false ? `<span class="badge badge-no">否</span>` : "—");
       }
-      if (c.key === "rank" || c.key === "board_rank") {
+      if (c.key === "rank" || c.key === "board_rank" || c.key === "path_rank") {
         const r = int(t[c.key], 0);
         if (r === 1) return '<span class="rank-tag rank-1">🥇 第一名</span>';
         if (r === 2) return '<span class="rank-tag rank-2">🥈 第二名</span>';
@@ -2777,6 +2778,9 @@
         return `<span class="board-tag ${cls}">${b}</span>`;
       }
       if (c.key === "sell_price_935" && t.sell_price_935 == null && t.sell_price_1315 == null) {
+        if (t.is_rank_placeholder || t.is_board_placeholder || (t.skip_reason && String(t.skip_reason).includes("空占位"))) {
+          return `<span class="badge badge-no-buy">空占位</span>`;
+        }
         if (t.skip_reason && t.skip_reason.includes("买不进")) {
           return `<span class="badge badge-no-buy">没买</span>`;
         }
