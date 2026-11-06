@@ -1713,7 +1713,7 @@
         );
       }
       if (board) {
-        trades = trades.filter(t => (t.board || "") === board && t.board_rank != null);
+        trades = trades.filter(t => (t.board || "") === board && t.board_rank != null && !t.is_board_placeholder && !t.is_rank_placeholder && String(t.stock_code || "").trim());
         if (boardRank) {
           const br = Number(boardRank);
           trades = trades.filter(t => Number(t.board_rank || 0) === br);
@@ -1810,7 +1810,7 @@
       if (pathKey === "A" || pathKey === "B") {
         list = list.filter(t => pagesEffPath(t) === pathKey);
       }
-      if (board) list = list.filter(t => (t.board || "") === board && t.board_rank != null);
+      if (board) list = list.filter(t => (t.board || "") === board && t.board_rank != null && !t.is_board_placeholder && !t.is_rank_placeholder && String(t.stock_code || "").trim());
       let r1src, r2src;
       if (board) {
         r1src = list.filter(t => Number(t.board_rank || 0) === 1);
