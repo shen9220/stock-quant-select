@@ -1708,7 +1708,7 @@
         if (month) trades = trades.filter(t => String(t.date || "").startsWith(month));
         if (date) trades = trades.filter(t => String(t.date || "") === date);
       }
-      if (rank) {
+      if (rank && (params.get("program") || "") !== "zt_pool") {
         const r = Number(rank);
         trades = trades.filter(t => Number(t.rank || 0) === r);
       } else {
