@@ -2807,6 +2807,9 @@
         if (!url || name === "—") return name;
         return `<a class="name-link" href="${url}" target="_blank" rel="noopener noreferrer">${name}</a>`;
       }
+      if (c.key === "score_label") {
+        return t.score_label || (t.score != null && t.score !== "" ? String(t.score) : "—");
+      }
       if (c.key === "board") {
         const b = t.board;
         if (!b) return "—";
