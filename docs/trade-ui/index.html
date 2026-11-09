@@ -2557,7 +2557,7 @@
         }
         body.innerHTML = rows.map(r => {
           const pnl = Number(r.total_profit || 0);
-          const cls = pnl > 0 ? "pnl-pos" : (pnl < 0 ? "pnl-neg" : "");
+          const cls = pnlClass(pnl);
           const best = r.best_day ? `${r.best_day.date} ${money(r.best_day.profit)}` : "—";
           const worst = r.worst_day ? `${r.worst_day.date} ${money(r.worst_day.profit)}` : "—";
           return `<tr>
