@@ -501,6 +501,7 @@
     .prog-tab.prog-stock_updata { background: #ccfbf1; color: #0f766e; border-color: #5eead4; }
     .prog-tab.prog-slow { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
     .prog-tab.prog-up { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
+    .prog-tab.prog-zt { background: #fef9c3; color: #854d0e; border-color: #fde047; }
     .prog-tab.active { color: #fff; border-color: transparent; }
     .prog-tab.prog-stock.active {
       background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -510,6 +511,7 @@
       background: linear-gradient(135deg, #fb923c, #ea580c);
       box-shadow: 0 8px 16px rgba(234, 88, 12, .32);
     }
+    .prog-tab.prog-zt.active { background: #ca8a04; color: #fff; border-color: transparent; }
     .prog-tab.prog-up.active {
       background: linear-gradient(135deg, #34d399, #059669);
       box-shadow: 0 8px 16px rgba(5, 150, 105, .32);
@@ -990,6 +992,7 @@
           <button class="prog-tab prog-stock_updata" id="progStockUpdata" type="button" onclick="setFamily('stock_updata')">Stock-V1（水下）</button>
           <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setFamily('slow')">Stock（低价）</button>
           <button class="prog-tab prog-up" id="progUp" type="button" onclick="setFamily('up')">Up</button>
+          <button class="prog-tab prog-zt" id="progZtPool" type="button" onclick="setFamily('zt_pool')">涨停池</button>
         </div>
       </div>
       <div class="nav-row nav-l2" id="subTabsRow" style="display:none">
@@ -1245,7 +1248,19 @@
       stock_updata: { program: "stock_updata", label: "Stock-V1（水下）", tabClass: "prog-stock_updata", subs: [], defaultSub: "" },
       slow: { program: "slow", label: "Stock（低价）", tabClass: "prog-slow", subs: [], defaultSub: "" },
       up: { program: "up", label: "Up", tabClass: "prog-up", subs: [], defaultSub: "" },
+      zt_pool: { program: "zt_pool", label: "涨停池", tabClass: "prog-zt", subs: [], defaultSub: "" },
     };
+    const COLS_POOL = [
+      { key: "date", label: "涨停日", sum: false, sortable: true },
+      { key: "d1", label: "买入日", sum: false, sortable: true },
+      { key: "stock_code", label: "代码", sum: false },
+      { key: "stock_name", label: "名称", sum: false },
+      { key: "board", label: "板块", sum: false },
+      { key: "d0_pct", label: "涨跌幅%", sum: false, sortable: true },
+      { key: "turnover", label: "换手%", sum: false, sortable: true },
+      { key: "lianban", label: "连板", sum: false, sortable: true },
+      { key: "src", label: "来源", sum: false },
+    ];
     // 兼容旧 lane 名
     const LANES = {
       stock: { program: "stock", board: "", label: "Stock-V1" },
@@ -1308,6 +1323,7 @@
     const COL_RANK = { key: "rank", label: "名次", sum: false, sortable: true };
 
     function getActiveCols() {
+      if (currentProgram === "zt_pool") return COLS_POOL;
       if (viewMode === "merge") {
         const cols = [...COLS_BASE];
         // V1 板块用 board_rank；V2 路径用 path_rank；其余用全局 rank
@@ -1337,6 +1353,7 @@
       if (currentFamily === "stock_updata") return "stock_updata";
       if (currentFamily === "slow") return "slow";
       if (currentFamily === "up") return "up";
+      if (currentFamily === "zt_pool") return "zt_pool";
       return "stock";
     }
 
@@ -1374,6 +1391,8 @@
       if (elUpdata) elUpdata.classList.toggle("active", currentFamily === "stock_updata");
       const elV2 = document.getElementById("progStockV2");
       if (elV2) elV2.classList.toggle("active", currentFamily === "stock_v2");
+      const elZt = document.getElementById("progZtPool");
+      if (elZt) elZt.classList.toggle("active", currentFamily === "zt_pool");
       renderSubTabs();
       const rankRow = document.getElementById("rankTabsRow");
       if (rankRow) rankRow.style.display = viewMode === "trades" ? "" : "none";
@@ -2483,8 +2502,11 @@
       document.body.classList.toggle("view-board", isBoard);
       document.getElementById("mainView").style.display = isDetail ? "" : "none";
       document.getElementById("boardView").style.display = isBoard ? "" : "none";
-      document.getElementById("stats").style.display = isDetail ? "" : "none";
-      const showRank = viewMode === "trades";
+      document.getElementById("stats").style.display = isDetail && !isPool ? "" : "none";
+      const viewNav = document.getElementById("viewNav");
+      if (viewNav) viewNav.style.display = isPool ? "none" : "";
+      const isPool = currentProgram === "zt_pool";
+      const showRank = viewMode === "trades" && !isPool;
       document.getElementById("rankTabs").style.display = showRank ? "" : "none";
       const rankRow = document.getElementById("rankTabsRow");
       if (rankRow) rankRow.style.display = showRank ? "" : "none";
@@ -2500,6 +2522,8 @@
       } else if (currentPath) {
         const pathName = currentPath === "A" ? "一进二" : "稳定版";
         hint = `${label} · 路径${currentPath}（${pathName}）path_rank · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板`;
+      } else if (isPool) {
+        hint = "涨停池查阅 · 按涨停日列出已落盘名单 · Pages 登录后可看代码和名称";
       }
       document.getElementById("boardHint").textContent = hint;
     }
@@ -2525,7 +2549,7 @@
         // 主板 / 创业板：读 stock 里带 board_rank 的板块 Top2
         qs.set("board", currentBoard);
         if (viewMode === "trades") qs.set("board_rank", String(currentRank));
-      } else if (viewMode === "trades") {
+      } else if (viewMode === "trades" && currentProgram !== "zt_pool") {
         qs.set("rank", String(currentRank));
       } else if (viewMode === "merge") {
         // 默认原合计：只算全局第一名+第二名，不含仅 board_rank 的主板/创业板记录
