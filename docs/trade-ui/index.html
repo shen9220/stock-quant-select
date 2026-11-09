@@ -1057,7 +1057,7 @@
       </div>
       <button type="button" onclick="resetAllFilters()">重置</button>
       <button type="button" id="btnRefresh" onclick="refreshView()">刷新</button>
-      <button class="primary" type="button" onclick="openCreate()">+ 新增交易</button>
+      <button class="primary" type="button" id="btnCreate" onclick="openCreate()">+ 新增交易</button>
     </div>
 
     <div class="table-card">
@@ -2510,6 +2510,8 @@
       document.getElementById("rankTabs").style.display = showRank ? "" : "none";
       const rankRow = document.getElementById("rankTabsRow");
       if (rankRow) rankRow.style.display = showRank ? "" : "none";
+      const btnCreate = document.getElementById("btnCreate");
+      if (btnCreate) btnCreate.style.display = isPool ? "none" : "";
       document.getElementById("topActionsDetail").style.display = isDetail ? "" : "none";
       document.getElementById("topActionsBoard").style.display = isBoard ? "" : "none";
       document.getElementById("btnViewTrades").classList.toggle("active", viewMode === "trades");
