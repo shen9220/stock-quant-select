@@ -1275,7 +1275,8 @@
       stock_updata: { program: "stock_updata", board: "", label: "Stock-V1（水下）" },
       main: { program: "stock", board: "主板", label: "Stock-V1（主板）" },
       cyb: { program: "stock", board: "创业板", label: "Stock-V1（创业板）" },
-      slow: { program: "slow", board: "", label: "Stock（低价）" },
+      slow: { program: "slow", board: "", label: "低价 V1" },
+      slow_v2: { program: "slow_v2", board: "", label: "低价 V2" },
       up: { program: "up", board: "", label: "Up" },
     };
     let currentFamily = "stock_v1";
@@ -2444,7 +2445,8 @@
       else if (lane === "stock") { currentFamily = "stock_v1"; currentSub = "all"; }
       else if (lane === "stock_v2") { currentFamily = "stock_v2"; currentSub = "A"; }
       else if (lane === "stock_updata") { currentFamily = "stock_updata"; currentSub = ""; }
-      else if (lane === "slow") { currentFamily = "slow"; currentSub = ""; }
+      else if (lane === "slow") { currentFamily = "slow"; currentSub = "v1"; }
+      else if (lane === "slow_v2") { currentFamily = "slow"; currentSub = "v2"; }
       else if (lane === "up") { currentFamily = "up"; currentSub = ""; }
       else { currentFamily = "stock_v1"; currentSub = "all"; }
       syncNavState();
@@ -2466,7 +2468,7 @@
 
     // 兼容旧调用
     function setProgram(p) {
-      if (p === "stock" || p === "stock_v2" || p === "slow" || p === "up" || p === "stock_updata") setLane(p);
+      if (p === "stock" || p === "stock_v2" || p === "slow" || p === "slow_v2" || p === "up" || p === "stock_updata") setLane(p);
     }
 
     function baiduFinanceUrl(code) {
