@@ -1005,6 +1005,7 @@
           <button type="button" class="view-nav-btn view-trades active" id="btnViewTrades" onclick="setViewMode('trades')">明细看板</button>
           <button type="button" class="view-nav-btn view-board" id="btnViewBoard" onclick="setViewMode('board')">历史看板</button>
           <button type="button" class="view-nav-btn view-merge" id="btnViewMerge" onclick="setViewMode('merge')">合计看板</button>
+          <button type="button" class="view-nav-btn view-compare" id="btnViewCompare" onclick="setViewMode('compare')">模型对比</button>
         </div>
       </div>
       <div class="nav-row nav-l4" id="rankTabsRow">
@@ -1072,6 +1073,30 @@
         <div class="empty" id="empty" style="display:none">当前月份暂无记录</div>
       </div>
     </div>
+    </div>
+
+    <div id="compareView" style="display:none">
+      <div class="board-hint" id="compareHint">本金 10 万 · 每只半仓 5 万 · 次日 9:35 卖 2.5 万、13:15 卖 2.5 万 · 仓位固定</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>排名</th>
+              <th>模型</th>
+              <th>已结算</th>
+              <th>盈利笔</th>
+              <th>亏损笔</th>
+              <th>累计盈亏</th>
+              <th>期末资产</th>
+              <th>收益率</th>
+              <th>最大回撤</th>
+              <th>最好一天</th>
+              <th>最差一天</th>
+            </tr>
+          </thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <div id="boardView" style="display:none">
@@ -1894,6 +1919,10 @@
         const filtered = pagesFilterTrades(pagesProgramTrades(program), params);
         return pagesComputeStats(filtered, params.get("month") || "");
       }
+      if (path === "/api/model-compare" || path.endsWith("/api/model-compare")) {
+        if (window.__COMPARE__) return window.__COMPARE__;
+        return __pagesFetchJson("data/compare.json");
+      }
       if (path === "/api/months" || path.endsWith("/api/months")) {
         const list = pagesProgramTrades(program);
         const months = Array.from(new Set(list.map(t => String(t.date || "").slice(0, 7)).filter(Boolean))).sort().reverse();
@@ -2504,16 +2533,62 @@
 
     function reloadCurrentView() {
       if (viewMode === "board") loadBoard();
+      else if (viewMode === "compare") loadCompare();
       else loadAll();
+    }
+
+    function money(n) {
+      const v = Number(n || 0);
+      const sign = v > 0 ? "+" : "";
+      return sign + v.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    async function loadCompare() {
+      const body = document.getElementById("compareBody");
+      const hint = document.getElementById("compareHint");
+      body.innerHTML = `<tr><td colspan="11">正在计算…</td></tr>`;
+      try {
+        const data = await api("/api/model-compare");
+        if (hint && data.rule) hint.textContent = data.rule;
+        const rows = data.rows || [];
+        if (!rows.length) {
+          body.innerHTML = `<tr><td colspan="11">没有可对比的数据</td></tr>`;
+          return;
+        }
+        body.innerHTML = rows.map(r => {
+          const pnl = Number(r.total_profit || 0);
+          const cls = pnl > 0 ? "pnl-pos" : (pnl < 0 ? "pnl-neg" : "");
+          const best = r.best_day ? `${r.best_day.date} ${money(r.best_day.profit)}` : "—";
+          const worst = r.worst_day ? `${r.worst_day.date} ${money(r.worst_day.profit)}` : "—";
+          return `<tr>
+            <td>${r.rank}</td>
+            <td>${r.name}</td>
+            <td>${r.closed_trades}</td>
+            <td>${r.win_trades}</td>
+            <td>${r.lose_trades}</td>
+            <td class="${cls}">${money(r.total_profit)}</td>
+            <td>${Number(r.ending_asset || 0).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td class="${cls}">${r.return_pct}%</td>
+            <td>${r.max_drawdown_pct}%</td>
+            <td>${best}</td>
+            <td>${worst}</td>
+          </tr>`;
+        }).join("");
+      } catch (e) {
+        body.innerHTML = `<tr><td colspan="11">对比加载失败</td></tr>`;
+      }
     }
 
     function applyViewMode() {
       const isPool = currentProgram === "zt_pool";
       const isBoard = viewMode === "board";
+      const isCompare = viewMode === "compare";
       const isDetail = viewMode === "trades" || viewMode === "merge";
       document.body.classList.toggle("view-board", isBoard);
       document.getElementById("mainView").style.display = isDetail ? "" : "none";
       document.getElementById("boardView").style.display = isBoard ? "" : "none";
+      const compareView = document.getElementById("compareView");
+      if (compareView) compareView.style.display = isCompare ? "" : "none";
       document.getElementById("stats").style.display = isDetail && !isPool ? "" : "none";
       const viewNav = document.getElementById("viewNav");
       if (viewNav) viewNav.style.display = isPool ? "none" : "";
@@ -2528,6 +2603,8 @@
       document.getElementById("btnViewTrades").classList.toggle("active", viewMode === "trades");
       document.getElementById("btnViewBoard").classList.toggle("active", viewMode === "board");
       document.getElementById("btnViewMerge").classList.toggle("active", viewMode === "merge");
+      const btnCompare = document.getElementById("btnViewCompare");
+      if (btnCompare) btnCompare.classList.toggle("active", viewMode === "compare");
       const label = laneLabel();
       let hint = `${label} · 左🥇第一名 / 右🥈第二名 · 点击月份跳转明细看板 · 本页合计仅统计当前页`;
       if (currentBoard) {
