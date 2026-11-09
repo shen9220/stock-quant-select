@@ -1224,8 +1224,8 @@
     let rangePickStart = "";
     let calViewYm = ""; // 左月 YYYY-MM
     // 真实数据程序（定时任务/收盘补全仍只用这些，与展示 lane 解耦）
-    const PROGRAMS = ["stock", "stock_v2", "slow", "up", "stock_updata"];
-    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）", up: "Up", stock_updata: "Stock-V1（水下）" };
+    const PROGRAMS = ["stock", "stock_v2", "slow", "slow_v2", "up", "stock_updata"];
+    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）V1", slow_v2: "Stock（低价）V2", up: "Up", stock_updata: "Stock-V1（水下）" };
     // 四层导航：L1 family → L2 sub → L3 viewMode → L4 rank
     const FAMILIES = {
       stock_v1: {
@@ -1246,7 +1246,14 @@
         defaultSub: "A",
       },
       stock_updata: { program: "stock_updata", label: "Stock-V1（水下）", tabClass: "prog-stock_updata", subs: [], defaultSub: "" },
-      slow: { program: "slow", label: "Stock（低价）", tabClass: "prog-slow", subs: [], defaultSub: "" },
+      slow: {
+        program: "slow", label: "Stock（低价）", tabClass: "prog-slow",
+        subs: [
+          { key: "v1", label: "低价 V1", program: "slow", cls: "sub-all" },
+          { key: "v2", label: "低价 V2", program: "slow_v2", cls: "sub-v2b" },
+        ],
+        defaultSub: "v1",
+      },
       up: { program: "up", label: "Up", tabClass: "prog-up", subs: [], defaultSub: "" },
       zt_pool: { program: "zt_pool", label: "涨停池", tabClass: "prog-zt", subs: [], defaultSub: "" },
     };
@@ -1351,7 +1358,7 @@
       }
       if (currentFamily === "stock_v2") return "stock_v2";
       if (currentFamily === "stock_updata") return "stock_updata";
-      if (currentFamily === "slow") return "slow";
+      if (currentFamily === "slow") return currentSub === "v2" ? "slow_v2" : "slow";
       if (currentFamily === "up") return "up";
       if (currentFamily === "zt_pool") return "zt_pool";
       return "stock";
@@ -1380,6 +1387,7 @@
       currentPath = "";
       const sub = (fam.subs || []).find(s => s.key === currentSub);
       if (sub) {
+        if (sub.program) currentProgram = sub.program;
         if ("board" in sub) currentBoard = sub.board || "";
         if (sub.path) currentPath = sub.path;
       }
