@@ -2497,6 +2497,7 @@
     }
 
     function applyViewMode() {
+      const isPool = currentProgram === "zt_pool";
       const isBoard = viewMode === "board";
       const isDetail = viewMode === "trades" || viewMode === "merge";
       document.body.classList.toggle("view-board", isBoard);
@@ -2505,7 +2506,6 @@
       document.getElementById("stats").style.display = isDetail && !isPool ? "" : "none";
       const viewNav = document.getElementById("viewNav");
       if (viewNav) viewNav.style.display = isPool ? "none" : "";
-      const isPool = currentProgram === "zt_pool";
       const showRank = viewMode === "trades" && !isPool;
       document.getElementById("rankTabs").style.display = showRank ? "" : "none";
       const rankRow = document.getElementById("rankTabsRow");
