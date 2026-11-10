@@ -1926,16 +1926,16 @@
         map.forEach(([src, dst]) => {
           if (t[src] != null) b[dst] += Number(t[src]);
         });
-        const m = t.d2_pnl_morning, a = t.d2_pnl_afternoon;
-        if (m != null && a != null) {
-          b.d2_batch += (Number(m) + Number(a)) / 2;
-          b.d2_batch_half += (Number(m) + Number(a)) / 4;
-        } else if (m != null) {
-          b.d2_batch += Number(m) / 2;
-          b.d2_batch_half += Number(m) / 4;
-        } else if (a != null) {
-          b.d2_batch += Number(a) / 2;
-          b.d2_batch_half += Number(a) / 4;
+        const d2m = t.d2_pnl_morning, d2a = t.d2_pnl_afternoon;
+        if (d2m != null && d2a != null) {
+          b.d2_batch += (Number(d2m) + Number(d2a)) / 2;
+          b.d2_batch_half += (Number(d2m) + Number(d2a)) / 4;
+        } else if (d2m != null) {
+          b.d2_batch += Number(d2m) / 2;
+          b.d2_batch_half += Number(d2m) / 4;
+        } else if (d2a != null) {
+          b.d2_batch += Number(d2a) / 2;
+          b.d2_batch_half += Number(d2a) / 4;
         }
         if (t.d1_batch_profit != null) b.d1_batch_profit += Number(t.d1_batch_profit);
         if (t.d2_batch_profit != null) b.d2_batch_profit += Number(t.d2_batch_profit);
