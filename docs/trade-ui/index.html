@@ -1462,13 +1462,12 @@
       { key: "total", label: "总笔数", icon: "📊", accent: "#3b82f6", bg: "#dbeafe" },
       { key: "completed", label: "已有卖价", icon: "✅", accent: "#16a34a", bg: "#dcfce7" },
       { key: "holding", label: "待补全", icon: "📌", accent: "#f59e0b", bg: "#fef3c7" },
-      { key: "board_cyb_count", label: "创业板数量", icon: "🟣", accent: "#8b5cf6", bg: "#f3e8ff" },
-      { key: "board_zb_count", label: "主板数量", icon: "🔵", accent: "#2563eb", bg: "#dbeafe" },
+      { key: "board_ratio", label: "主板：创业板", icon: "🔵", accent: "#2563eb", bg: "#dbeafe" },
       { key: "month_pnl_morning_half", label: "早盘盈亏累计", icon: "🌅", accent: "#f97316", bg: "#ffedd5", pnl: true, suffix: "%" },
       { key: "month_pnl_afternoon_half", label: "午盘盈亏累计", icon: "☀️", accent: "#0ea5e9", bg: "#e0f2fe", pnl: true, suffix: "%" },
       { key: "month_pnl_batch_half", label: "分批盈亏累计", icon: "💰", accent: "#e11d48", bg: "#ffe4e6", pnl: true, suffix: "%" },
-      { key: "max_win_streak", label: "最大连赢", icon: "🔥", accent: "#ef4444", bg: "#fee2e2" },
-      { key: "max_loss_streak", label: "最大连亏", icon: "❄️", accent: "#64748b", bg: "#f1f5f9" },
+      { key: "month_d2_pnl_morning", label: "D2早盘盈亏累计", icon: "🌄", accent: "#c2410c", bg: "#ffedd5", pnl: true, suffix: "%" },
+      { key: "month_d2_pnl_afternoon", label: "D2午盘盈亏累计", icon: "🌤️", accent: "#0369a1", bg: "#e0f2fe", pnl: true, suffix: "%" },
     ];
 
     const FIELDS = [
@@ -1790,23 +1789,14 @@
         sum_pnl_morning: 0, sum_pnl_afternoon: 0, sum_pnl_batch: 0,
         sum_pnl_batch_half: 0, avg_pnl_morning: 0, avg_pnl_afternoon: 0,
         avg_pnl_batch: 0, second_board_count: 0, second_board_rate: 0,
-        board_cyb_count: 0, board_zb_count: 0,
+        board_ratio: "0:0",
         month_pnl_morning_half: 0, month_pnl_afternoon_half: 0, month_pnl_batch_half: 0,
-        max_win_streak: 0, max_loss_streak: 0, month: month || null,
+        month_d2_pnl_morning: 0, month_d2_pnl_afternoon: 0, month: month || null,
       };
       if (!total) return empty;
       const completed = list.filter(t => t.sell_price_935 != null || t.sell_price_1315 != null).length;
       const sum = (key) => list.reduce((a, t) => a + (t[key] != null ? Number(t[key]) : 0), 0);
       const round2 = (n) => Math.round(n * 100) / 100;
-      let maxWin = 0, maxLoss = 0, curW = 0, curL = 0;
-      const ordered = list.slice().sort((a, b) => String(a.date||"").localeCompare(String(b.date||"")) || Number(a.id||0)-Number(b.id||0));
-      ordered.forEach(t => {
-        const pnl = t.pnl_batch_total;
-        if (pnl == null) { curW = curL = 0; return; }
-        if (Number(pnl) > 0) { curW += 1; curL = 0; maxWin = Math.max(maxWin, curW); }
-        else if (Number(pnl) < 0) { curL += 1; curW = 0; maxLoss = Math.max(maxLoss, curL); }
-        else { curW = curL = 0; }
-      });
       let cyb = 0, zb = 0;
       list.forEach(t => {
         if (t.board === "创业板") cyb += 1;
@@ -1817,19 +1807,18 @@
         total,
         completed,
         holding: total - completed,
-        board_cyb_count: cyb,
-        board_zb_count: zb,
+        board_ratio: zb + ":" + cyb,
         month_pnl_morning_half: round2(sum("pnl_morning_half")),
         month_pnl_afternoon_half: round2(sum("pnl_afternoon_half")),
         month_pnl_batch_half: round2(sum("pnl_batch_total_half")),
-        max_win_streak: maxWin,
-        max_loss_streak: maxLoss,
+        month_d2_pnl_morning: round2(sum("d2_pnl_morning")),
+        month_d2_pnl_afternoon: round2(sum("d2_pnl_afternoon")),
         month: month || null,
       };
     }
 
     function pagesEmptyBucket() {
-      return { morning: 0, morning_half: 0, afternoon: 0, afternoon_half: 0, batch: 0, batch_half: 0, count: 0 };
+      return { morning: 0, afternoon: 0, batch: 0, d2_morning: 0, d2_afternoon: 0, count: 0 };
     }
 
     function pagesAccumulateMonths(list) {
@@ -1842,16 +1831,18 @@
         if (t.is_rank_placeholder || t.is_board_placeholder) return;
         b.count += 1;
         const map = [
-          ["pnl_morning", "morning"], ["pnl_morning_half", "morning_half"],
-          ["pnl_afternoon", "afternoon"], ["pnl_afternoon_half", "afternoon_half"],
-          ["pnl_batch_total", "batch"], ["pnl_batch_total_half", "batch_half"],
+          ["pnl_morning", "morning"],
+          ["pnl_afternoon", "afternoon"],
+          ["pnl_batch_total", "batch"],
+          ["d2_pnl_morning", "d2_morning"],
+          ["d2_pnl_afternoon", "d2_afternoon"],
         ];
         map.forEach(([src, dst]) => {
           if (t[src] != null) b[dst] += Number(t[src]);
         });
       });
       Object.values(by).forEach(b => {
-        ["morning","morning_half","afternoon","afternoon_half","batch","batch_half"].forEach(k => {
+        ["morning","afternoon","batch","d2_morning","d2_afternoon"].forEach(k => {
           b[k] = Math.round(b[k] * 100) / 100;
         });
       });
@@ -2620,11 +2611,10 @@
 
     const BOARD_PNL_COLS = [
       { key: "morning", label: "早盘盈亏累计" },
-      { key: "morning_half", label: "早盘半仓" },
       { key: "afternoon", label: "午盘盈亏累计" },
-      { key: "afternoon_half", label: "午盘半仓" },
       { key: "batch", label: "分批盈亏累计" },
-      { key: "batch_half", label: "分批半仓盈亏累计" },
+      { key: "d2_morning", label: "D2早盘盈亏累计" },
+      { key: "d2_afternoon", label: "D2午盘盈亏累计" },
     ];
 
     function qsBase() {
@@ -2989,14 +2979,14 @@
         return `<td class="${cls}">${v > 0 ? "+" : ""}${v}%</td>`;
       }).join("");
       const cnt = slice.reduce((a, r) => a + Number(r.count || 0), 0);
-      const batchHalfSum = round2(slice.reduce((a, r) => a + Number(r.batch_half || 0), 0));
+      const batchSum = round2(slice.reduce((a, r) => a + Number(r.batch || 0), 0));
       // 大盘涨跌幅度：本页各月幅度累加（与其它盈亏列合计口径一致）
       const indexVals = slice.map(r => r.index_pct).filter(v => v != null && v !== "" && !Number.isNaN(Number(v)));
       const indexPctSum = indexVals.length ? round2(indexVals.reduce((a, v) => a + Number(v), 0)) : null;
       document.getElementById(sumRowId).innerHTML =
         `<td>本页合计</td>${sumCells}<td>${cnt}</td>` +
         `<td>${indexPctHtml(indexPctSum)}</td>` +
-        `<td>${monthResultHtml(batchHalfSum)}</td>`;
+        `<td>${monthResultHtml(batchSum)}</td>`;
 
       tb.innerHTML = slice.map(r => {
         const label = r.month.replace("-", "年") + "月";
@@ -3008,7 +2998,7 @@
           ${cells}
           <td>${r.count || 0}</td>
           <td>${indexPctHtml(r.index_pct)}</td>
-          <td>${monthResultHtml(r.batch_half)}</td>
+          <td>${monthResultHtml(r.batch)}</td>
         </tr>`;
       }).join("");
     }
