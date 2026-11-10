@@ -1734,6 +1734,28 @@
       const boardRank = params.get("board_rank") || "";
       const path = (params.get("path") || "").toUpperCase();
       const pathRank = params.get("path_rank") || "";
+      if (path === "A" || path === "B") {
+        trades = trades.filter(t => pagesEffPath(t) === path);
+        if (pathRank) {
+          const pr = Number(pathRank);
+          trades = trades.filter(t => Number(t.path_rank || 0) === pr);
+        }
+      }
+      if (rank && (params.get("program") || "") !== "zt_pool") {
+        const r = Number(rank);
+        trades = trades.filter(t => Number(t.rank || 0) === r);
+      } else if (!(path === "A" || path === "B")) {
+        const ranks = params.get("ranks") || "";
+        if (ranks) {
+          const allow = new Set(ranks.split(",").map(s => Number(s.trim())).filter(n => !Number.isNaN(n)));
+          trades = trades.filter(t => allow.has(Number(t.rank || 0)));
+        }
+      }
+      if (board) {
+        trades = trades.filter(t => (t.board || "") === board && t.board_rank != null && !t.is_board_placeholder && !t.is_rank_placeholder && String(t.stock_code || "").trim());
+        if (boardRank) trades = trades.filter(t => Number(t.board_rank || 0) === Number(boardRank));
+      }
+      pagesAttachCapital(trades);
       if (dateFromP || dateToP) {
         if (dateFromP && dateToP && dateFromP > dateToP) {
           const tmp = dateFromP; dateFromP = dateToP; dateToP = tmp;
@@ -1825,7 +1847,61 @@
     }
 
     function pagesEmptyBucket() {
-      return { morning: 0, afternoon: 0, batch: 0, d2_morning: 0, d2_afternoon: 0, count: 0 };
+      return {
+        morning: 0, morning_half: 0, afternoon: 0, afternoon_half: 0, batch: 0, batch_half: 0,
+        d2_morning: 0, d2_afternoon: 0, d2_batch: 0, d2_batch_half: 0,
+        d1_capital_end: null, d2_capital_end: null, d1_batch_profit: 0, d2_batch_profit: 0, count: 0,
+      };
+    }
+
+    function pagesAttachCapital(list) {
+      const by = {};
+      list.forEach(t => {
+        const day = String(t.date || "").slice(0, 10);
+        if (day.length === 10) (by[day] || (by[day] = [])).push(t);
+      });
+      let capital = 100000;
+      Object.keys(by).sort().forEach(day => {
+        const rows = by[day];
+        let dayProfit = 0;
+        let touched = false;
+        rows.forEach(t => {
+          t.d1_capital = Math.round(capital * 100) / 100;
+          const half = t.pnl_batch_total_half;
+          const usable = !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim() && !String(t.skip_reason || "").includes("买不进");
+          if (usable && half != null && half !== "") {
+            const profit = Math.round(capital * Number(half)) / 100;
+            t.d1_batch_profit = Math.round(profit * 100) / 100;
+            dayProfit += t.d1_batch_profit;
+            touched = true;
+          } else {
+            t.d1_batch_profit = null;
+          }
+        });
+        const end = Math.round((capital + (touched ? dayProfit : 0)) * 100) / 100;
+        rows.forEach(t => {
+          t.d1_capital_end = end;
+          const m = t.d2_pnl_morning, a = t.d2_pnl_afternoon;
+          let d2Half = null;
+          if (m != null && a != null) d2Half = (Number(m) + Number(a)) / 4;
+          else if (m != null) d2Half = Number(m) / 4;
+          else if (a != null) d2Half = Number(a) / 4;
+          t.d2_capital = end;
+          const usable = !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim();
+          if (usable && d2Half != null) {
+            const p = Math.round(end * d2Half) / 100;
+            t.d2_batch_profit = Math.round(p * 100) / 100;
+            t.d2_batch_half_profit = t.d2_batch_profit;
+            t.d2_capital_end = Math.round((end + t.d2_batch_profit) * 100) / 100;
+          } else {
+            t.d2_batch_profit = null;
+            t.d2_batch_half_profit = null;
+            t.d2_capital_end = end;
+          }
+        });
+        if (touched) capital = end;
+      });
+      return list;
     }
 
     function pagesAccumulateMonths(list) {
@@ -1839,17 +1915,35 @@
         b.count += 1;
         const map = [
           ["pnl_morning", "morning"],
+          ["pnl_morning_half", "morning_half"],
           ["pnl_afternoon", "afternoon"],
+          ["pnl_afternoon_half", "afternoon_half"],
           ["pnl_batch_total", "batch"],
+          ["pnl_batch_total_half", "batch_half"],
           ["d2_pnl_morning", "d2_morning"],
           ["d2_pnl_afternoon", "d2_afternoon"],
         ];
         map.forEach(([src, dst]) => {
           if (t[src] != null) b[dst] += Number(t[src]);
         });
+        const m = t.d2_pnl_morning, a = t.d2_pnl_afternoon;
+        if (m != null && a != null) {
+          b.d2_batch += (Number(m) + Number(a)) / 2;
+          b.d2_batch_half += (Number(m) + Number(a)) / 4;
+        } else if (m != null) {
+          b.d2_batch += Number(m) / 2;
+          b.d2_batch_half += Number(m) / 4;
+        } else if (a != null) {
+          b.d2_batch += Number(a) / 2;
+          b.d2_batch_half += Number(a) / 4;
+        }
+        if (t.d1_batch_profit != null) b.d1_batch_profit += Number(t.d1_batch_profit);
+        if (t.d2_batch_profit != null) b.d2_batch_profit += Number(t.d2_batch_profit);
+        b.d1_capital_end = t.d1_capital_end;
+        b.d2_capital_end = t.d2_capital_end;
       });
       Object.values(by).forEach(b => {
-        ["morning","afternoon","batch","d2_morning","d2_afternoon"].forEach(k => {
+        ["morning","morning_half","afternoon","afternoon_half","batch","batch_half","d2_morning","d2_afternoon","d2_batch","d2_batch_half","d1_batch_profit","d2_batch_profit"].forEach(k => {
           b[k] = Math.round(b[k] * 100) / 100;
         });
       });
@@ -1874,6 +1968,8 @@
         r1src = list.filter(t => Number(t.rank || 0) === 1);
         r2src = list.filter(t => Number(t.rank || 0) === 2);
       }
+      pagesAttachCapital(r1src);
+      pagesAttachCapital(r2src);
       const r1 = pagesAccumulateMonths(r1src);
       const r2 = pagesAccumulateMonths(r2src);
       let months = Array.from(new Set([...Object.keys(r1), ...Object.keys(r2)])).sort().reverse();
@@ -2927,6 +3023,14 @@
       page = newPage;
       if (viewMode === "board") loadBoard();
       else renderTableBody();
+    }
+
+    function fmtMoney(v) {
+      if (v == null || v === "") return "—";
+      const n = Number(v);
+      if (Number.isNaN(n)) return "—";
+      const sign = n > 0 ? "+" : "";
+      return sign + n.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function fmtPnl(v) {
