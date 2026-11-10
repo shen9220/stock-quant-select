@@ -1335,19 +1335,26 @@
       { key: "score_label", label: "分值", sum: false },
       { key: "board", label: "板块", sum: false },
       { key: "buy_price", label: "买入价", sum: false },
-      { key: "sell_price_935", label: "早盘卖出价", sum: false },
-      { key: "pnl_morning", label: "早盘盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_morning_half", label: "早盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_1315", label: "午盘卖出价", sum: false },
-      { key: "pnl_afternoon", label: "午盘盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_afternoon_half", label: "午盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_batch_avg", label: "分批总价", sum: false },
-      { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_batch_total_half", label: "分批半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "d1_capital", label: "D1当日本金", sum: false, money: true },
+      { key: "sell_price_935", label: "D1 早盘卖出价", sum: false },
+      { key: "pnl_morning", label: "D1 早盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_morning_half", label: "D1 早盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_1315", label: "D1 午盘卖出价", sum: false },
+      { key: "pnl_afternoon", label: "D1 午盘盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_afternoon_half", label: "D1 午盘半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_batch_avg", label: "D1 分批总价", sum: false },
+      { key: "pnl_batch_total", label: "D1 分批总盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_batch_total_half", label: "D1 分批半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "d1_batch_profit", label: "D1 分批盈亏利润", sum: true, money: true },
+      { key: "d1_capital_end", label: "D1 汇总本金", sum: false, money: true },
+      { key: "d2_capital", label: "D2当日本金", sum: false, money: true },
       { key: "d2_sell_price_935", label: "D2早盘卖价", sum: false },
       { key: "d2_pnl_morning", label: "D2早盘利润", sum: true, pnl: true, sortable: true },
       { key: "d2_sell_price_1315", label: "D2午盘卖价", sum: false },
       { key: "d2_pnl_afternoon", label: "D2午盘利润", sum: true, pnl: true, sortable: true },
+      { key: "d2_batch_profit", label: "D2 分批盈亏利润", sum: true, money: true },
+      { key: "d2_batch_half_profit", label: "D2 分批半仓盈亏利润", sum: true, money: true },
+      { key: "d2_capital_end", label: "D2 汇总本金", sum: false, money: true },
       { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
       { key: "hold_days", label: "持有天数", sum: false, sortable: true },
       { key: "is_second_board", label: "二板", sum: false },
@@ -1475,8 +1482,8 @@
       { key: "stock_name", label: "股票名称", type: "text", required: true },
       { key: "stock_code", label: "代码（可空，名称自动填充）", type: "text" },
       { key: "buy_price", label: "买入价(开盘)", type: "number" },
-      { key: "sell_price_935", label: "早盘卖出价", type: "number" },
-      { key: "sell_price_1315", label: "午盘卖出价", type: "number" },
+      { key: "sell_price_935", label: "D1 早盘卖出价", type: "number" },
+      { key: "sell_price_1315", label: "D1 午盘卖出价", type: "number" },
       { key: "sell_date", label: "卖出日期", type: "date" },
       { key: "is_second_board", label: "二板", type: "select", options: [
         { v: "", t: "未知/自动" }, { v: "true", t: "是" }, { v: "false", t: "否" }
@@ -2610,11 +2617,20 @@
     }
 
     const BOARD_PNL_COLS = [
-      { key: "morning", label: "早盘盈亏累计" },
-      { key: "afternoon", label: "午盘盈亏累计" },
-      { key: "batch", label: "分批盈亏累计" },
-      { key: "d2_morning", label: "D2早盘盈亏累计" },
-      { key: "d2_afternoon", label: "D2午盘盈亏累计" },
+      { key: "morning", label: "D1 早盘盈亏累计" },
+      { key: "morning_half", label: "D1 早盘半仓" },
+      { key: "afternoon", label: "D1 午盘盈亏累计" },
+      { key: "afternoon_half", label: "D1 午盘半仓" },
+      { key: "batch", label: "D1 分批盈亏累计" },
+      { key: "batch_half", label: "D1 分批半仓盈亏累计" },
+      { key: "d2_morning", label: "D2 早盘盈亏累计" },
+      { key: "d2_afternoon", label: "D2 午盘盈亏累计" },
+      { key: "d2_batch", label: "D2 分批盈亏累计" },
+      { key: "d2_batch_half", label: "D2 分批半仓盈亏累计" },
+      { key: "d1_capital_end", label: "D1 汇总本金", money: true },
+      { key: "d2_capital_end", label: "D2 汇总本金", money: true },
+      { key: "d1_batch_profit", label: "D1 分批利润", money: true },
+      { key: "d2_batch_profit", label: "D2 分批利润", money: true },
     ];
 
     function qsBase() {
@@ -2894,6 +2910,7 @@
         return `<span class="badge badge-hold">持仓中</span>`;
       }
       const v = t[c.key];
+      if (c.money) return fmtMoney(t[c.key]);
       if (c.pnl) {
         if (v == null || v === "") return "—";
         return `<span>${(Number(v) > 0 ? "+" : "") + v}%</span>`;
@@ -2961,7 +2978,7 @@
 
     function renderBoardHead() {
       const headHtml = `<th>月份</th>` + BOARD_PNL_COLS.map(c => `<th>${c.label}</th>`).join("") +
-        `<th>笔数</th><th>大盘涨跌幅度</th><th>月度盈亏</th>`;
+        `<th>大盘涨跌幅度</th><th>月度盈亏</th>`;
       document.getElementById("boardHeadRank1").innerHTML = headHtml;
       document.getElementById("boardHeadRank2").innerHTML = headHtml;
     }
@@ -2974,29 +2991,33 @@
       }));
       const tb = document.getElementById(tbodyId);
       const sumCells = BOARD_PNL_COLS.map(c => {
+        if (c.money && (c.key === "d1_capital_end" || c.key === "d2_capital_end")) {
+          return `<td>—</td>`;
+        }
         const v = round2(slice.reduce((a, r) => a + Number(r[c.key] || 0), 0));
+        if (c.money) return `<td>${fmtMoney(v)}</td>`;
         const cls = boardSumTextClass(v);
         return `<td class="${cls}">${v > 0 ? "+" : ""}${v}%</td>`;
       }).join("");
-      const cnt = slice.reduce((a, r) => a + Number(r.count || 0), 0);
       const batchSum = round2(slice.reduce((a, r) => a + Number(r.batch || 0), 0));
       // 大盘涨跌幅度：本页各月幅度累加（与其它盈亏列合计口径一致）
       const indexVals = slice.map(r => r.index_pct).filter(v => v != null && v !== "" && !Number.isNaN(Number(v)));
       const indexPctSum = indexVals.length ? round2(indexVals.reduce((a, v) => a + Number(v), 0)) : null;
       document.getElementById(sumRowId).innerHTML =
-        `<td>本页合计</td>${sumCells}<td>${cnt}</td>` +
+        `<td>本页合计</td>${sumCells}` +
         `<td>${indexPctHtml(indexPctSum)}</td>` +
         `<td>${monthResultHtml(batchSum)}</td>`;
 
       tb.innerHTML = slice.map(r => {
         const label = r.month.replace("-", "年") + "月";
         const cells = BOARD_PNL_COLS.map(c =>
-          `<td class="${boardPnlClass(r[c.key])}">${fmtBoardPnl(r[c.key])}</td>`
+          c.money
+            ? `<td>${fmtMoney(r[c.key])}</td>`
+            : `<td class="${boardPnlClass(r[c.key])}">${fmtBoardPnl(r[c.key])}</td>`
         ).join("");
         return `<tr>
           <td class="month-link" onclick="goDetailFromBoard('${r.month}', ${rankNum})">${label}</td>
           ${cells}
-          <td>${r.count || 0}</td>
           <td>${indexPctHtml(r.index_pct)}</td>
           <td>${monthResultHtml(r.batch)}</td>
         </tr>`;
@@ -3013,7 +3034,7 @@
       if (!boardRows.length) {
         document.getElementById("boardTbodyRank1").innerHTML = "";
         document.getElementById("boardTbodyRank2").innerHTML = "";
-        document.getElementById("boardSumRank1").innerHTML = `<td>本页合计</td>${BOARD_PNL_COLS.map(() => "<td>—</td>").join("")}<td>—</td><td>—</td><td>—</td>`;
+        document.getElementById("boardSumRank1").innerHTML = `<td>本页合计</td>${BOARD_PNL_COLS.map(() => "<td>—</td>").join("")}<td>—</td><td>—</td>`;
         document.getElementById("boardSumRank2").innerHTML = document.getElementById("boardSumRank1").innerHTML;
         empty.style.display = "block";
         return;
