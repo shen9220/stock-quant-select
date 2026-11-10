@@ -1185,6 +1185,19 @@
     </div>
   </div>
   <div class="pages-boot" id="pagesBootMask">正在加载脱敏看板…</div>
+  <script>
+    if (/github\.io$/i.test(location.hostname)) {
+      document.documentElement.classList.add("pages-mode");
+      setTimeout(function () {
+        var mask = document.getElementById("pagesBootMask");
+        if (mask && !mask.classList.contains("done")) {
+          mask.classList.add("done");
+          var btn = document.getElementById("btnAuth");
+          if (btn) btn.style.display = "";
+        }
+      }, 8000);
+    }
+  </script>
   <div class="auth-modal" id="authModal">
     <div class="auth-card">
       <h3>登录查看完整数据</h3>
@@ -1881,11 +1894,11 @@
         const end = Math.round((capital + (touched ? dayProfit : 0)) * 100) / 100;
         rows.forEach(t => {
           t.d1_capital_end = end;
-          const m = t.d2_pnl_morning, a = t.d2_pnl_afternoon;
+          const d2Open = t.d2_pnl_morning, d2Close = t.d2_pnl_afternoon;
           let d2Half = null;
-          if (m != null && a != null) d2Half = (Number(m) + Number(a)) / 4;
-          else if (m != null) d2Half = Number(m) / 4;
-          else if (a != null) d2Half = Number(a) / 4;
+          if (d2Open != null && d2Close != null) d2Half = (Number(d2Open) + Number(d2Close)) / 4;
+          else if (d2Open != null) d2Half = Number(d2Open) / 4;
+          else if (d2Close != null) d2Half = Number(d2Close) / 4;
           t.d2_capital = end;
           const usable = !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim();
           if (usable && d2Half != null) {
