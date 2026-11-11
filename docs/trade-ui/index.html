@@ -1092,6 +1092,9 @@ html[data-skin="night"] #v3Root .summary td.session-cell{background:var(--sessio
 html[data-skin="night"] #v3Root tbody tr:hover td.session-cell,html[data-skin="night"] #v3Root .month-row:hover td.session-cell{background:var(--session-hover)!important}
 @media(max-width:850px){ #v3Root .session-legend{padding:0 14px 12px;gap:6px}#v3Root .legend-label{display:none}#v3Root .legend-note{margin-left:0;font-size:10px}#v3Root .compare-panel table{min-width:1150px}}
 @media(prefers-reduced-motion:reduce){ #v3Root *{scroll-behavior:auto!important;transition:none!important}}
+:root{--red:#c92c43;--green:#0c8058}
+html[data-skin="night"] :is(.modal-mask,.auth-modal,.auth-transit,.loading-mask){background:rgba(0,0,0,.78)}
+html[data-skin="night"] .auth-actions button{background:#151515;color:#eee;border-color:#383838}
 
 </style>
 </head>
