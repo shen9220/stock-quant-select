@@ -728,7 +728,13 @@ def _ensure_board_tabs_for_day(today: str) -> dict:
     except Exception as e:
         return {"ready": False, "error": f"import_backfill_board_records:{e}"}
 
-    if bbr.already_done("stock", today):
+    now = datetime.now()
+    probe_halt = today == now.strftime("%Y-%m-%d") and (
+        now.hour > 15 or (now.hour == 15 and now.minute >= 30)
+    )
+    if bbr.already_done("stock", today) and not bbr.slot_needs_halt_promote(
+        "stock", today, probe=probe_halt
+    ):
         return {"ready": True, "reason": "already_done"}
     try:
         should_mark, msg = bbr.process_one_day("stock", today)
@@ -1288,11 +1294,22 @@ def run_after_close_job(as_of: Optional[str] = None, force: bool = False, progra
         _save_state(state)
         print(f"[close-job] 完成: {summary}")
 
-        # 收盘补全后尾盘通知（权威：PushPlus通知规范.md 2026-10-30 最终）
-        # 仅 program=stock：①V1原日 ②创业板日 ③（周末）V1周 —— 单次串行等回执
-        # V2 尾盘暂停；未到 15:00 禁止发（盘中 --force 补价不得触发）
+        # 收盘补全后尾盘通知。未到 15:00 禁止发。
+        # V2 只发当日买入涨跌幅（仅本人）。V2 周结果仍暂停。
         if program == "stock_v2":
-            print("[close-job] stock_v2 尾盘通知已暂停（规范 §3），不推送", flush=True)
+            if not _after_close_window():
+                print("[close-job] stock_v2 未到 15:00，跳过尾盘推送", flush=True)
+            else:
+                try:
+                    from push_top2_result import push_stock_top2
+                    _push_once(
+                        "last_v2_top2_push_date",
+                        today,
+                        lambda: push_stock_top2(today, "stock_v2"),
+                        "V2 当日买入涨跌幅",
+                    )
+                except Exception as e:
+                    print(f"[close-job] stock_v2 尾盘推送异常（不影响补全）: {e}", flush=True)
         elif program == "stock":
             if not _after_close_window():
                 print(

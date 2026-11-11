@@ -1,0 +1,24 @@
+/* Presentation checks use canonical money fields, never independent trading math. */
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const source=fs.readFileSync(path.join(__dirname,'../templates/v3-dashboard.js'),'utf8').split('// Keep legacy save/refresh/auth')[0];
+const context={beijingMonth:()=> '2026-11',beijingToday:()=> '2026-11-11'};vm.createContext(context);vm.runInContext(source+';globalThis.dashboard=V3;',context);const v=context.dashboard;
+const november={ra:-424.0164,rp:-848.0328,amHalf:-142.7098,pmHalf:-570.8391,aProfit:-82.8414,pProfit:-451.1023,otherProfit:69.685,batchTotal:-643.8639,profit:-464.2587,floatingChange:-74.29,assetPnl:-538.5487,opening:40000,ending:39461.4513,cash:19985.7413,position_value:19475.71,count:3};
+const october={profit:500,assetPnl:650,floatingChange:150,opening:101000,ending:101650,count:2};
+const payload={version:'doc-delta-v1',mode:'D1',as_of:'2026-11-11T18:00',rows:[],monthly_stats:{'2026-10':october,'2026-11':november},snapshots:[]};
+let count=0;const test=(name,fn)=>{fn();count++;console.log('PASS',name)};const rows=v.calculate(payload,'D1');
+test('raw legacy records cannot silently calculate money',()=>assert.throws(()=>v.calculate([], 'D1')));
+test('old calculation version is rejected',()=>assert.throws(()=>v.calculate({...payload,version:'shares-v1-20261111'},'D1')));
+test('wrong mode rejected',()=>assert.throws(()=>v.calculate(payload,'D2')));
+test('monthly realized profit comes directly from server',()=>{const s=v.periodStats(rows,'2026-11','2026-11');assert.equal(s.profit,-464.2587);assert.equal(s.aProfit,-82.8414);assert.equal(s.pProfit,-451.1023)});
+test('other settlement is not put into AM or PM',()=>assert.equal(v.periodStats(rows,'2026-11','2026-11').otherProfit,69.685));
+test('money fields are not converted to return percentages or halved',()=>{const s=v.periodStats(rows,'2026-11','2026-11');assert.equal(s.ra,-424.0164);assert.equal(s.amHalf,-142.7098);assert.equal(s.batchTotal,-643.8639)});
+test('floating changes reconcile assets',()=>{const s=v.periodStats(rows,'2026-11','2026-11');assert(Math.abs(s.opening+s.profit+s.floatingChange-s.ending)<1e-8);assert.equal(s.assetPnl,-538.5487)});
+test('month table and comparison share the same projection',()=>{const a=v.periodStats(rows,'2026-11','2026-11'),b=v.monthly(rows,2026,2026).find(m=>m.month==='2026-11');for(const k of ['profit','otherProfit','amHalf','pmHalf','assetPnl','floatingChange','opening','ending'])assert.equal(a[k],b[k])});
+test('asset balances are never summed across months',()=>{const s=v.periodStats(rows,'2026-10','2026-11');assert.equal(s.opening,101000);assert.equal(s.ending,39461.4513);assert.equal(s.profit,35.741300000000024);assert.equal(s.accountReturnPct,null)});
+test('future months have no predicted assets',()=>{const s=v.periodStats(rows,'2026-12','2026-12');assert.equal(s.opening,null);assert.equal(s.ending,null)});
+test('missing ending value remains null',()=>{const p={...payload,monthly_stats:{'2026-11':{...november,ending:null,assetPnl:null}}};const s=v.periodStats(v.calculate(p,'D1'),'2026-11','2026-11');assert.equal(s.ending,null);assert.equal(s.assetPnl,null)});
+test('zero and null stay distinct',()=>{assert.equal(v.totals([{profit:0}]).profit,0);assert.equal(v.totals([]).profit,null)});
+test('historical row does not show later sales',()=>{const r=v.projectRow({executed:true,display_profit:-533.9437,events:[{slot:'am',date:'2026-11-03',price:59.43,whole_pnl:-424.0164,batch_change:-142.7098,profit:-82.8414,proceeds:6089.1586}],history:[{date:'2026-11-02',display_profit:179.6052,remainingShares:300,profit_kind:'浮动'}]},'2026-11-02');assert.equal(r.am,null);assert.equal(r.saleAmount,0);assert.equal(r.display_profit,179.6052);assert.equal(r.profit_kind,'浮动')});
+test('D2 actual entry remains shifted',()=>{const r=v.calculate({...payload,mode:'D2',rows:[{date:'2026-11-03',buy:19.91}]},'D2');assert.equal(r[0].date,'2026-11-03');assert.equal(r[0].buy,19.91)});
+test('latest buy excludes today and unexecuted candidates',()=>assert.equal(v.latestBuy([{date:'2026-11-11',executed:true},{date:'2026-11-10',executed:false},{date:'2026-11-09',executed:true}],'2026-11-11').date,'2026-11-09'));
+console.log(`${count} template/UI contract checks passed`);

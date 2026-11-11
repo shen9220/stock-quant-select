@@ -14,6 +14,10 @@ if user_site_packages not in sys.path:
 """
 
 import sys
+from pathlib import Path as _FirstBoardPath
+_first_board_public = next((p / '公共/lib' for p in _FirstBoardPath(__file__).resolve().parents if (p / '公共/lib/first_board_gate.py').is_file()), None)
+if _first_board_public is not None and str(_first_board_public) not in sys.path:
+    sys.path.insert(0, str(_first_board_public))
 import os
 
 # 添加用户 site-packages 路径（确保 akshare 能被找到）
@@ -77,22 +81,23 @@ def get_stock_history_with_retry(stock_code, days=60, max_retries=2):
     if len(stock_code) > 6:
         normalized_code = stock_code[-6:]
     
-    # 尝试不同的数据源
+    # 东财历史 K 冷处理。日线改腾讯，再不行用新浪。
+    prefix = "sh" if normalized_code.startswith(("5", "6", "9")) else "sz"
+    start8 = (datetime.now() - timedelta(days=days)).strftime("%Y%m%d")
+    end8 = datetime.now().strftime("%Y%m%d")
     data_sources = [
-        # 方案1：标准接口
-        lambda: ak.stock_zh_a_hist(
-            symbol=normalized_code,
-            period="daily",
-            start_date=(datetime.now() - timedelta(days=days)).strftime('%Y%m%d'),
-            end_date=datetime.now().strftime('%Y%m%d'),
-            adjust="qfq"
+        lambda: ak.stock_zh_a_hist_tx(
+            symbol=f"{prefix}{normalized_code}",
+            start_date=start8,
+            end_date=end8,
+            adjust="",
         ),
-        # 方案2：新浪财经接口（备用）
-        lambda: ak.stock_zh_a_hist(
-            symbol=normalized_code,
-            period="daily",
-            adjust=""
-        )
+        lambda: ak.stock_zh_a_daily(
+            symbol=f"{prefix}{normalized_code}",
+            start_date=start8,
+            end_date=end8,
+            adjust="",
+        ),
     ]
     
     for source_idx, get_data in enumerate(data_sources):
@@ -100,6 +105,12 @@ def get_stock_history_with_retry(stock_code, days=60, max_retries=2):
             try:
                 df = get_data()
                 if df is not None and not df.empty and len(df) >= 10:
+                    df = df.rename(columns={
+                        "close": "收盘", "open": "开盘", "high": "最高", "low": "最低",
+                        "volume": "成交量", "amount": "成交额",
+                    })
+                    if "收盘" not in df.columns:
+                        continue
                     return df
             except Exception as e:
                 if attempt < max_retries - 1:
@@ -161,18 +172,10 @@ def check_single_day_limit_up(stock_code, zt_date_str):
     prev_date = get_previous_trading_day(zt_date)
     prev_date_str = prev_date.strftime('%Y%m%d')
     
-    # 获取前一交易日的涨停池
-    prev_zt_df = get_zt_pool_with_retry(prev_date_str)
-    
-    if prev_zt_df is None or prev_zt_df.empty:
-        # 无法获取前一交易日数据，假设是首次涨停
-        return True, "无法获取前一日数据，假设首次涨停"
-    
-    # 检查该股票是否在前一交易日也涨停
-    if stock_code in prev_zt_df['代码'].values:
-        return False, "前一日已涨停，属于连板"
-    
-    return True, "首次涨停"
+    # Uniform D0-2 check: missing data never means first board.
+    from first_board_gate import classify
+    status = classify(str(stock_code).zfill(6), zt_date.strftime('%Y-%m-%d'), prev_date.strftime('%Y-%m-%d'))
+    return status == 'first', {'first': '首次涨停', 'lianban': 'D0-2已涨停，连板剔除'}.get(status, '首板校验未通过：' + status)
 
 
 def analyze_k_line_trend(df):
@@ -231,29 +234,33 @@ def analyze_k_line_trend(df):
     
     score += pct_score
     
-    # 3. 成交量趋势（25分）
-    recent_vol = df['成交量'].tail(5).mean()
-    earlier_vol = df['成交量'].tail(20).head(15).mean()
-    
-    if recent_vol > earlier_vol * 2:
-        vol_score = 25
-        details['成交量'] = "大幅放量"
-    elif recent_vol > earlier_vol * 1.5:
-        vol_score = 20
-        details['成交量'] = "明显放量"
-    elif recent_vol > earlier_vol:
-        vol_score = 15
-        details['成交量'] = "温和放量"
-    else:
+    # 3. 成交量趋势（25分）。腾讯日线有时没有成交量，缺了就不打分。
+    if "成交量" not in df.columns:
         vol_score = 10
-        details['成交量'] = "缩量"
+        details["成交量"] = "无成交量"
+    else:
+        recent_vol = df["成交量"].tail(5).mean()
+        earlier_vol = df["成交量"].tail(20).head(15).mean()
+        if recent_vol > earlier_vol * 2:
+            vol_score = 25
+            details['成交量'] = "大幅放量"
+        elif recent_vol > earlier_vol * 1.5:
+            vol_score = 20
+            details['成交量'] = "明显放量"
+        elif recent_vol > earlier_vol:
+            vol_score = 15
+            details['成交量'] = "温和放量"
+        else:
+            vol_score = 10
+            details['成交量'] = "缩量"
     
     score += vol_score
     
     # 4. 突破形态（20分）
     # 检查是否突破前期高点
-    high_20 = df['最高'].tail(20).max()
-    current_close = df.iloc[-1]['收盘']
+    high_col = "最高" if "最高" in df.columns else "收盘"
+    high_20 = df[high_col].tail(20).max()
+    current_close = df.iloc[-1]["收盘"]
     
     if current_close > high_20 * 0.98:  # 接近或突破20日高点
         breakthrough_score = 20
@@ -306,7 +313,8 @@ def analyze_future_outlook(df, trend_score):
     
     # 2. 支撑位强度（35分）
     # 检查是否有强支撑
-    recent_low = df['最低'].tail(10).min()
+    low_col = "最低" if "最低" in df.columns else "收盘"
+    recent_low = df[low_col].tail(10).min()
     support_strength = (current_price - recent_low) / current_price
     
     if support_strength < 0.03:  # 距离支撑位近
@@ -681,6 +689,21 @@ def calculate_composite_score(stock_code, stock_name, zt_date_str, zt_df_row):
     }
 
 
+def _keep_main_and_cyb(zt_df):
+    """只留主板、创业板。ST、科创板、北交所（8/4/920）剔除。"""
+    pub = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "公共")
+    if pub not in sys.path:
+        sys.path.insert(0, pub)
+    from stock_meta import board_of_code
+
+    codes = zt_df["代码"].astype(str).str.strip()
+    boards = codes.map(board_of_code)
+    names = zt_df["名称"].astype(str)
+    keep = boards.isin(["主板", "创业板"]) & ~names.str.contains("ST", case=False, na=False)
+    print(f"剔除科创/北交所/ST/其他 {int((~keep).sum())} 只，保留主板和创业板")
+    return zt_df.loc[keep].copy()
+
+
 def analyze_strength_limit_up_stocks(target_date=None, top_n=2):
     """
     分析强度首板战法股票
@@ -726,9 +749,8 @@ def analyze_strength_limit_up_stocks(target_date=None, top_n=2):
     
     print(f"找到 {len(zt_df)} 只涨停股票\n")
     
-    # 排除ST、科创板、北交所
-    zt_df = zt_df[~zt_df['代码'].str.startswith(('688', '8'))]
-    zt_df = zt_df[~zt_df['名称'].str.contains('ST', case=False)]
+    # 只要主板、创业板。ST、科创板、北交所（含 920）都不要。
+    zt_df = _keep_main_and_cyb(zt_df)
     
     if zt_df.empty:
         print("筛选后无数据")
@@ -981,6 +1003,8 @@ def main():
                 if '基本面' in components:
                     print(f"\n  💎 基本面: {components['基本面'].get('score', 0)}/100")
                     fundamental_details = components['基本面'].get('fundamentals', {})
+                    if not isinstance(fundamental_details, dict):
+                        fundamental_details = {"说明": fundamental_details}
                     for key, value in fundamental_details.items():
                         print(f"     {key}: {value}")
     
@@ -1030,6 +1054,7 @@ def main():
             'market_cap': float(stock['market_cap']),
             'pe_ratio': float(stock['pe_ratio']),
             'turnover': float(stock['turnover']),
+            'pct_change': float((stock.get('details') or {}).get('pct_change') or 0),
             'amount': float(stock['amount']),
             'zt_reason': stock['zt_reason'],
             'trading_advice': advice,
@@ -1054,19 +1079,24 @@ def _save_up_recommendations_md(result, date_str):
     os.makedirs(results_dir, exist_ok=True)
     if date_str is None:
         date_str = datetime.now().strftime('%Y-%m-%d')
-    date8 = date_str.replace('-', '')
-    display = date_str[:4] + '年' + date_str[5:7] + '月' + date_str[8:10] + '日'
+    run_dt = datetime.strptime(date_str[:10], "%Y-%m-%d")
+    pool_day = get_previous_trading_day(run_dt).strftime("%Y-%m-%d")
+    date8 = pool_day.replace('-', '')
+    display = pool_day[:4] + '年' + pool_day[5:7] + '月' + pool_day[8:10] + '日'
 
     lines = []
     lines.append(f"=== {display} 强度首板推荐（前2只，基于多因子综合得分）===")
-    lines.append("交易时序: D0首板复盘选出 → D1开盘集合竞价买入 → D2收盘前卖出")
-    lines.append("数据: 东财涨停池；选股偏好: 非ST非688首板强度排序")
+    lines.append("交易时序: D0-1首板；D1模式D0买/D1卖；D2模式D1买/D2卖；卖点9:35/13:35")
+    lines.append("数据: 东财涨停池；选股偏好: 仅主板和创业板，排除 ST、科创板、北交所")
+    lines.append(f"涨停池日期: {pool_day}")
+    lines.append(f"买入日: {date_str[:10]}")
     lines.append("")
     top_stocks = result.get('top_stocks', [])
     for rank, stock in enumerate(top_stocks, 1):
         lines.append(f"排名 {rank}: {stock['stock_code']} - {stock['stock_name']}")
         lines.append(f"  最新价: {stock.get('current_price', '-')}")
-        lines.append(f"  涨幅: {stock.get('turnover', '-')}%")
+        lines.append(f"  涨幅: {stock.get('pct_change', '-')}%")
+        lines.append(f"  换手率: {stock.get('turnover', '-')}%")
         lines.append(f"  成交额: {stock.get('amount', '-')}")
         lines.append(f"  综合得分: {stock['score']:.2f}")
         reason = stock.get('zt_reason', '数据中未提供具体原因')

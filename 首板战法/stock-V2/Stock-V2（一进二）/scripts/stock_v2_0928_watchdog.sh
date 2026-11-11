@@ -86,13 +86,20 @@ PY
   elif [[ "$status" != "OK" && "$status" != "NO_TRADE" ]]; then
     need=1
   fi
-  # 窗内真竞价应为 live；若仍是 backfill_open_same_day 且无 Push 成功记录 → 补发
-  if ! grep -q "PushPlus 发送成功" "$CRONLOG" 2>/dev/null; then
-    # 仅看今日段落
-    if ! awk -v d="$TODAY" '$0 ~ d {p=1} p && /PushPlus 发送成功/ {ok=1} END{exit ok?0:1}' "$CRONLOG" 2>/dev/null; then
-      echo "今日 cron 未见 PushPlus 成功 → 需补发"
-      need=1
-    fi
+  # 成功行在日期行前面（09:27:01 成功，09:27:02 才打出日期）。
+  # 看今日日志尾部：有成功句，且附近有今天的日期，就不再补发。
+  MARK="${LOG_DIR}/notify_ok_${TODAY}"
+  notified=0
+  if [[ -f "$MARK" ]]; then
+    notified=1
+  fi
+  if tail -80 "$CRONLOG" 2>/dev/null | grep -q "PushPlus 发送 成功" \
+    && tail -80 "$CRONLOG" 2>/dev/null | grep -q "$TODAY"; then
+    notified=1
+  fi
+  if [[ "$notified" -eq 0 ]]; then
+    echo "今日 cron 未见 PushPlus 成功 → 需补发"
+    need=1
   fi
 fi
 

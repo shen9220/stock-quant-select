@@ -126,7 +126,15 @@ def resolve_up_top2(buy_date: str) -> tuple[list[dict], str, str | None]:
 
     d0 = ps.prev_trading_day(buy_date)
     if d0:
+        md_path = paths.recommendation_md("up", d0)
         stocks = top2_from_md(d0)
+        if stocks and os.path.isfile(md_path):
+            text = open(md_path, encoding="utf-8").read()
+            # 旧 up.py 把分析日写成文件名，池子其实是前一交易日。
+            # 没有「涨停池日期」的东财文件不能当成今天的 D0，否则会把昨天的票再抄一天。
+            today = datetime.now().strftime("%Y-%m-%d")
+            if buy_date == today and f"涨停池日期: {d0}" not in text and "数据: 东财涨停池" in text:
+                stocks = []
         if stocks:
             for i, s in enumerate(stocks, 1):
                 s["rank"] = i

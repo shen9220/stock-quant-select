@@ -17,6 +17,10 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+from pathlib import Path as _FirstBoardPath
+_first_board_public = next((p / '公共/lib' for p in _FirstBoardPath(__file__).resolve().parents if (p / '公共/lib/first_board_gate.py').is_file()), None)
+if _first_board_public is not None and str(_first_board_public) not in sys.path:
+    sys.path.insert(0, str(_first_board_public))
 import time as time_mod
 from datetime import datetime, timedelta, time
 from typing import Optional
@@ -619,6 +623,8 @@ def analyze_green_open_stocks(*, force: bool = False, dry_run: bool = False, do_
         print("无首板候选")
         return
 
+    from first_board_gate import keep_first_board
+    today_zt_only = keep_first_board(today_zt_only, query_date_str, two_days_ago_str)
     today_zt_only = today_zt_only.copy()
     today_zt_only["综合得分"] = today_zt_only.apply(calculate_fast_score, axis=1)
     sorted_stocks = today_zt_only.sort_values("综合得分", ascending=False)
@@ -647,7 +653,7 @@ def analyze_green_open_stocks(*, force: bool = False, dry_run: bool = False, do_
     # md
     lines = [
         f"=== {query_date_display} Stock水下（今开绿开 Top2）===",
-        f"买入日(D1): {buy_date_str} | 规则: 强度序跳过红开，取 (今开-昨收)/昨收 < 0",
+        f"买入日(D0): {buy_date_str} | 规则: 强度序跳过红开，取 (今开-昨收)/昨收 < 0",
         f"扫描时刻: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         "",
     ]
@@ -700,6 +706,8 @@ def _build_first_board_sorted(d0: datetime) -> Optional[pd.DataFrame]:
         return None
     prev_codes = _zt_pool_codes(two_zt)
     cand = zt_df[~zt_df["代码"].isin(prev_codes)].copy()
+    from first_board_gate import keep_first_board
+    cand = keep_first_board(cand, d0, two)
     cand = cand[
         ~cand["代码"].astype(str).str.startswith(("688", "92"))
         & ~cand["名称"].astype(str).str.contains("ST|st", case=False, na=False)
@@ -846,7 +854,7 @@ def backfill_range(start: str, end: str, *, enrich: bool = True, sleep_stock: fl
         d0_display = d0_dt.strftime("%Y年%m月%d日")
         lines = [
             f"=== {d0_display} Stock水下（今开绿开 Top2，回补）===",
-            f"买入日(D1): {buy_date} | 规则: (今开-昨收)/昨收 < 0",
+            f"买入日(D0): {buy_date} | 规则: (今开-昨收)/昨收 < 0",
             "",
         ]
         for rank, (_, row) in enumerate(top2.iterrows(), start=1):

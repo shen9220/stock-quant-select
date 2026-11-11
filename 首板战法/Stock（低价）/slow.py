@@ -14,6 +14,10 @@ from datetime import datetime, timedelta, time
 import os
 import re
 import sys
+from pathlib import Path as _FirstBoardPath
+_first_board_public = next((p / '公共/lib' for p in _FirstBoardPath(__file__).resolve().parents if (p / '公共/lib/first_board_gate.py').is_file()), None)
+if _first_board_public is not None and str(_first_board_public) not in sys.path:
+    sys.path.insert(0, str(_first_board_public))
 import time as time_mod
 import requests
 from requests.exceptions import RequestException
@@ -905,6 +909,8 @@ def analyze_zhangting_stocks(query_date_str=None):
         print(f"{two_days_ago_str} 无涨停数据，视为全部为首板候选")
 
     today_zt_only = zt_df[~zt_df["代码"].astype(str).isin(prev_zt_codes)].copy()
+    from first_board_gate import keep_first_board
+    today_zt_only = keep_first_board(today_zt_only, query_date_str, two_days_ago_str)
 
     today_zt_only = today_zt_only[~today_zt_only['代码'].astype(str).str.startswith(('688', '92'))]
     print(f"排除688/92后剩余 {len(today_zt_only)} 只（含ST）")
@@ -941,7 +947,7 @@ def analyze_zhangting_stocks(query_date_str=None):
     print("分析完成，正在生成结果...")
     output_lines = []
     output_lines.append(f"=== {query_date_display} 低价一进二推荐（前2只：①ST ②创业板）===")
-    output_lines.append("交易时序: D0首板复盘选出 → D1开盘半仓买入冲击二板 → D2收盘前清仓")
+    output_lines.append("交易时序: D0-1首板；D1模式D0买/D1卖；D2模式D1买/D2卖；每次买入不超过总资产50%，卖点9:35/13:35")
     output_lines.append("数据: 东财涨停池 + ST补充；选股偏好: 低价活跃ST优先 + 创业板早封缩量；无通知")
     output_lines.append("")
     for rank, (_, row) in enumerate(top2.iterrows(), start=1):

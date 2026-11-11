@@ -39,8 +39,12 @@ PY
   # 串行买→卖；到配额/硬停即停；BACKFILL_RESPECT_RESERVE 禁生产源 00:00–10:00
   caffeinate -dimsu -t 46800 "$PY" -u "$ROOT/jobs/board_buy_orchestrator.py" \
     --lanes sohu,qq --per-lane 2 --rounds 80 --start 2026-01-01 --until "$UNTIL" || true
-  caffeinate -dimsu -t 46800 "$PY" -u "$ROOT/jobs/board_sell_orchestrator.py" \
-    --per-lane 2 --rounds 60 --lookback-days 400 --until "$UNTIL" || true
+  if [[ -f "$ROOT/data/SELL_BACKFILL_PAUSED" ]]; then
+    echo "[$(date '+%F %T')] sell backfill paused: $(tr '\n' ' ' < "$ROOT/data/SELL_BACKFILL_PAUSED")"
+  else
+    caffeinate -dimsu -t 46800 "$PY" -u "$ROOT/jobs/board_sell_orchestrator.py" \
+      --per-lane 2 --rounds 60 --lookback-days 400 --until "$UNTIL" || true
+  fi
 
   echo "[$(date '+%F %T')] board_price_night end"
   "$PY" -u -c "from platform_gate import quota_status; import json; print(json.dumps(quota_status(),ensure_ascii=False))" || true

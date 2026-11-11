@@ -111,13 +111,16 @@ def _sell_work(lookback_days: int) -> list[tuple[str, str, str]]:
                 continue
             if "买不进" in str(t.get("skip_reason") or ""):
                 continue
+            if "取价失败2次" in str(t.get("skip_reason") or ""):
+                continue
             if not str(t.get("stock_code") or "").strip():
                 continue
             if _sell_still_due(t, day):
                 need_boards.add(trade_board(t))
         for board in need_boards:
             items.append((day[:7], board, day))
-    return items
+    from board_phase import skipped_days
+    return [it for it in items if it[2] not in skipped_days("sell", it[1])]
 
 
 def list_todo_days(lookback_days: int = DEFAULT_LOOKBACK_DAYS) -> list[str]:
@@ -174,6 +177,11 @@ def main():
                 f"hour {st['hour_used']}/{st['hour_limit']} "
                 f"interval={st['min_interval_sec']}s stopped={st['stopped']}"
             )
+        return
+
+    pause_file = os.path.join(BASE_DIR, "data", "SELL_BACKFILL_PAUSED")
+    if os.path.isfile(pause_file) and not args.force:
+        log(f"卖价回补已暂停: {pause_file}")
         return
 
     if _quiet() and not args.force:
@@ -265,6 +273,12 @@ def main():
                     break
                 time.sleep(3)
             log(f"round{r} 完成，近端剩余≈{len(list_todo_days(args.lookback_days))}")
+            still = set(list_todo_days(args.lookback_days))
+            stuck = [d for d in todo if d in still]
+            if stuck and phase_b:
+                from board_phase import mark_hour_skip
+                mark_hour_skip("sell", phase_b, stuck)
+                log(f"本小时不再空转 {phase_b} {stuck[:6]}，下小时再试")
     finally:
         fcntl.flock(fd, fcntl.LOCK_UN)
         os.close(fd)

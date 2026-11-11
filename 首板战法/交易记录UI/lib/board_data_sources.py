@@ -160,8 +160,20 @@ def fetch_zt_ths(date8: str) -> pd.DataFrame:
             continue
         again = x.get("is_again_limit")
         tag = str(x.get("change_tag") or "")
-        if again in (1, "1", True) and tag != "FIRST_LIMIT":
-            continue
+        # 这里落的是全量涨停池，连板必须留下。旧逻辑把连板丢掉再写入磁盘，
+        # 次日用这份残池做「不在池里=首板」，三连板及以上会重新混进首板。
+        high = x.get("high_days")
+        if high in (None, ""):
+            high = x.get("continue_num") or x.get("limit_up_days")
+        try:
+            lianban = int(float(high)) if high not in (None, "") else None
+        except (TypeError, ValueError):
+            lianban = None
+        if lianban is None:
+            if tag == "FIRST_LIMIT" or again in (0, "0", False, None, ""):
+                lianban = 1 if tag == "FIRST_LIMIT" or again in (0, "0", False) else None
+            elif again in (1, "1", True) or tag == "LIMIT_BACK":
+                lianban = 2
         try:
             zf = float(x.get("change_rate") or x.get("pct_chg") or 0)
         except (TypeError, ValueError):
@@ -174,10 +186,13 @@ def fetch_zt_ths(date8: str) -> pd.DataFrame:
             hs = float(x.get("turnover_rate") or x.get("hs") or 0)
         except (TypeError, ValueError):
             hs = 0.0
-        rows.append({
+        row = {
             "代码": code, "名称": name, "涨跌幅": zf,
             "成交额": amount, "换手率": hs,
-        })
+        }
+        if lianban is not None:
+            row["连板数"] = lianban
+        rows.append(row)
     return _normalize_zt(pd.DataFrame(rows) if rows else None)
 
 

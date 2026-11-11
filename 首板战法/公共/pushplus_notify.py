@@ -63,7 +63,7 @@ KIND_STOCK_V2 = "stock_v2_notify"           # stock-V2 早盘 ~09:27（本人+�
 KIND_STOCK_TOP2 = "stock_top2"              # V1 原当日买入涨跌幅（仅本人·尾盘）
 KIND_STOCK_CHINEXT_TOP2 = "stock_chinext_top2"  # V1 创业板当日买入涨跌幅（仅本人·尾盘）
 KIND_STOCK_WEEKLY = "stock_weekly"          # V1 原周结果（仅本人·尾盘）
-KIND_STOCK_V2_TOP2 = "stock_v2_top2"        # V2 尾盘日涨跌幅（2026-10-30 起暂停）
+KIND_STOCK_V2_TOP2 = "stock_v2_top2"        # V2 尾盘日涨跌幅（仅本人，2026-11-04 恢复）
 KIND_STOCK_V2_WEEKLY = "stock_v2_weekly"    # V2 尾盘周结果（2026-10-30 起暂停）
 KIND_SLOW_NOTIFY = "slow_notify"            # slow（暂停）
 KIND_UP_NOTIFY = "up_notify"                # up（暂停）
@@ -74,7 +74,6 @@ PAUSED_NOTIFY_PROGRAMS = frozenset({"slow", "up"})
 
 # 尾盘暂停 kind（规范 §3）：调用方不得再发；闸门二次拦截
 PAUSED_CLOSE_KINDS = frozenset({
-    KIND_STOCK_V2_TOP2,
     KIND_STOCK_V2_WEEKLY,
 })
 

@@ -30,12 +30,21 @@ _DEBOUNCE_SEC = float(os.environ.get("TRADE_UI_PAGES_DEBOUNCE", "20") or 20)
 _LAST_RESULT: dict[str, Any] = {}
 
 
+def _pages_review_held() -> bool:
+    shared_hold = os.path.join(_REPO_ROOT, "首板战法", "交易记录UI", "data", "PAGES_REVIEW_HOLD")
+    return any(os.path.exists(path) for path in (os.path.join(DATA_DIR, "PAGES_REVIEW_HOLD"), shared_hold))
+
+
 def pages_sync_enabled() -> bool:
+    if _pages_review_held():
+        return False
     v = (os.environ.get("TRADE_UI_PAGES_SYNC") or "1").strip().lower()
     return v not in ("0", "false", "no", "off")
 
 
 def pages_git_push_enabled() -> bool:
+    if _pages_review_held():
+        return False
     v = (os.environ.get("TRADE_UI_PAGES_GIT_PUSH") or "1").strip().lower()
     return v not in ("0", "false", "no", "off")
 
@@ -123,6 +132,8 @@ def _git_push_pages() -> dict[str, Any]:
 
 def sync_pages_now(*, push: bool | None = None) -> dict[str, Any]:
     """立即导出；默认按环境变量决定是否 push。"""
+    if _pages_review_held():
+        return {"ok": False, "reason": "awaiting_user_ui_review", "pushed": False}
     with _lock:
         from pages_export import export_pages_bundle
 

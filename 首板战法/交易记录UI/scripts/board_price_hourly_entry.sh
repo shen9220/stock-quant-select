@@ -5,7 +5,7 @@
 # 时间窗（backfill_window 统一）：
 #   每日 10:00 → 次日 00:00；过零点硬停，第二天 10:00 续
 #   00:00–10:00 全体安静（护 07:00–10:00 正式通知）
-# 铁律：不批量硬撞；每平台串行门禁；小时/日软上限到了就停
+# 铁律：不批量硬撞；小时软上限到了就停。旧卖价另走证券宝 5 分钟，每天最多 8 个买入日。
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 LOG_DIR="$ROOT/data/board_price_logs"
@@ -48,9 +48,14 @@ PY
   caffeinate -dimsu -t 3500 "$PY" -u "$ROOT/jobs/board_buy_orchestrator.py" \
     --lanes sohu,qq --per-lane 2 --rounds 40 --start 2026-01-01 --until "$UNTIL" \
     || true
-  caffeinate -dimsu -t 3500 "$PY" -u "$ROOT/jobs/board_sell_orchestrator.py" \
-    --per-lane 2 --rounds 40 --lookback-days 400 --until "$UNTIL" \
-    || true
+  # 2026-11-04：涨停池连板误入首板，先停卖价回补，复核完成前不打卖价。
+  if [[ -f "$ROOT/data/SELL_BACKFILL_PAUSED" ]]; then
+    echo "[$(date '+%F %T')] sell backfill paused: $(tr '\n' ' ' < "$ROOT/data/SELL_BACKFILL_PAUSED")"
+  else
+    caffeinate -dimsu -t 3500 "$PY" -u "$ROOT/jobs/board_sell_orchestrator.py" \
+      --per-lane 2 --rounds 40 --lookback-days 400 --until "$UNTIL" \
+      || true
+  fi
 
   echo "[$(date '+%F %T')] board_price_hourly end"
   "$PY" -u -c "from platform_gate import quota_status; import json; print(json.dumps(quota_status(),ensure_ascii=False))" || true

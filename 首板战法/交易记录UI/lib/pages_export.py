@@ -86,7 +86,8 @@ def _load_program_trades(program: str) -> list[dict]:
             row.setdefault("program", program)
             out.append(row)
     out.sort(key=lambda x: (str(x.get("date") or ""), int(x.get("id") or 0)))
-    return out
+    from v3_sell_1335 import attach_1335
+    return attach_1335(out, program, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 def _collect_trade_months(programs: dict[str, list]) -> list[str]:
@@ -121,15 +122,58 @@ def _build_index_months(months: list[str]) -> dict[str, dict[str, Any]]:
     return out
 
 
+def _load_zt_pool_lookup() -> list[dict]:
+    """涨停池查阅名单。目录不在交易程序 trades 下。"""
+    lookup = os.path.join(os.path.dirname(__file__), "..", "data", "zt_pool_lookup")
+    out: list[dict] = []
+    if not os.path.isdir(lookup):
+        return out
+    for fname in sorted(os.listdir(lookup)):
+        if not fname.endswith(".json") or fname.startswith("."):
+            continue
+        day = fname[:-5]
+        path = os.path.join(lookup, fname)
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except (OSError, json.JSONDecodeError, ValueError):
+            continue
+        if not isinstance(data, list):
+            continue
+        for t in data:
+            if not isinstance(t, dict):
+                continue
+            row = dict(t)
+            row.setdefault("date", day)
+            row.setdefault("program", "zt_pool")
+            out.append(row)
+    out.sort(key=lambda x: (str(x.get("date") or ""), int(x.get("id") or 0)))
+    return out
+
+
 def build_full_snapshot() -> dict[str, Any]:
     programs: dict[str, list] = {}
     for prog in paths.PROGRAMS:
         programs[prog] = _load_program_trades(prog)
+    programs["zt_pool"] = _load_zt_pool_lookup()
     months = _collect_trade_months(programs)
+    # Materialize the exact server calculation; Pages must not reconstruct money
+    # from raw legacy trades in JavaScript after decrypting a static snapshot.
+    import stock_UI as ui
+    from v3_ledger_service import MODELS, ledger_for
+    ledgers = {}
+    for mode in ('D1', 'D2'):
+        for model in MODELS:
+            for rank in (1, 2):
+                account = f"{model['id']}:{rank}:{mode}"
+                ledgers[account] = ledger_for(ui.__dict__,model['id'],rank,mode)
+                print(f"[pages-export] ledger {account} ready",flush=True)
     return {
         "exported_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "programs": programs,
         "index_months": _build_index_months(months),
+        "ledgers": ledgers,
+        "calc_version": "doc-delta-v1",
     }
 
 
@@ -157,11 +201,21 @@ def _should_mask_key(key: str) -> bool:
 
 def mask_snapshot(full: dict[str, Any]) -> dict[str, Any]:
     masked = deepcopy(full)
+    public_fields={'date','buy_date','signal_date','d1','program','rank','board_rank','path','path_rank',
+                   'id','is_board_placeholder','is_rank_placeholder'}
     for prog, trades in (masked.get("programs") or {}).items():
         for t in trades:
             for k in list(t.keys()):
-                if _should_mask_key(k):
+                if k not in public_fields:
                     t[k] = _mask_value(k, t.get(k))
+    # No positions, trades, events, or monetary aggregates outside encryption.
+    masked['ledgers'] = {
+        key: dict(version=value['version'],calc_version=value['version'],source_mode='market',
+                  mode=value['mode'],model=value['model'],rank=value['rank'],as_of=value['as_of'],
+                  rows=[],events=[],snapshots=[],monthly_stats={month:{k:None for k in stats}
+                  for month,stats in value.get('monthly_stats',{}).items()},masked=True)
+        for key,value in (full.get('ledgers') or {}).items()
+    }
     masked["masked"] = True
     return masked
 
@@ -201,15 +255,20 @@ def _write_docs_root_helpers() -> None:
 
 def export_pages_bundle(*, password: str | None = None) -> dict[str, Any]:
     """写出 masked.json + encrypted.json + index.html。返回摘要。"""
+    hold = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "PAGES_REVIEW_HOLD"))
+    shared_hold = os.path.join(_REPO_ROOT, "首板战法", "交易记录UI", "data", "PAGES_REVIEW_HOLD")
+    if os.path.exists(hold) or os.path.exists(shared_hold):
+        raise RuntimeError("Pages 导出暂停：等待用户验收 V3 界面")
     pwd = (password or _pages_password()).strip()
     if not pwd:
         raise ValueError("缺少 Pages 加密口令（TRADE_UI_PAGES_PASSWORD）")
 
     full = build_full_snapshot()
     masked = mask_snapshot(full)
-    enc = encrypt_payload(full, pwd)
+    enc = encrypt_payload(full, pwd, compress=True)
 
     os.makedirs(PAGES_DATA_DIR, exist_ok=True)
+    _atomic_write_json(os.path.join(PAGES_DATA_DIR, "compare.json"), {"masked":True,"items":[]})
     _atomic_write_json(os.path.join(PAGES_DATA_DIR, "masked.json"), masked)
     _atomic_write_json(os.path.join(PAGES_DATA_DIR, "encrypted.json"), enc)
     _write_index_html()

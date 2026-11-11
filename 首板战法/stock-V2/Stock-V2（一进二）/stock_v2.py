@@ -26,6 +26,10 @@ import argparse
 import json
 import os
 import sys
+from pathlib import Path as _FirstBoardPath
+_first_board_public = next((p / '公共/lib' for p in _FirstBoardPath(__file__).resolve().parents if (p / '公共/lib/first_board_gate.py').is_file()), None)
+if _first_board_public is not None and str(_first_board_public) not in sys.path:
+    sys.path.insert(0, str(_first_board_public))
 import time as time_mod
 from datetime import datetime, timedelta, time
 from typing import Any, Optional
@@ -616,6 +620,8 @@ def build_d0_universe(as_of: Optional[str] = None) -> dict[str, Any]:
 
     zt0 = fetch_zt_pool(d0_8)
     zt_m1 = fetch_zt_pool(dm1_8)
+    from first_board_gate import keep_first_board
+    zt0 = keep_first_board(zt0, d0_8, dm1_8)
     m1_codes = set(zt_m1["代码"].astype(str)) if not zt_m1.empty and "代码" in zt_m1.columns else set()
     m1_pool_status = "ok" if not zt_m1.empty else "empty_or_fail"
 
@@ -1542,13 +1548,25 @@ def _notify_pushplus(result: dict, *, late_resend: bool = False) -> None:
     try:
         sys.path.insert(0, _SHOU)
         from pushplus_notify import send_pushplus, KIND_STOCK_V2
+        mark = os.path.join(_HERE, "logs", f"notify_ok_{result.get('d1')}")
+        if os.path.isfile(mark):
+            log(f"今日已通知，跳过重复发送 {mark}")
+            return
         ok = send_pushplus(title=title, content=content, kind=KIND_STOCK_V2)
         log(f"PushPlus 发送 {'成功' if ok else '失败'}（kind={KIND_STOCK_V2} 本人+好友 late={late}）")
+        if ok:
+            os.makedirs(os.path.dirname(mark), exist_ok=True)
+            with open(mark, "w", encoding="utf-8") as f:
+                f.write(beijing_now().isoformat(timespec="seconds") + "\n")
         if not ok:
             # 失败再试一次（发现问题立即补发）
             time_mod.sleep(1.5)
             ok2 = send_pushplus(title=title + " 重试", content=content, kind=KIND_STOCK_V2)
             log(f"PushPlus 重试 {'成功' if ok2 else '失败'}")
+            if ok2:
+                os.makedirs(os.path.dirname(mark), exist_ok=True)
+                with open(mark, "w", encoding="utf-8") as f:
+                    f.write(beijing_now().isoformat(timespec="seconds") + "\n")
     except Exception as e:
         log(f"PushPlus 异常: {e}")
 

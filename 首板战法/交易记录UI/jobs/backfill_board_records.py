@@ -311,17 +311,101 @@ def list_buy_dates_with_v1_results() -> list[str]:
     return sorted(set(out), reverse=True)
 
 
+# 买入日停牌，买点错过。已核对，选股必须跳过，下一名顺延。
+CONFIRMED_BUY_DAY_HALT = {
+    ("300986", "2026-01-13"),  # 志特新材，1月16日才开盘
+    ("300333", "2026-07-30"),  # 兆日科技
+    ("603221", "2026-08-11"),  # 爱丽家居
+}
+HALT_SKIP_REASON = "买入日停牌，错过买点，忽略并顺延下一名"
+
+
+def _is_lianban_on_d0(code: str, buy_date: str) -> bool:
+    """D0-1 涨停则是连板，选股必须跳过。日线不够时不在这里删已有记录。"""
+    d0 = ps.prev_trading_day(buy_date)
+    d0_prev = ps.prev_trading_day(d0) if d0 else None
+    if not d0 or not d0_prev:
+        return False
+    try:
+        from first_board_rule import classify_first_board, load_bars
+    except Exception:
+        return False
+    return classify_first_board(code, d0, d0_prev, load_bars()) == "lianban"
+
+
+def is_buy_day_halt(code: str, buy_date: str, *, probe: bool = False) -> bool:
+    """买入日停牌才返回 True。接口失败不算停牌。"""
+    key = (str(code).zfill(6), str(buy_date)[:10])
+    if key in CONFIRMED_BUY_DAY_HALT:
+        return True
+    if not probe:
+        return False
+    return _probe_buy_day_halt(key[0], key[1])
+
+
+def _probe_buy_day_halt(code: str, day: str) -> bool:
+    """搜狐当日 K 线：有行且成交量为 0，或明确空行情，才算停牌。"""
+    import requests
+
+    d8 = day.replace("-", "")
+    url = (
+        f"https://q.stock.sohu.com/hisHq?code=cn_{code}"
+        f"&start={d8}&end={d8}&stat=1&order=D&period=d"
+    )
+    try:
+        from platform_gate import platform_slot
+        with platform_slot("sohu"):
+            r = requests.get(url, timeout=12, headers={"User-Agent": "Mozilla/5.0"})
+            r.raise_for_status()
+            payload = r.json()
+    except Exception:
+        return False
+    if not isinstance(payload, list) or not payload or not isinstance(payload[0], dict):
+        return False
+    hq = payload[0].get("hq") or []
+    if not hq:
+        return True
+    row = hq[0]
+    try:
+        volume = float(row[7]) if len(row) > 7 else None
+    except (TypeError, ValueError):
+        return False
+    return volume == 0
+
+
+def slot_needs_halt_promote(program: str, buy_date: str, *, probe: bool = False) -> bool:
+    """板块名次上仍坐着买入日停牌票时，要改写并顺延。"""
+    trades = stock_UI._load_day(buy_date, program)
+    for t in trades:
+        if t.get("board_rank") is None or t.get("is_board_placeholder"):
+            continue
+        code = str(t.get("stock_code") or "").strip()
+        if code and is_buy_day_halt(code, buy_date, probe=probe):
+            return True
+    return False
+
+
 def board_top2_from_scored(
-    buy_date_str: str, scored: list[dict]
+    buy_date_str: str,
+    scored: list[dict],
+    *,
+    probe_suspend: bool = False,
 ) -> dict[str, list[dict]]:
-    """按综合得分从高到低，筛主板/创业板各 Top2；不足 2 只则空占位补齐。"""
+    """按综合得分从高到低，筛主板/创业板各 Top2；买入日停牌顺延；不足 2 只则空占位补齐。"""
     result: dict[str, list[dict]] = {b: [] for b in VALID_BOARDS}
+    skipped: list[str] = []
     for row in scored:
         code = str(row["stock_code"]).zfill(6)
         board = board_of_code(code)
         if board not in result:
             continue
         if len(result[board]) >= 2:
+            continue
+        if is_buy_day_halt(code, buy_date_str, probe=probe_suspend):
+            skipped.append(f"{code} {row.get('stock_name')} 买入日停牌")
+            continue
+        if _is_lianban_on_d0(code, buy_date_str):
+            skipped.append(f"{code} {row.get('stock_name')} 连板")
             continue
         result[board].append({
             "date": buy_date_str,
@@ -334,6 +418,8 @@ def board_top2_from_scored(
         })
         if all(len(result[b]) >= 2 for b in VALID_BOARDS):
             break
+    if skipped:
+        log(f"  [{buy_date_str}] 买入日停牌忽略: {', '.join(skipped)}")
     return pad_board_top2_slots(buy_date_str, result)
 
 
@@ -363,7 +449,14 @@ def build_board_top2(
     if buy_in_md and buy_in_md != buy_date_str:
         log(f"  [{buy_date_str}] 警告: md 买入日={buy_in_md} 与请求不一致 "
             f"({os.path.basename(path)})，仍按请求日写入")
-    top2 = board_top2_from_scored(buy_date_str, scored)
+    # 历史日只跳过已确认停牌，避免全量重跑打接口。当日收盘后才探停牌。
+    now = datetime.now()
+    today = now.strftime("%Y-%m-%d")
+    probe = (
+        buy_date_str == today
+        and (now.hour > 15 or (now.hour == 15 and now.minute >= 30))
+    )
+    top2 = board_top2_from_scored(buy_date_str, scored, probe_suspend=probe)
     zb = top2.get(BOARD_ZHUBAN) or []
     cy = top2.get(BOARD_CHUANGYEBAN) or []
 

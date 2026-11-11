@@ -12,6 +12,10 @@ import pandas as pd
 from datetime import datetime, timedelta, time
 import os
 import sys
+from pathlib import Path as _FirstBoardPath
+_first_board_public = next((p / '公共/lib' for p in _FirstBoardPath(__file__).resolve().parents if (p / '公共/lib/first_board_gate.py').is_file()), None)
+if _first_board_public is not None and str(_first_board_public) not in sys.path:
+    sys.path.insert(0, str(_first_board_public))
 import time as time_mod
 from requests.exceptions import RequestException
 
@@ -150,6 +154,49 @@ def _local_calendar_mod():
     import fetch_calendar as fc  # noqa: WPS433
 
     return fc
+
+
+def _keep_proven_first_board(df, d0_dt, d0_prev_dt):
+    """只留已证明的首板。连板跳过。日线或连板数都证明不了的，也跳过。"""
+    if df is None or df.empty:
+        return df
+    try:
+        lib = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+            "交易记录UI", "lib",
+        )
+        if lib not in sys.path:
+            sys.path.insert(0, lib)
+        from first_board_rule import classify_first_board, load_bars
+    except Exception as e:
+        print(f"首板日线复核模块不可用，拒绝放行未证明的票: {e}")
+        return df.iloc[0:0]
+    bars = load_bars()
+    d0 = d0_dt.strftime("%Y-%m-%d")
+    d0_prev = d0_prev_dt.strftime("%Y-%m-%d")
+    keep = []
+    skipped = []
+    for idx, row in df.iterrows():
+        code = str(row.get("代码") or "").zfill(6)
+        raw = row.get("连板数")
+        try:
+            n = float(raw) if raw not in (None, "") else None
+        except (TypeError, ValueError):
+            n = None
+        if n is not None and n > 1:
+            skipped.append(f"{code}连板数{n:g}")
+            continue
+        if n == 1:
+            keep.append(idx)
+            continue
+        status = classify_first_board(code, d0, d0_prev, bars)
+        if status == "first":
+            keep.append(idx)
+        else:
+            skipped.append(f"{code}{status}")
+    if skipped:
+        print(f"连板或未证明首板，跳过 {len(skipped)} 只: {', '.join(skipped[:12])}")
+    return df.loc[keep].copy() if keep else df.iloc[0:0]
 
 
 def get_previous_trading_day(current_date):
@@ -565,7 +612,7 @@ def analyze_zhangting_stocks(
     
     print(f"获取到 {len(zt_df)} 只涨停股票")
     
-    # 筛选连续1天涨停（前一个交易日涨停，前两天没涨停）
+    # 首板：D0 涨停，D0-1 不是涨停。连板跳过。D1 买入，D2 卖出。
     two_days_ago = get_previous_trading_day(previous_trading_day)
     two_days_ago_str = two_days_ago.strftime('%Y%m%d')
     print(f"筛选首次涨停股票（排除{two_days_ago_str}已涨停的股票）...")
@@ -576,14 +623,30 @@ def analyze_zhangting_stocks(
         return {"ok": False, "message": f"获取前两日涨停池失败: {e}", "query_date_display": query_date_display}
     
     prev_zt_codes = _zt_pool_codes(two_days_ago_zt)
-    if not prev_zt_codes:
-        print(f"{two_days_ago_str} 无涨停数据，视为全部为首板候选")
-    
-    today_zt_only = zt_df[~zt_df["代码"].isin(prev_zt_codes)]
+    # 涨停池本身包含连板。首板只能由「连板数=1」或「前一日完整涨停池里没有这只」证明。
+    # 前一日池为空时，禁止把当日涨停全部当成首板（2026-05-28 华塑控股就是这样混进来的）。
+    lianban_num = pd.to_numeric(zt_df["连板数"], errors="coerce") if "连板数" in zt_df.columns else None
+    has_lianban = lianban_num is not None and bool(lianban_num.notna().any())
+    if has_lianban:
+        before = len(zt_df)
+        zt_df = zt_df[lianban_num.isna() | (lianban_num <= 1)].copy()
+        print(f"按连板数剔除连板 {before - len(zt_df)} 只")
+    if not prev_zt_codes and not has_lianban:
+        print(f"{two_days_ago_str} 无涨停数据，不能把当日涨停全部当成首板")
+        return {
+            "ok": False,
+            "message": f"{two_days_ago_str} 涨停池缺失，拒绝把连板当首板",
+            "query_date_display": query_date_display,
+        }
+
+    today_zt_only = zt_df[~zt_df["代码"].isin(prev_zt_codes)] if prev_zt_codes else zt_df
     
     # 增加筛选条件：排除科创板（688开头）、北交所（92开头）和ST票（名称包含ST或st），主要查询主板和创业板
     today_zt_only = today_zt_only[~today_zt_only['代码'].str.startswith(('688', '92')) & ~today_zt_only['名称'].str.contains('ST|st', case=False)]
-    
+    today_zt_only = _keep_proven_first_board(today_zt_only, previous_trading_day, two_days_ago)
+    from first_board_gate import keep_first_board
+    today_zt_only = keep_first_board(today_zt_only, previous_trading_day, two_days_ago)
+
     if today_zt_only.empty:
         print(f"{query_date_display} 无符合连续1天涨停条件的股票。")
         return {"ok": False, "message": f"{query_date_display} 无首板候选", "query_date_display": query_date_display}
@@ -676,7 +739,7 @@ def analyze_zhangting_stocks(
     # D0=涨停日，D1=买入日=D0下一交易日
     buy_day = get_next_trading_day(previous_trading_day)
     buy_date_str = buy_day.strftime("%Y-%m-%d")
-    print(f"买入日(D1): {buy_date_str}（涨停日 D0={query_date_display}）")
+    print(f"买入日(D0): {buy_date_str}（涨停日 D0-1={query_date_display}）")
     if not results_only:
         sync_trades_to_ui(top2, buy_date_str)
     else:
@@ -686,7 +749,7 @@ def analyze_zhangting_stocks(
     # 准备输出内容
     output_lines = []
     output_lines.append(f"=== {query_date_display} 强度推荐排名（前2只，基于多因子综合得分）===")
-    output_lines.append(f"买入日(D1): {buy_date_str} | 卖出日(D2): 下一交易日 9:35/13:15")
+    output_lines.append(f"买入日(D0): {buy_date_str} | 卖出日(D1): 下一交易日 9:35/13:35")
     for rank, (idx, row) in enumerate(top2.iterrows(), start=1):
         output_lines.append(f"排名 {rank}: {row['代码']} - {row['名称']}")
         output_lines.append(f"  涨停天数: 1天")

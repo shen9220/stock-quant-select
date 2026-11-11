@@ -73,6 +73,7 @@ stock_notify, stock_updata, stock_v2_notify
 | e1 | V1 原当日买入涨跌幅 | `stock_top2` | 交易日 ≥15:00 收盘补全后 | `交易记录UI/jobs/push_top2_result.py`（program=stock） | ✅ | ❌ |
 | e2 | V1 创业板当日买入涨跌幅 | `stock_chinext_top2` | 同上 | 同上（board=创业板） | ✅ | ❌ |
 | g | V1 原周结果 | `stock_weekly` | 当周最后交易日 ≥15:00 | `交易记录UI/jobs/push_weekly_result.py`（program=stock） | ✅ | ❌ |
+| e3 | V2 当日买入涨跌幅 | `stock_v2_top2` | 交易日 ≥15:00 收盘补全后 | `交易记录UI/jobs/push_top2_result.py`（program=stock_v2） | ✅ | ❌ |
 
 ### 2.1 V1 原周结果内容口径
 
@@ -96,7 +97,7 @@ stock_notify, stock_updata, stock_v2_notify
 |------|------|------|
 | slow | **暂停** | 不发 PushPlus |
 | up | **暂停** | 不发 PushPlus |
-| **stock-V2 尾盘**（日涨跌幅 / 周结果） | **暂停** | 用户 2026-10-30：V2 及其他尾盘全部暂不通知；以后要开另说 |
+| stock-V2 尾盘日涨跌幅 | **开启** | 2026-11-04 起收盘后发本人。kind=`stock_v2_top2`。周结果仍暂停 |
 | V1 主板当日涨跌幅 / 主板周结果 / 创业板周结果 | **暂停** | 未列入 §2；不得擅自加发 |
 
 ---
@@ -117,6 +118,7 @@ stock_notify, stock_updata, stock_v2_notify
 
 | 日期 | 变更 | 指示 |
 |------|------|------|
+| 2026-11-04 | 恢复 V2 收盘当日买入涨跌幅（仅本人）。V2 周结果仍暂停 | 用户要求补发 |
 | **2026-10-30** | **最终定稿**：早盘仅 a/b/c（本人+好友）；尾盘仅 e1/e2/g（仅本人）；V2 尾盘及未列项全部暂停；**第三方接口禁止批量、必须单次且等回执** | 用户书面 |
 | 2026-10-30 | （废止）周结果按排名/板块拆多条连发；V2 尾盘通知 | 被本日定稿覆盖 |
 | 2026-10-29 | 初版好友白名单 / 测试仅本人 / 暂停 slow·up | 用户清单 |

@@ -1316,6 +1316,10 @@ def upsert_from_stock_py(records: list[dict], auto_enrich: bool = True, replace_
     return {"created": created, "updated": updated}
 
 
+from v3_ui_api import register_v3_ui
+register_v3_ui(app, globals())
+
+
 # ── API ───────────────────────────────────────────────────
 
 @app.route("/")

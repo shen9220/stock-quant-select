@@ -92,7 +92,7 @@ def _resolve_execution_time(buy_day: str, program: str = "stock") -> str:
                 return m.group(2)
     except Exception:
         pass
-    return "09:05"
+    return "09:27" if program == "stock_v2" else "09:05"
 
 
 def _quote_with_retry(code: str, date_str: str) -> tuple[Optional[float], Optional[float], Optional[float]]:
@@ -145,7 +145,7 @@ def build_stock_top2_report(
         trades = [t for t in trades if t.get("rank") not in (None, "") and int(t.get("rank") or 0) in (1, 2)]
         trades.sort(key=lambda x: int(x.get("rank") or 99))
         rank_key = "rank"
-        header = "【stockV1 原当日买入涨跌幅】"
+        header = "【stock_v2 Top2】" if program == "stock_v2" else "【stockV1 原当日买入涨跌幅】"
 
     if not trades:
         return None
@@ -196,12 +196,9 @@ def push_stock_top2(
     *,
     board: str | None = None,
 ) -> bool:
-    """收盘后推送当日买入涨跌幅。V2 尾盘已暂停（规范 §3）。"""
+    """收盘后推送当日买入涨跌幅。V2 只发日涨跌幅，周结果仍暂停。"""
     buy_day = buy_day or datetime.now().strftime("%Y-%m-%d")
-    if program == "stock_v2":
-        print("[push-top2] stock_v2 尾盘通知已暂停（规范 §3），跳过", flush=True)
-        return False
-    if program != "stock":
+    if program not in ("stock", "stock_v2"):
         print(f"[push-top2] program={program} 不在尾盘通知清单，跳过", flush=True)
         return False
 
@@ -215,7 +212,11 @@ def push_stock_top2(
         print(f"[push-top2] board={board or '原'} {buy_day} 无买入记录，跳过推送", flush=True)
         return False
 
-    if board == "创业板":
+    if program == "stock_v2":
+        from pushplus_notify import KIND_STOCK_V2_TOP2 as _KIND
+        title = f"stock-V2 买入涨跌幅 {buy_day}"
+        kind = _KIND
+    elif board == "创业板":
         from pushplus_notify import KIND_STOCK_CHINEXT_TOP2 as _KIND
         title = f"stockV1-创业板 当日买入涨跌幅 {buy_day}"
         kind = _KIND

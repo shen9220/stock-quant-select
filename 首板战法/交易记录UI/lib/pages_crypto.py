@@ -5,6 +5,7 @@ from __future__ import annotations
 import base64
 import json
 import os
+import gzip
 from typing import Any
 
 DEFAULT_ITER = 100_000
@@ -61,7 +62,7 @@ def _aes_gcm_decrypt(key: bytes, iv: bytes, ct: bytes, tag: bytes) -> bytes:
         return cipher.decrypt_and_verify(ct, tag)
 
 
-def encrypt_payload(obj: Any, password: str, *, iterations: int = DEFAULT_ITER) -> dict:
+def encrypt_payload(obj: Any, password: str, *, iterations: int = DEFAULT_ITER, compress: bool = False) -> dict:
     """返回与质量看板相同字段：salt/iv/tag/ct（均为 base64）+ iter。"""
     if not password:
         raise ValueError("password required")
@@ -69,8 +70,10 @@ def encrypt_payload(obj: Any, password: str, *, iterations: int = DEFAULT_ITER) 
     iv = os.urandom(12)
     key = _derive_key(password, salt, iterations)
     plain = json.dumps(obj, ensure_ascii=False, separators=(",", ":"), default=str).encode("utf-8")
+    if compress:
+        plain = gzip.compress(plain,mtime=0)
     ct, tag = _aes_gcm_encrypt(key, iv, plain)
-    return {
+    result = {
         "v": 1,
         "iter": iterations,
         "salt": base64.b64encode(salt).decode("ascii"),
@@ -78,6 +81,9 @@ def encrypt_payload(obj: Any, password: str, *, iterations: int = DEFAULT_ITER) 
         "tag": base64.b64encode(tag).decode("ascii"),
         "ct": base64.b64encode(ct).decode("ascii"),
     }
+    if compress:
+        result['compression']='gzip'
+    return result
 
 
 def decrypt_payload(payload: dict, password: str) -> Any:
@@ -89,4 +95,6 @@ def decrypt_payload(payload: dict, password: str) -> Any:
     iterations = int(payload.get("iter") or DEFAULT_ITER)
     key = _derive_key(password, salt, iterations)
     plain = _aes_gcm_decrypt(key, iv, ct, tag)
+    if payload.get('compression')=='gzip':
+        plain=gzip.decompress(plain)
     return json.loads(plain.decode("utf-8"))

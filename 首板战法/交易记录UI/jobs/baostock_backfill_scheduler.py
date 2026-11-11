@@ -40,6 +40,12 @@ for p in (ROOT_DIR, BASE_DIR, os.path.join(ROOT_DIR, "stock", "scripts")):
     if p not in sys.path:
         sys.path.insert(0, p)
 
+# 11:00 全市场扫描已于 2026-11-06 永久停用。直接 --run 也不再登录证券宝。
+_RETIRED = os.path.join(_BASE_DIR, "data", "BAOSTOCK_11_SCAN_RETIRED")
+if os.path.isfile(_RETIRED) or os.environ.get("BAOSTOCK_11_SCAN_RETIRED") == "1":
+    print("[baostock-sched] 11:00 全市场扫描已永久停用，拒绝运行")
+    sys.exit(0)
+
 # 本任务必须允许 baostock；若外部环境误设为 1，入口脚本应已 unset
 if os.environ.get("DISABLE_BAOSTOCK", "").lower() in ("1", "true", "yes"):
     print("[baostock-sched] DISABLE_BAOSTOCK=1，拒绝运行（请用 16:00 入口脚本）")
