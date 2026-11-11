@@ -58,9 +58,11 @@ const V3 = (() => {
     const end=`${month}-${String(new Date(y,m,0).getDate()).padStart(2,'0')}`;
     const today=list.ledger?.as_of?.slice(0,10)||beijingToday();return end<today?end:today;
   }
-  function projectRow(source,day){
+  function projectRow(source,day,currentDay=null){
     const r={...source};if(!r.executed)return r;
-    const historical=(r.history||[]).filter(h=>h.date<=day).at(-1);if(historical){const {date:historyDate,...stateAtDate}=historical;Object.assign(r,stateAtDate);}
+    let historical=(r.history||[]).filter(h=>h.date<=day).at(-1);
+    if(day===currentDay&&historical?.date!==day)historical=null;
+    if(historical){const {date:historyDate,...stateAtDate}=historical;Object.assign(r,stateAtDate);}
     const events=(source.events||[]).filter(e=>e.date<=day);r.events=events;
     for(const [slot,whole,batch,profit] of [['am','ra','amHalf','aProfit'],['pm','rp','pmHalf','pProfit']]){
       const e=events.find(e=>e.slot===slot);r[slot]=e?.price??null;r[whole]=e?.whole_pnl??null;
@@ -75,7 +77,7 @@ const V3 = (() => {
   function scoped(list){
     let a=list.filter(r=>{const month=String(r.date).slice(0,7);return state.from?month>=state.from&&month<=state.to:month===state.month;});
     if(state.keyword){const k=state.keyword.toLowerCase();a=a.filter(r=>(String(r.stock_code)+' '+String(r.stock_name)).toLowerCase().includes(k));}
-    const day=cutoffDay(list);return a.map(r=>projectRow(r,day));
+    const day=cutoffDay(list);return a.map(r=>projectRow(r,day,list.ledger?.as_of?.slice(0,10)));
   }
   function totals(list){return Object.fromEntries(['ra','rp','morningBatchPct','afternoonBatchPct','amHalf','pmHalf','batchTotal','batch','profit','aProfit','pProfit'].map(k=>[k,sum(list,k)]));}
   function card(label,value,note,accent='#527af1'){return `<div class="card" style="--accent:${accent}"><div class="label">${label}</div><div class="value">${value}</div><div class="tiny">${note}</div></div>`;}
