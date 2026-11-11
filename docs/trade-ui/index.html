@@ -1017,6 +1017,81 @@ html[data-skin="night"] #v3Root .mode-tabs{background:#193b38}html[data-skin="ni
 #v3Root .compare-panel th:nth-child(2),#v3Root .compare-panel td:nth-child(2){width:100px;min-width:90px}
 #v3Root .compare-panel th:nth-child(3),#v3Root .compare-panel td:nth-child(3){width:165px}
 #v3Root .rank-medal{white-space:nowrap;font-size:12px}
+/* Session palette shared by detail, monthly and model-comparison tables. */
+:root{
+  --session-morning:#fff7ed;--session-morning-head:#ffecd5;--session-morning-hover:#ffeedb;--session-morning-sum:#ffe5c8;--session-morning-line:#efd8bc;--session-morning-text:#89571c;
+  --session-afternoon:#eef9f4;--session-afternoon-head:#ddf2e8;--session-afternoon-hover:#e0f3e9;--session-afternoon-sum:#d3ecdf;--session-afternoon-line:#cce4d7;--session-afternoon-text:#316b58;
+  --session-batch:#f6f1ff;--session-batch-head:#eae0fb;--session-batch-hover:#ede4fc;--session-batch-sum:#e2d5f6;--session-batch-line:#ded0ef;--session-batch-text:#74519b;
+  --identity-bg:var(--panel);--identity-head:#eef3fc;
+}
+#v3Root .session-legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:0 18px 13px;font-size:11px;color:var(--sub)}
+#v3Root .session-legend>span:not(.legend-label):not(.legend-note){padding:4px 9px;border:1px solid;border-radius:7px;line-height:1.4}
+#v3Root .session-legend .legend-morning{background:var(--session-morning);color:var(--session-morning-text);border-color:var(--session-morning-line)!important}
+#v3Root .session-legend .legend-afternoon{background:var(--session-afternoon);color:var(--session-afternoon-text);border-color:var(--session-afternoon-line)!important}
+#v3Root .session-legend .legend-batch{background:var(--session-batch);color:var(--session-batch-text);border-color:var(--session-batch-line)!important}
+#v3Root .legend-note{margin-left:auto;letter-spacing:.3px}
+#v3Root .session-morning,#v3Root .metric-morning{--session-bg:var(--session-morning);--session-head:var(--session-morning-head);--session-hover:var(--session-morning-hover);--session-sum:var(--session-morning-sum);--session-border:var(--session-morning-line);--session-text:var(--session-morning-text)}
+#v3Root .session-afternoon,#v3Root .metric-afternoon{--session-bg:var(--session-afternoon);--session-head:var(--session-afternoon-head);--session-hover:var(--session-afternoon-hover);--session-sum:var(--session-afternoon-sum);--session-border:var(--session-afternoon-line);--session-text:var(--session-afternoon-text)}
+#v3Root .session-batch,#v3Root .metric-batch{--session-bg:var(--session-batch);--session-head:var(--session-batch-head);--session-hover:var(--session-batch-hover);--session-sum:var(--session-batch-sum);--session-border:var(--session-batch-line);--session-text:var(--session-batch-text)}
+#v3Root td.session-cell{background:var(--session-bg)!important}
+#v3Root th.session-cell{background:var(--session-head)!important;color:var(--session-text)!important}
+#v3Root .summary td.session-cell{background:var(--session-sum)!important;color:var(--text);border-bottom:2px solid var(--session-border)}
+#v3Root tbody tr:hover td.session-cell,#v3Root .month-row:hover td.session-cell{background:var(--session-hover)!important}
+#v3Root tbody tr:focus-visible td.session-cell{background:var(--session-hover)!important}
+#v3Root td.session-start,#v3Root th.session-start{border-left:1px solid var(--session-border)}
+#v3Root td.session-end,#v3Root th.session-end{border-right:1px solid var(--session-border)}
+#v3Root .tablewrap{scrollbar-width:thin;scrollbar-color:#b8c3d5 transparent;scroll-padding-left:130px;overscroll-behavior-x:contain}
+#v3Root thead{z-index:5}
+#v3Root tbody td:first-child,#v3Root .summary td:first-child,#v3Root thead th:first-child{position:sticky;left:0;z-index:2;box-shadow:1px 0 0 var(--line)}
+#v3Root tbody td:first-child{background:var(--identity-bg)}
+#v3Root thead th:first-child{background:var(--identity-head);z-index:6}
+#v3Root .month-row:focus-visible{outline:2px solid #6088ec;outline-offset:-2px}
+#v3Root .mgrid>[class^="metric-"]{background:var(--session-bg);border:1px solid var(--session-border);border-radius:9px;padding:9px 10px;color:var(--text)}
+#v3Root .name-link{transition:color .15s;text-underline-offset:3px}
+#v3Root .name-link:hover{color:var(--blue);text-decoration:underline}
+#v3Root .compare-panel th,#v3Root .compare-panel td{font-size:13px;white-space:nowrap}
+#v3Root .compare-panel table{min-width:1250px}
+/* True black canvas. All large surfaces use neutral blacks rather than navy. */
+html[data-skin="night"]{
+  color-scheme:dark;--bg:#000000;--panel:#090909;--card:#090909;--text:#ededed;--sub:#a0a0a0;--muted:#a0a0a0;--line:#262626;--head:#111111;--shadow:none;--red:#ff6b7a;--green:#43ce98;--blue:#88a7ff;
+  --identity-bg:#090909;--identity-head:#141414;
+  --session-morning:#1c150d;--session-morning-head:#302211;--session-morning-hover:#302313;--session-morning-sum:#3a2915;--session-morning-line:#49351e;--session-morning-text:#e8bf86;
+  --session-afternoon:#0c1b14;--session-afternoon-head:#132e21;--session-afternoon-hover:#173324;--session-afternoon-sum:#1a3829;--session-afternoon-line:#244733;--session-afternoon-text:#9ed8b8;
+  --session-batch:#1b1425;--session-batch-head:#2b203d;--session-batch-hover:#2c2140;--session-batch-sum:#362747;--session-batch-line:#463358;--session-batch-text:#d1b7f1;
+}
+html[data-skin="night"] body,html[data-skin="night"] #v3Root,html[data-skin="night"] #v3Root .main,html[data-skin="night"] #v3Root .top{background:#000000;color:var(--text)}
+html[data-skin="night"] #v3Root aside{background:#000000;border-right:1px solid #242424;color:#b7b7b7}
+html[data-skin="night"] #v3Root .navbtn{color:#aaa}
+html[data-skin="night"] #v3Root .navbtn:hover,html[data-skin="night"] #v3Root .navbtn.active{background:#171717;color:#fff}
+html[data-skin="night"] #v3Root .group{color:#d1d1d1}
+html[data-skin="night"] #v3Root .section,html[data-skin="night"] #v3Root .sidefoot,html[data-skin="night"] #v3Root .brand small{color:#8d8d8d}
+html[data-skin="night"] #v3Root .card,html[data-skin="night"] #v3Root .panel,html[data-skin="night"] #v3Root .mobiletrade{background:#090909;border-color:#272727}
+html[data-skin="night"] #v3Root .footnote{background:#0d0d0d;color:#a5a5a5}
+html[data-skin="night"] #v3Root th{background:#141414;color:#d8d8d8}
+html[data-skin="night"] #v3Root .summary td{background:#1d1d1d!important;color:#e5e5e5;border-bottom-color:#454545}
+html[data-skin="night"] #v3Root tbody tr:hover td,html[data-skin="night"] #v3Root .month-row:hover td{background:#171717!important}
+html[data-skin="night"] #v3Root .field,html[data-skin="night"] #v3Root .month-trigger,html[data-skin="night"] #v3Root .picker-arrow{background:#0c0c0c;color:#ededed;border-color:#353535}
+html[data-skin="night"] #v3Root .month-picker-dialog{background:#0b0b0b;border-color:#343434;box-shadow:0 24px 90px #000b}
+html[data-skin="night"] #v3Root .month-dialog-backdrop{background:#0009}
+html[data-skin="night"] #v3Root .month-cell.in-range,html[data-skin="night"] #v3Root .month-cell:hover,html[data-skin="night"] #v3Root .picker-arrow:hover{background:#242424;color:#ededed}
+html[data-skin="night"] #v3Root .month-cell.selected{background:#3d62ce;color:#fff}
+html[data-skin="night"] #v3Root .tabs{background:#1a1a1a}
+html[data-skin="night"] #v3Root .smallbtn{background:#191919;border-color:#393939;color:#c2d2ff}
+html[data-skin="night"] #v3Root .code{color:#b0bcd6}
+html[data-skin="night"] #v3Root .buy-date{color:#aaa}
+html[data-skin="night"] #v3Root .comparebar{background:#262626}
+html[data-skin="night"] #v3Root .tablewrap{scrollbar-color:#525252 #090909}
+html[data-skin="night"] #v3Root .mode-tabs .tab.on{background:#177f6c;color:white}
+html[data-skin="night"] :is(.modal,.auth-card,.auth-transit-card,.loading-box){background:#0b0b0b!important;color:#ededed;border-color:#333}
+html[data-skin="night"] :is(.form-grid input,.form-grid select,.auth-card input){background:#111!important;color:#eee;border-color:#3a3a3a}
+html[data-skin="night"] #v3Root .session-legend .legend-note{color:#aaa}
+/* Group colors retain priority over generic hover/summary rules in either theme. */
+html[data-skin="night"] #v3Root td.session-cell{background:var(--session-bg)!important}
+html[data-skin="night"] #v3Root th.session-cell{background:var(--session-head)!important;color:var(--session-text)!important}
+html[data-skin="night"] #v3Root .summary td.session-cell{background:var(--session-sum)!important}
+html[data-skin="night"] #v3Root tbody tr:hover td.session-cell,html[data-skin="night"] #v3Root .month-row:hover td.session-cell{background:var(--session-hover)!important}
+@media(max-width:850px){ #v3Root .session-legend{padding:0 14px 12px;gap:6px}#v3Root .legend-label{display:none}#v3Root .legend-note{margin-left:0;font-size:10px}#v3Root .compare-panel table{min-width:1150px}}
+@media(prefers-reduced-motion:reduce){ #v3Root *{scroll-behavior:auto!important;transition:none!important}}
 
 </style>
 </head>
@@ -3712,8 +3787,11 @@ const V3 = (() => {
   function hero(title,desc,pill){return `<section class="hero"><div><h2>${title}</h2><p>${desc}</p></div><span class="pill">${pill}</span></section>`;}
   function notice(){return '';}
 
-  function table(headers,body,summary='',mobile=false){return `<div class="tablewrap ${mobile?'desktoponly':''}"><table><thead><tr>${headers.map((h,i)=>`<th ${state.view==='trade'&&columns[i]?`onclick="V3.sort(${i})" tabindex="0" onkeydown="if(event.key==='Enter')V3.sort(${i})"`:''}>${h}</th>`).join('')}</tr>${summary?`<tr class="summary">${summary}</tr>`:''}</thead><tbody>${body||`<tr><td colspan="${headers.length}" class="empty-state">该范围暂无记录</td></tr>`}</tbody></table></div>`;}
-  function cell(value){return `<td>${value}</td>`;}
+  const sessionColumns={trade:{morning:[7,8,9],afternoon:[10,11,12],batch:[13,14]},history:{morning:[2,3,4],afternoon:[5,6,7],batch:[8,9]},compare:{morning:[4,5],afternoon:[6,7],batch:[8,9]}};
+  function sessionClass(index){const groups=sessionColumns[state.view];if(!groups)return '';for(const [group,indexes] of Object.entries(groups)){if(indexes.includes(index))return `session-cell session-${group}${index===indexes[0]?' session-start':''}${index===indexes.at(-1)?' session-end':''}`;}return '';}
+  function tableLegend(){return !sessionColumns[state.view]?'':`<div class="session-legend" aria-label="交易时段列分组"><span class="legend-label">列分组</span><span class="legend-morning">早盘 · 9:35</span><span class="legend-afternoon">午盘 · 13:35</span><span class="legend-batch">分批汇总</span><span class="legend-note">盈利红色 · 亏损绿色</span></div>`;}
+  function table(headers,body,summary='',mobile=false){return tableLegend()+`<div class="tablewrap ${mobile?'desktoponly':''}" tabindex="0" aria-label="交易数据表，可横向滚动"><table><thead><tr>${headers.map((h,i)=>`<th class="${sessionClass(i)}" ${state.view==='trade'&&columns[i]?`onclick="V3.sort(${i})" tabindex="0" onkeydown="if(event.key==='Enter')V3.sort(${i})"`:''}>${h}</th>`).join('')}</tr>${summary?`<tr class="summary">${summary}</tr>`:''}</thead><tbody>${body||`<tr><td colspan="${headers.length}" class="empty-state">该范围暂无记录</td></tr>`}</tbody></table></div>`;}
+  function cell(value,index){return `<td class="${sessionClass(index)}">${value}</td>`;}
   const columns=['date','stock_name','board','score','capital','buyAmount','buy','am','morningBatchPct','aProfit','pm','afternoonBatchPct','pProfit','batchTotal','profit','ending'];
   function stock(t){const c=esc(t.stock_code||'—'),n=esc(t.stock_name||'空占位');const url=baiduFinanceUrl(t.stock_code);return `<span class="code">${c}</span><span class="stock">${url?`<a class="name-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${n}</a>`:n}</span>`;}
   function price(t,key){
@@ -3758,7 +3836,7 @@ const V3 = (() => {
     const sumrow=['全部汇总','—','—','—','—','—','—','—',fmt(t.morningBatchPct,true),fmt(t.aProfit),'—',fmt(t.afternoonBatchPct,true),fmt(t.pProfit),fmt(t.batchTotal,true),fmt(t.profit),'—','—'].map(cell).join('');
     const body=visible.map(r=>'<tr>'+[`${esc(r.date)}<div class="muted">${weekdayOf(r.date)}</div>`,stock(r),boardTag(r.board),score(r),money(r.capital),money(r.buyAmount),price(r,'buy'),price(r,'am'),fmt(r.morningBatchPct,true),fmt(r.aProfit),`${price(r,'pm')}<div class="stock-sub">13:35</div>`,fmt(r.afternoonBatchPct,true),fmt(r.pProfit),fmt(r.batchTotal,true),fmt(r.profit),money(r.ending),operations(r)].map(cell).join('')+'</tr>').join('');
     html+=table(heads,body,sumrow,true);
-    html+=`<div class="mobilecards">${visible.map(r=>`<article class="mobiletrade"><div class="mtop"><div>${stock(r)}</div><span class="chip">${esc(r.board||'—')}</span></div><div class="hint">${esc(r.date)} ${weekdayOf(r.date)} · 分值 ${score(r)}</div><div class="mgrid"><div>买入价<b>${price(r,'buy')}</b></div><div>当日本金<b>${money(r.capital)}</b></div><div>当日买入本金<b>${money(r.buyAmount)}</b></div><div>9:35 卖价 / 分批盈亏<b>${price(r,'am')} · ${fmt(r.morningBatchPct,true)}</b></div><div>13:35 卖价 / 分批盈亏<b>${price(r,'pm')} · ${fmt(r.afternoonBatchPct,true)}</b></div><div>早盘分批利润<b>${fmt(r.aProfit)}</b></div><div>午盘分批利润<b>${fmt(r.pProfit)}</b></div><div>分批盈亏<b>${fmt(r.batchTotal,true)}</b></div><div>分批利润<b>${fmt(r.profit)}</b></div><div>汇总本金<b>${money(r.ending)}</b></div><div>${operations(r)}</div></div></article>`).join('')||'<div class="empty-state">该范围暂无记录</div>'}<div class="footnote">全范围分批利润 ${fmt(t.profit)} · 分批盈亏 ${fmt(t.batchTotal,true)}</div></div>`;
+    html+=`<div class="mobilecards">${visible.map(r=>`<article class="mobiletrade"><div class="mtop"><div>${stock(r)}</div><span class="chip">${esc(r.board||'—')}</span></div><div class="hint">${esc(r.date)} ${weekdayOf(r.date)} · 分值 ${score(r)}</div><div class="mgrid"><div>买入价<b>${price(r,'buy')}</b></div><div>当日本金<b>${money(r.capital)}</b></div><div>当日买入本金<b>${money(r.buyAmount)}</b></div><div class="metric-morning">9:35 卖价 / 分批盈亏<b>${price(r,'am')} · ${fmt(r.morningBatchPct,true)}</b></div><div class="metric-afternoon">13:35 卖价 / 分批盈亏<b>${price(r,'pm')} · ${fmt(r.afternoonBatchPct,true)}</b></div><div class="metric-morning">早盘分批利润<b>${fmt(r.aProfit)}</b></div><div class="metric-afternoon">午盘分批利润<b>${fmt(r.pProfit)}</b></div><div class="metric-batch">分批盈亏<b>${fmt(r.batchTotal,true)}</b></div><div class="metric-batch">分批利润<b>${fmt(r.profit)}</b></div><div>汇总本金<b>${money(r.ending)}</b></div><div>${operations(r)}</div></div></article>`).join('')||'<div class="empty-state">该范围暂无记录</div>'}<div class="footnote">全范围分批利润 ${fmt(t.profit)} · 分批盈亏 ${fmt(t.batchTotal,true)}</div></div>`;
     html+=`<div class="bottom"><span class="notice">共 ${a.length} 条 · ${multi?'跨月区间分页':'单月展示全部'} · 第 ${state.page} / ${pages} 页</span><div class="filters">${multi?`<select class="field" aria-label="每页条数" onchange="V3.set('per',+this.value)">${[50,100,200].map(n=>`<option ${n===state.per?'selected':''}>${n}</option>`).join('')}</select>`:''}${[['首页',1],['上一页',state.page-1],['下一页',state.page+1],['末页',pages]].map(([label,n],i)=>`<button class="btn" ${i<2?state.page<=1?'disabled':'':state.page>=pages?'disabled':''} onclick="V3.page(${n})">${label}</button>`).join('')}</div></div><div class="footnote">午盘按真实 13:35 价格计算；缺价保留空值，不使用 13:15 替代。默认采用早午各半仓分批卖出；早午分批盈亏按各时点真实成交价对买入价计算，分批盈亏＝（早盘分批盈亏＋午盘分批盈亏）÷ 2。分批利润＝买入本金 × 分批盈亏＝早午分批利润之和，直接用于本金结转，不再额外折半。缺失一边只计入已成交一边的半仓贡献；单点全仓模式记录保留在后台，不在本页面展示。</div></section>`;
     return html;
   }
@@ -3798,12 +3876,12 @@ const V3 = (() => {
   function compare(){
     const data=comparison.map(({m,rank,list})=>{
       const ledger=calculate(list,state.mode),stats=periodStats(ledger,state.compareFrom,state.compareTo);
-      return {m,rank,p:stats.profit,returnPct:stats.batchTotal,opening:stats.opening,ending:stats.ending};
+      return {m,rank,p:stats.profit,returnPct:stats.batchTotal,opening:stats.opening,ending:stats.ending,amHalf:stats.amHalf,pmHalf:stats.pmHalf,aProfit:stats.aProfit,pProfit:stats.pProfit};
     }).sort((a,b)=>a.p===null&&b.p===null?models.indexOf(a.m)-models.indexOf(b.m)||a.rank-b.rank:a.p===null?1:b.p===null?-1:b.p-a.p);
     const max=Math.max(...data.map(r=>Math.abs(r.p||0)),1),valid=data.filter(r=>r.p!==null);
     let html='<div class="grid g4">'+card('最佳模型',modelJump(valid[0]?.m,valid[0]?.rank),money(valid[0]?.p),'#df9441')+card('最弱模型',modelJump(valid.at(-1)?.m,valid.at(-1)?.rank),money(valid.at(-1)?.p),'#7b84bd')+card('统计范围',esc(state.compareFrom===state.compareTo?state.compareFrom:`${state.compareFrom} — ${state.compareTo}`),'与对应模型历史月表同一区间')+card('资金口径','逐笔滚动','采用对应模型、名次与模式的真实本金链','#1caa9d')+'</div>';
     html+=`<section class="panel compare-panel"><div class="paneltop"><h3>全模型分批利润排名</h3><div class="actions">${modeTabs()}${periodControls('compare')}</div></div>`;
-    html+=table(['排名 / 模型','模型名次','所属档位','月初资产','分批盈亏','分批利润','期末资产','利润相对规模'],data.map((r,i)=>'<tr>'+[`${i+1}. <b>${r.m.name}</b> ${valid.length&&r===valid[0]?'<span class="chip best-tag">最好</span>':valid.length&&r===valid.at(-1)?'<span class="chip worst-tag">最弱</span>':''}`,`<span class="rank-medal">${r.rank===1?'🥇 第一名':'🥈 第二名'}</span>`,tiers[r.m.tier],money(r.opening),fmt(r.returnPct,true),fmt(r.p),money(r.ending),`<div class="comparebar ${r.p>0?'positive':r.p<0?'negative':'neutral'}"><i style="width:${Math.abs(r.p||0)/max*100}%"></i></div>`].map(cell).join('')+'</tr>').join(''));
+    html+=table(['排名 / 模型','模型名次','所属档位','月初资产','早盘半仓','早盘利润','午盘半仓','午盘利润','分批盈亏','分批利润','期末资产','利润相对规模'],data.map((r,i)=>'<tr>'+[`${i+1}. <b>${r.m.name}</b> ${valid.length&&r===valid[0]?'<span class="chip best-tag">最好</span>':valid.length&&r===valid.at(-1)?'<span class="chip worst-tag">最弱</span>':''}`,`<span class="rank-medal">${r.rank===1?'🥇 第一名':'🥈 第二名'}</span>`,tiers[r.m.tier],money(r.opening),fmt(r.amHalf,true),fmt(r.aProfit),fmt(r.pmHalf,true),fmt(r.pProfit),fmt(r.returnPct,true),fmt(r.p),money(r.ending),`<div class="comparebar ${r.p>0?'positive':r.p<0?'negative':'neutral'}"><i style="width:${Math.abs(r.p||0)/max*100}%"></i></div>`].map(cell).join('')+'</tr>').join(''));
     return html+'<div class="footnote">与历史月表共用同一套逐笔滚动统计：月初资产取所选开始月月初汇总本金；分批盈亏为所选月份累计；分批利润逐笔汇总，期末资产取所选范围月末本金，不将本金相加。2026 年 11 月重置 4 万，2026 年以前金额留空。</div></section>';
   }
   function pool(){
