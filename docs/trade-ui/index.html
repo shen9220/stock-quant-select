@@ -3491,10 +3491,62 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       return (n > 0 ? "+" : "") + round2(n) + "%";
     }
 
+    function legacyMonthRows(list, indexByMonth) {
+      const by = {};
+      list.forEach(t => {
+        const month = String(t.date || "").slice(0, 7);
+        const rank = Number(t.rank || t.board_rank || t.path_rank || 0);
+        if (!month || (rank !== 1 && rank !== 2)) return;
+        const key = rank === 1 ? "rank1" : "rank2";
+        if (!by[month]) by[month] = { month, index_pct: indexByMonth[month] ?? null, rank1: {}, rank2: {} };
+        const bucket = by[month][key];
+        const m = legacyMetrics(t);
+        ["pnl_morning", "pnl_afternoon", "pnl_morning_half", "pnl_afternoon_half", "pnl_batch_total", "pnl_batch_total_half", "d1_batch_profit", "d2_pnl_morning", "d2_pnl_afternoon", "d2_batch_profit"].forEach(src => {
+          const dst = {
+            pnl_morning: "morning", pnl_afternoon: "afternoon",
+            pnl_morning_half: "morning_half", pnl_afternoon_half: "afternoon_half",
+            pnl_batch_total: "batch", pnl_batch_total_half: "batch_half",
+            d1_batch_profit: "d1_batch_profit",
+            d2_pnl_morning: "d2_morning", d2_pnl_afternoon: "d2_afternoon",
+            d2_batch_profit: "d2_batch_profit",
+          }[src];
+          if (m[src] == null) return;
+          bucket[dst] = round2((bucket[dst] || 0) + Number(m[src]));
+        });
+        const d2pair = legacyHalfPair(m.d2_pnl_morning, m.d2_pnl_afternoon);
+        if (d2pair.total != null) bucket.d2_batch = round2((bucket.d2_batch || 0) + d2pair.total);
+        if (d2pair.half != null) bucket.d2_batch_half = round2((bucket.d2_batch_half || 0) + d2pair.half);
+        const am = m.d2_pnl_morning, pm = m.d2_pnl_afternoon;
+        if (am != null) bucket.d2_morning_half = round2((bucket.d2_morning_half || 0) + am / 2);
+        if (pm != null) bucket.d2_afternoon_half = round2((bucket.d2_afternoon_half || 0) + pm / 2);
+      });
+      return Object.values(by).sort((a, b) => b.month.localeCompare(a.month));
+    }
     async function loadBoard() {
       const seq = ++loadSeq;
       try {
         if (viewMode !== "board") return false;
+        if (document.documentElement.dataset.ui === "legacy") {
+          pageSize = Number(document.getElementById("pageSize").value) || 30;
+          const qs = new URLSearchParams({ program: currentProgram });
+          if (currentBoard) qs.set("board", currentBoard);
+          if (currentPath) qs.set("path", currentPath);
+          const trades = await api("/api/trades?" + qs.toString());
+          const idx = await api("/api/history-board?" + new URLSearchParams({ program: currentProgram, page: "1", page_size: "500" }));
+          if (seq !== loadSeq) return false;
+          const indexByMonth = {};
+          (idx.rows || []).forEach(r => { indexByMonth[r.month] = r.index_pct; });
+          let rows = legacyMonthRows(trades || [], indexByMonth);
+          if (boardFilterYear) rows = rows.filter(r => r.month.startsWith(boardFilterYear));
+          if (boardFilterFrom) rows = rows.filter(r => r.month >= boardFilterFrom);
+          if (boardFilterTo) rows = rows.filter(r => r.month <= boardFilterTo);
+          boardTotal = rows.length;
+          totalPages = Math.max(1, Math.ceil(boardTotal / pageSize));
+          if (page > totalPages) page = totalPages;
+          boardRows = rows.slice((page - 1) * pageSize, page * pageSize);
+          renderBoard();
+          return true;
+        }
         pageSize = Number(document.getElementById("pageSize").value) || 30;
         const qs = new URLSearchParams({
           program: currentProgram,
