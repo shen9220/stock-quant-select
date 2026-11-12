@@ -1728,20 +1728,19 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       { key: "date", label: "买入日期", sum: false, sortable: true },
       { key: "weekday", label: "星期", sum: false },
       { key: "stock_code", label: "代码", sum: false },
-      { key: "stock_name", label: "名称", sum: false },
       { key: "score_label", label: "分值", sum: false },
-      { key: "board", label: "板块", sum: false },
+      { key: "stock_name", label: "名称", sum: false },
       { key: "buy_price", label: "买入价", sum: false },
-      { key: "d1_capital", label: "D1当日本金", sum: false, money: true },
-      { key: "sell_price_935", label: "D1 早盘卖出价", sum: false },
-      { key: "pnl_morning", label: "D1 早盘盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_morning_half", label: "D1 早盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_1315", label: "D1 午盘卖出价", sum: false },
-      { key: "pnl_afternoon", label: "D1 午盘盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_afternoon_half", label: "D1 午盘半仓盈亏", sum: true, pnl: true, sortable: true },
-      { key: "sell_price_batch_avg", label: "D1 分批总价", sum: false },
-      { key: "pnl_batch_total", label: "D1 分批总盈亏", sum: true, pnl: true, sortable: true },
-      { key: "pnl_batch_total_half", label: "D1 分批半仓盈亏", sum: true, pnl: true, sortable: true },
+      { key: "board", label: "板块", sum: false },
+      { key: "d1_capital", label: "当日本金", sum: false, money: true },
+      { key: "sell_price_935", label: "9:35卖价", sum: false },
+      { key: "pnl_morning", label: "早盘盈亏累计", sum: true, pnl: true, sortable: true },
+      { key: "pnl_morning_half", label: "早盘半仓", sum: true, pnl: true, sortable: true },
+      { key: "sell_price_1335", label: "13:35卖价", sum: false },
+      { key: "pnl_afternoon", label: "午盘盈亏累计", sum: true, pnl: true, sortable: true },
+      { key: "pnl_afternoon_half", label: "午盘半仓", sum: true, pnl: true, sortable: true },
+      { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
+      { key: "pnl_batch_total_half", label: "分批半仓", sum: true, pnl: true, sortable: true },
       { key: "d1_batch_profit", label: "D1 分批盈亏利润", sum: true, money: true, signed: true },
       { key: "d1_capital_end", label: "D1 汇总本金", sum: false, money: true },
       { key: "d2_capital", label: "D2当日本金", sum: false, money: true },
@@ -3116,20 +3115,20 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
     }
 
     const BOARD_PNL_COLS = [
-      { key: "morning", label: "D1 早盘盈亏累计" },
-      { key: "morning_half", label: "D1 早盘半仓" },
-      { key: "afternoon", label: "D1 午盘盈亏累计" },
-      { key: "afternoon_half", label: "D1 午盘半仓" },
-      { key: "batch", label: "D1 分批盈亏累计" },
-      { key: "batch_half", label: "D1 分批半仓盈亏累计" },
-      { key: "d2_morning", label: "D2 早盘盈亏累计" },
-      { key: "d2_afternoon", label: "D2 午盘盈亏累计" },
-      { key: "d2_batch", label: "D2 分批盈亏累计" },
-      { key: "d2_batch_half", label: "D2 分批半仓盈亏累计" },
-      { key: "d1_capital_end", label: "D1 汇总本金", money: true },
-      { key: "d2_capital_end", label: "D2 汇总本金", money: true },
-      { key: "d1_batch_profit", label: "D1 分批利润", money: true, signed: true },
-      { key: "d2_batch_profit", label: "D2 分批利润", money: true, signed: true },
+      { key: "morning", label: "早盘盈亏累计" },
+      { key: "morning_half", label: "早盘半仓" },
+      { key: "afternoon", label: "午盘盈亏累计" },
+      { key: "afternoon_half", label: "午盘半仓" },
+      { key: "batch", label: "分批总盈亏" },
+      { key: "batch_half", label: "分批半仓" },
+      { key: "d1_batch_profit", label: "分批利润", money: true, signed: true },
+      { key: "d2_morning", label: "D2早盘盈亏累计" },
+      { key: "d2_morning_half", label: "D2早盘半仓" },
+      { key: "d2_afternoon", label: "D2午盘盈亏累计" },
+      { key: "d2_afternoon_half", label: "D2午盘半仓" },
+      { key: "d2_batch", label: "D2分批总盈亏" },
+      { key: "d2_batch_half", label: "D2分批半仓" },
+      { key: "d2_batch_profit", label: "D2分批利润", money: true, signed: true },
     ];
 
     function qsBase() {
@@ -3363,7 +3362,50 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       return ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"][dt.getDay()];
     }
 
+    function legacyPct(sell, buy) {
+      const s = Number(sell), b = Number(buy);
+      if (!Number.isFinite(s) || !Number.isFinite(b) || b === 0) return null;
+      return (s - b) / b * 100;
+    }
+    function legacyHalfPair(fullAm, fullPm) {
+      const amHalf = fullAm == null ? null : fullAm / 2;
+      const pmHalf = fullPm == null ? null : fullPm / 2;
+      if (amHalf == null && pmHalf == null) return { half: null, total: null };
+      const total = (amHalf || 0) + (pmHalf || 0);
+      return { half: total / 2, total };
+    }
+    function legacyMetrics(t) {
+      const buy = t.buy_price;
+      const am = legacyPct(t.sell_price_935, buy);
+      const pm = legacyPct(t.sell_price_1335, buy);
+      const pair = legacyHalfPair(am, pm);
+      const capital = Number(t.d1_capital);
+      const base = Number.isFinite(capital) && capital > 0 ? capital : 100000;
+      const profit = pair.half == null ? null : pair.half / 100 * (base / 2);
+      const d2buy = t.d2_buy_price;
+      const d2am = legacyPct(t.d2_sell_price_935, d2buy);
+      const d2pm = legacyPct(t.d2_sell_price_1335, d2buy);
+      const d2pair = legacyHalfPair(d2am, d2pm);
+      const d2capital = Number(t.d2_capital);
+      const d2base = Number.isFinite(d2capital) && d2capital > 0 ? d2capital : base;
+      const d2profit = d2pair.half == null ? null : d2pair.half / 100 * (d2base / 2);
+      return {
+        pnl_morning: am == null ? null : round2(am),
+        pnl_afternoon: pm == null ? null : round2(pm),
+        pnl_morning_half: am == null ? null : round2(am / 2),
+        pnl_afternoon_half: pm == null ? null : round2(pm / 2),
+        pnl_batch_total: pair.total == null ? null : round2(pair.total),
+        pnl_batch_total_half: pair.half == null ? null : round2(pair.half),
+        d1_batch_profit: profit == null ? null : round2(profit),
+        d2_pnl_morning: d2am == null ? null : round2(d2am),
+        d2_pnl_afternoon: d2pm == null ? null : round2(d2pm),
+        d2_batch_profit: d2profit == null ? null : round2(d2profit),
+      };
+    }
     function cellHtml(t, c) {
+      if (document.documentElement.dataset.ui === "legacy") {
+        t = Object.assign({}, t, legacyMetrics(t));
+      }
       if (c.key === "_ops") {
         if (window.__PAGES_MODE__) return "—";
         return `<div class="ops">
