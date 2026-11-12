@@ -88,3 +88,9 @@ python3 jobs/board_buy_orchestrator.py --help
 用户已授权核验后同步UI并发布Pages。`lib/v3_template_ledger.py`为当前计算入口，版本`doc-delta-v1`；价差0.97作为收益率0.97%。期初承接前日收盘，分批回款按分摊持仓结算，初始成本/预算余款/账户现金分开。月表和比较共用`lib/v3_period_stats.py`；CSV和手机字段一致，历史行按截止时点投影。原始trades/result/行情不覆盖，模板校验输入不写入实际行情。
 
 验证：71项Python、17项前端契约、36账户守恒、桌面/手机/CSV、静态登录解密与脱敏均通过。Pages直接使用加密后的36账户服务端账本，避免静态端重新计算。复核脚本为`jobs/test_v3_template_ledger.py`、`jobs/verify_v3_template.cjs`、`jobs/verify_v3_pages.cjs`。
+
+## 2026-11-12 开盘同步恢复
+
+本机行情库不可用时，V3保留最近有效账本并同步今日选股，明确标记成交待确认，不用缺失行情重算历史资金。私有有效账本缓存位于`data/v3_ledger_cache/`（不入Git）。Pages任务增加跨进程互斥、180秒总限时、`pages_sync.log`及`pages_sync_state.json`；失败状态可见，清洁工作区仍重试积压提交，GitHub自动推送统一走gh认证HTTPS。概览允许今天的选股/有效买入，日期和行情有效时点分开显示。
+
+回归：`python3 jobs/test_pages_open_sync.py`；日交易文件原子写入使用独立临时文件，避免cron和常驻UI同时写同一`.tmp`发生替换失败。

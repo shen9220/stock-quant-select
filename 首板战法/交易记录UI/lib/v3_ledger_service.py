@@ -8,6 +8,8 @@ import re
 import sys
 import threading
 import time
+import socket
+import subprocess
 
 from v3_ledger import positive, at_limit
 from v3_template_ledger import Replay, VERSION
@@ -22,6 +24,25 @@ MODELS = [
     dict(id='up', program='up')]
 _CACHE = {}
 _LOCK = threading.RLock()
+
+
+def ensure_quote_service(base):
+    """Recover the existing bundled local server, without scheduling any new job."""
+    def ready():
+        try:
+            with socket.create_connection(('127.0.0.1',7899),timeout=.3):pass
+            return True
+        except OSError:return False
+    if ready():return True
+    app=Path(base).parent/'数据缓存/free-stockdb/stockdb/stockdb.app'
+    if sys.platform!='darwin' or not app.exists():return False
+    try:
+        subprocess.run(['open','-g',str(app)],capture_output=True,timeout=5,check=False)
+        for _ in range(15):
+            if ready():return True
+            time.sleep(.2)
+    except (OSError,subprocess.TimeoutExpired):pass
+    return False
 
 
 def belongs(row, model, rank=None):
@@ -41,6 +62,10 @@ class LocalMarket:
         self.rd = None
         self.error = None
         try:
+            # The native SDK can wait indefinitely when its local server is
+            # absent. Check the endpoint before importing/initializing it.
+            with socket.create_connection(('127.0.0.1',7899),timeout=.3):
+                pass
             sdk = self.base.parent / '数据缓存/free-stockdb/stockdb/pybao'
             if str(sdk) not in sys.path:
                 sys.path.insert(0, str(sdk))
@@ -333,11 +358,18 @@ def ledger_for(namespace, model_id, rank, mode, as_of=None, force=False):
     with _LOCK:
         cached = _CACHE.get(cache_key)
         if not force and cached and cached[0] == fingerprint:
+            if cached[1].get('market_status')=='offline':
+                return cached[1]
             return refresh_current_marks(cached[1], base, cached[2])
         with namespace['_data_lock']:
             all_rows = scores.enrich(namespace['_load_all_trades'](model['program']))
         selected = [r for r in all_rows if belongs(r, model, rank)]
         market = LocalMarket(base, model, all_rows, calendar)
+        from v3_ledger_cache import read_ledger,save_ledger,offline_projection
+        if market.rd is None:
+            replay=offline_projection(read_ledger(base,model_id,rank,mode),selected,calendar,market,now,model_id,rank,mode)
+            _CACHE[cache_key]=fingerprint,replay,marks_signature
+            return replay
         replay = Replay(calendar, market, now).run(selected, mode)
         attach_opening_prices(replay, selected, market)
         attach_scores(replay, all_rows, scores)
@@ -347,6 +379,8 @@ def ledger_for(namespace, model_id, rank, mode, as_of=None, force=False):
                 row['first_board_check'] = info
         replay.update(model=model_id, rank=rank, market_error=market.error)
         replay['monthly_stats']=monthly_stats(replay)
+        replay['market_status']='online'
+        save_ledger(base,model_id,rank,mode,replay)
         _CACHE[cache_key] = fingerprint, replay, marks_signature
         return refresh_current_marks(replay, base, marks_signature)
 

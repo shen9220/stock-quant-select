@@ -11,6 +11,9 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import subprocess
+import signal
+import time
 
 _JOBS = os.path.dirname(os.path.abspath(__file__))
 _BASE = os.path.dirname(_JOBS)
@@ -30,7 +33,22 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="同步交易 UI 到 GitHub Pages")
     ap.add_argument("--no-push", action="store_true", help="只导出，不 git push")
     ap.add_argument("--push", action="store_true", help="强制 push（默认跟环境变量）")
+    ap.add_argument("--worker",action="store_true",help=argparse.SUPPRESS)
+    ap.add_argument("--timeout",type=int,default=180,help=argparse.SUPPRESS)
     args = ap.parse_args()
+    if not args.worker:
+        command=[sys.executable,__file__,"--worker"]
+        if args.no_push:command.append("--no-push")
+        elif args.push:command.append("--push")
+        env=dict(os.environ,PYTHONUNBUFFERED="1",TRADE_UI_PAGES_DEADLINE=str(time.time()+args.timeout-3))
+        process=subprocess.Popen(command,env=env,start_new_session=True)
+        try:return process.wait(timeout=args.timeout)
+        except subprocess.TimeoutExpired:
+            os.killpg(process.pid,signal.SIGKILL);process.wait()
+            from pages_sync import _write_sync_state
+            _write_sync_state(status="failed",error="Pages导出超过180秒，已终止；本地原数据保留")
+            print("[pages-sync] 超时终止，请检查 pages_sync_state.json",flush=True)
+            return 124
     push = False if args.no_push else (True if args.push else None)
     summary = sync_pages_now(push=push)
     print(summary)

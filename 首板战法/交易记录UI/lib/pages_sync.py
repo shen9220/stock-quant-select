@@ -8,6 +8,11 @@
 from __future__ import annotations
 
 import os
+import json
+import signal
+import tempfile
+import fcntl
+from contextlib import contextmanager
 import shlex
 import subprocess
 import sys
@@ -85,71 +90,99 @@ def _crypto_python() -> str:
     return sys.executable
 
 
+def _write_sync_state(**values):
+    os.makedirs(DATA_DIR,exist_ok=True)
+    path=os.path.join(DATA_DIR,'pages_sync_state.json')
+    try:
+        with open(path) as file:state=json.load(file)
+    except (OSError,ValueError):state={}
+    state.update(values,updated_at=time.strftime('%Y-%m-%d %H:%M:%S'))
+    fd,tmp=tempfile.mkstemp(prefix='pages-state-',suffix='.tmp',dir=DATA_DIR)
+    with os.fdopen(fd,'w') as file:json.dump(state,file,ensure_ascii=False,indent=2)
+    os.replace(tmp,path)
+
+
+@contextmanager
+def _process_lock():
+    os.makedirs(DATA_DIR,exist_ok=True)
+    with open(os.path.join(DATA_DIR,'pages_publish.lock'),'a') as file:
+        fcntl.flock(file,fcntl.LOCK_EX)
+        try:yield
+        finally:fcntl.flock(file,fcntl.LOCK_UN)
+
+
 def _run_git(args: list[str], *, timeout: int = 120) -> subprocess.CompletedProcess:
-    return subprocess.run(
-        ["git", *args],
-        cwd=_REPO_ROOT,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-        check=False,
-    )
+    if os.environ.get('TRADE_UI_PAGES_DEADLINE'):
+        timeout=min(timeout,max(.1,float(os.environ['TRADE_UI_PAGES_DEADLINE'])-time.time()))
+    env=dict(os.environ,GIT_TERMINAL_PROMPT='0',GIT_SSH_COMMAND='ssh -o BatchMode=yes -o ConnectTimeout=10')
+    command=['git',*args]
+    process=subprocess.Popen(command,cwd=_REPO_ROOT,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+                             text=True,env=env,start_new_session=True)
+    try:
+        out,err=process.communicate(timeout=timeout)
+        return subprocess.CompletedProcess(command,process.returncode,out,err)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid,signal.SIGKILL)
+        out,err=process.communicate()
+        return subprocess.CompletedProcess(command,124,out,(err or '')+' Git request timed out')
+
+
+def _https_remote(url):
+    if url.startswith('git@github.com:'):return 'https://github.com/'+url.split(':',1)[1]
+    if url.startswith('ssh://git@github.com/'):return 'https://github.com/'+url.split('github.com/',1)[1]
+    return url
 
 
 def _git_push_pages() -> dict[str, Any]:
-    if not pages_git_push_enabled():
-        return {"pushed": False, "reason": "git_push_disabled"}
-
-    paths = [
-        "docs/trade-ui",
-        "docs/index.html",
-        "docs/.nojekyll",
-    ]
-    st = _run_git(["status", "--porcelain", "--", *paths])
-    if st.returncode != 0:
-        return {"pushed": False, "error": (st.stderr or st.stdout or "git status failed")[:300]}
-    if not (st.stdout or "").strip():
-        return {"pushed": False, "reason": "no_changes"}
-
-    add = _run_git(["add", "--", *paths])
-    if add.returncode != 0:
-        return {"pushed": False, "error": (add.stderr or "git add failed")[:300]}
-
-    msg = f"chore(pages): sync trade-ui snapshot {time.strftime('%Y-%m-%d %H:%M:%S')}"
-    commit = _run_git(["commit", "-m", msg])
-    out = (commit.stdout or "") + (commit.stderr or "")
-    if commit.returncode != 0 and "nothing to commit" not in out.lower():
-        return {"pushed": False, "error": out[:300]}
-
-    push = _run_git(["push", "origin", "HEAD"], timeout=180)
-    if push.returncode != 0:
-        return {
-            "pushed": False,
-            "error": ((push.stderr or push.stdout or "git push failed")[:400]),
-        }
-    return {"pushed": True}
+    if not pages_git_push_enabled():return {'pushed':False,'reason':'git_push_disabled'}
+    paths=['docs/trade-ui','docs/index.html','docs/.nojekyll']
+    st=_run_git(['status','--porcelain','--',*paths])
+    if st.returncode:return {'pushed':False,'error':'git status failed'}
+    if st.stdout.strip():
+        added=_run_git(['add','--',*paths])
+        if added.returncode:return {'pushed':False,'error':'git add failed'}
+        commit=_run_git(['commit','-m',f"chore(pages): sync trade-ui snapshot {time.strftime('%Y-%m-%d %H:%M:%S')}"])
+        if commit.returncode:return {'pushed':False,'error':(commit.stderr or commit.stdout)[:400]}
+    remote=_run_git(['remote','get-url','origin'])
+    if remote.returncode:return {'pushed':False,'error':'origin missing'}
+    url=_https_remote(remote.stdout.strip())
+    config=['-c','http.lowSpeedLimit=1024','-c','http.lowSpeedTime=20']
+    if url.startswith('https://github.com/'):
+        config+=['-c','credential.helper=','-c','credential.helper=!gh auth git-credential']
+    head=_run_git(['rev-parse','HEAD']).stdout.strip()
+    observed=_run_git([*config,'ls-remote',url,'refs/heads/main'],timeout=30)
+    if observed.returncode==0 and observed.stdout.split() and observed.stdout.split()[0]==head:
+        return {'pushed':False,'reason':'already_current','commit':head}
+    # A prior failed push may leave a clean worktree and unpublished commits.
+    # Retry that push even when this export introduced no file changes.
+    push=_run_git([*config,'push',url,'HEAD:main'],timeout=120)
+    if push.returncode:return {'pushed':False,'error':(push.stderr or push.stdout or 'git push failed')[:500]}
+    return {'pushed':True,'commit':head}
 
 
 def sync_pages_now(*, push: bool | None = None) -> dict[str, Any]:
-    """立即导出；默认按环境变量决定是否 push。"""
-    if _pages_review_held():
-        return {"ok": False, "reason": "awaiting_user_ui_review", "pushed": False}
-    with _lock:
-        from pages_export import export_pages_bundle
-
-        summary = export_pages_bundle()
-        do_push = pages_git_push_enabled() if push is None else bool(push)
-        if do_push:
-            summary["git"] = _git_push_pages()
-        else:
-            summary["git"] = {"pushed": False, "reason": "skipped"}
+    if _pages_review_held():return {'ok':False,'reason':'awaiting_user_ui_review','pushed':False}
+    with _lock,_process_lock():
+        if _pages_review_held():return {'ok':False,'reason':'awaiting_user_ui_review','pushed':False}
+        started=time.time()
+        _write_sync_state(status='exporting',started_at=time.strftime('%Y-%m-%d %H:%M:%S'),error=None)
+        try:
+            from pages_export import export_pages_bundle
+            summary=export_pages_bundle()
+            _write_sync_state(status='pushing',exported_at=summary.get('exported_at'))
+            do_push=pages_git_push_enabled() if push is None else bool(push)
+            summary['git']=_git_push_pages() if do_push else {'pushed':False,'reason':'skipped'}
+            if summary['git'].get('error'):summary['ok']=False
+            _write_sync_state(status='success' if summary.get('ok') else 'failed',
+                exported_at=summary.get('exported_at'),commit=summary['git'].get('commit'),
+                pushed=summary['git'].get('pushed',False),error=summary['git'].get('error'),
+                elapsed_seconds=round(time.time()-started,2))
+        except Exception as exc:
+            _write_sync_state(status='failed',error=str(exc)[:500],elapsed_seconds=round(time.time()-started,2))
+            raise
         global _LAST_RESULT
-        _LAST_RESULT = summary
-        print(
-            f"[pages-sync] export ok total={summary.get('total')} "
-            f"git={summary.get('git')} url={PAGES_URL}",
-            flush=True,
-        )
+        _LAST_RESULT=summary
+        print(f"[pages-sync] ok={summary.get('ok')} exported={summary.get('exported_at')} git={summary.get('git')}",flush=True)
         return summary
 
 
@@ -194,13 +227,15 @@ def schedule_pages_sync(*, delay: float | None = None) -> None:
         f"exec {shlex.quote(py)} {shlex.quote(_JOB_SCRIPT)} {push_flag}"
     )
     try:
+        log_file = open(os.path.join(DATA_DIR, "pages_sync.log"), "a")
         subprocess.Popen(
             ["/bin/bash", "-c", cmd],
             cwd=BASE_DIR,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=subprocess.STDOUT,
             start_new_session=True,
         )
-        print(f"[pages-sync] 已调度独立同步 delay={wait:.0f}s token={token[-6:]}", flush=True)
+        log_file.close()
+        print(f"[pages-sync] 已调度独立同步 delay={wait:.0f}s；结果写入 pages_sync.log", flush=True)
     except Exception as e:
         print(f"[pages-sync] 调度失败: {e}", flush=True)

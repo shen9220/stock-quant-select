@@ -160,7 +160,8 @@ def build_full_snapshot() -> dict[str, Any]:
     # Materialize the exact server calculation; Pages must not reconstruct money
     # from raw legacy trades in JavaScript after decrypting a static snapshot.
     import stock_UI as ui
-    from v3_ledger_service import MODELS, ledger_for
+    from v3_ledger_service import MODELS, ledger_for, ensure_quote_service
+    print('[pages-export] local quote service ready='+str(ensure_quote_service(ui.BASE_DIR)),flush=True)
     ledgers = {}
     for mode in ('D1', 'D2'):
         for model in MODELS:
@@ -212,6 +213,8 @@ def mask_snapshot(full: dict[str, Any]) -> dict[str, Any]:
     masked['ledgers'] = {
         key: dict(version=value['version'],calc_version=value['version'],source_mode='market',
                   mode=value['mode'],model=value['model'],rank=value['rank'],as_of=value['as_of'],
+                  market_status=value.get('market_status'),data_note=value.get('data_note'),
+                  valuation_as_of=value.get('valuation_as_of'),
                   rows=[],events=[],snapshots=[],monthly_stats={month:{k:None for k in stats}
                   for month,stats in value.get('monthly_stats',{}).items()},masked=True)
         for key,value in (full.get('ledgers') or {}).items()

@@ -98,3 +98,8 @@ github_upload_config.txt
 **/*.pyc
 **/*logs/
 **/*.log
+
+# Private validated ledgers and local publication diagnostics
+**/data/v3_ledger_cache/
+**/data/pages_sync_state.json
+**/data/pages_publish.lock

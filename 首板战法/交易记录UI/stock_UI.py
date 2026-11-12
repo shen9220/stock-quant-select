@@ -12,6 +12,7 @@ import os
 import re
 import socket
 import sys
+import tempfile
 import threading
 import time
 import webbrowser
@@ -37,6 +38,8 @@ import stock_meta  # noqa: E402  板块判定唯一事实来源（创业板/主�
 
 BACKUP_DIR = os.path.join(BASE_DIR, "data", "backups")
 VALID_PROGRAMS = paths.PROGRAMS
+# 涨停池查阅名单，不进交易程序，避免和推荐记录混写
+LOOKUP_PROGRAMS = ("zt_pool",)
 DEFAULT_PROGRAM = "stock"
 os.makedirs(BACKUP_DIR, exist_ok=True)
 # 旧 trades/ 目录（迁移后仍保留只读）
@@ -44,6 +47,10 @@ _LEGACY_TRADES_BASE = os.path.join(BASE_DIR, "trades")
 
 
 def _trades_dir(program: str = DEFAULT_PROGRAM) -> str:
+    if program in LOOKUP_PROGRAMS:
+        d = os.path.join(BASE_DIR, "data", "zt_pool_lookup")
+        os.makedirs(d, exist_ok=True)
+        return d
     return paths.program_trades_dir(program)
 
 
@@ -460,7 +467,8 @@ def auto_calculate(trade: dict) -> dict:
     trade["pnl_afternoon_half"] = round(pnl_a / 2, 2) if pnl_a is not None else None
     trade["pnl_batch_morning"] = pnl_bm
     trade["pnl_batch_afternoon"] = pnl_ba
-    # 分批总盈亏 = 早盘分批/2 + 午盘分批/2
+    # 分批盈亏：半仓卖出价对买入价的涨跌幅，两边都有时各取一半再相加。
+    # 半仓卖出价未单独填时等于全仓卖出价，此时等于 (早盘盈亏 + 午盘盈亏) / 2。
     if pnl_bm is not None and pnl_ba is not None:
         trade["pnl_batch_total"] = round(pnl_bm / 2 + pnl_ba / 2, 2)
     elif pnl_bm is not None:
@@ -655,10 +663,15 @@ def _recover_day(date_str: str, program: str = DEFAULT_PROGRAM) -> list:
 
 
 def _atomic_write(filepath: str, data):
-    tmp = filepath + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2, default=str)
-    os.replace(tmp, filepath)
+    # Cron and the resident UI can write the same day concurrently. A shared
+    # filename.tmp lets one writer rename the other writer's temporary file.
+    fd,tmp=tempfile.mkstemp(prefix=os.path.basename(filepath)+'-',suffix='.tmp',dir=os.path.dirname(filepath))
+    try:
+        with os.fdopen(fd,"w",encoding="utf-8") as f:
+            json.dump(data,f,ensure_ascii=False,indent=2,default=str)
+        os.replace(tmp,filepath)
+    finally:
+        if os.path.exists(tmp):os.unlink(tmp)
 
 
 def _backup_day(date_str: str, data: list):
@@ -1141,6 +1154,8 @@ def purge_open_limit_buys(program: str = DEFAULT_PROGRAM) -> list[dict]:
 
 RANK_PLACEHOLDER_NAME = "（空占位）"
 RANK_PLACEHOLDER_SKIP = "当日候选不足，空占位（规范：第一名/第二名必占位）"
+V2_PATHS = ("A", "B")
+V2_PLACEHOLDER_SKIP = "当日该路径候选不足，空占位（规范：第一名/第二名必占位）"
 
 
 def ensure_rank_placeholders(date_str: str, program: str = DEFAULT_PROGRAM) -> dict:
@@ -1195,6 +1210,76 @@ def ensure_rank_placeholders(date_str: str, program: str = DEFAULT_PROGRAM) -> d
         if added:
             _save_day(date_str, trades, program)
         return {"ok": True, "added": added, "date": date_str, "program": program}
+
+
+def _v2_slot_filled(t: dict, path: str, path_rank: int) -> bool:
+    if str(t.get("path") or "").strip().upper() != path:
+        return False
+    try:
+        pr = int(t.get("path_rank") or 0)
+    except (TypeError, ValueError):
+        return False
+    return pr == path_rank
+
+
+def ensure_v2_path_placeholders(date_str: str) -> dict:
+    """V2 路径 A/B 各自必须有 path_rank 1、2。没有票就写空占位，避免整日看起来像缺数据。"""
+    date_str = str(date_str or "").strip()[:10]
+    if not DATE_RE.match(date_str) or not _is_trading_buy_date(date_str):
+        return {"ok": False, "reason": "bad_date"}
+    with _data_lock:
+        trades = _load_day(date_str, "stock_v2")
+        next_id = _next_global_id("stock_v2")
+        for t in trades:
+            try:
+                next_id = max(next_id, int(t.get("id") or 0) + 1)
+            except Exception:
+                pass
+        added = 0
+        changed = False
+        for path in V2_PATHS:
+            for pr in (1, 2):
+                slot = [t for t in trades if _v2_slot_filled(t, path, pr)]
+                real = None
+                for t in slot:
+                    code = str(t.get("stock_code") or "").strip()
+                    if code and STOCK_CODE_RE.match(code.zfill(6)) and not t.get("is_rank_placeholder"):
+                        real = t
+                        break
+                if real is not None:
+                    continue
+                cur = slot[0] if slot else None
+                if cur is not None:
+                    cur["stock_code"] = ""
+                    cur["stock_name"] = RANK_PLACEHOLDER_NAME
+                    cur["path"] = path
+                    cur["path_rank"] = pr
+                    cur["rank"] = pr
+                    cur["is_rank_placeholder"] = True
+                    cur["is_board_placeholder"] = False
+                    cur["skip_reason"] = V2_PLACEHOLDER_SKIP
+                    cur["program"] = "stock_v2"
+                    cur["date"] = date_str
+                    changed = True
+                    continue
+                trades.append(empty_trade(
+                    id=next_id,
+                    date=date_str,
+                    program="stock_v2",
+                    stock_code="",
+                    stock_name=RANK_PLACEHOLDER_NAME,
+                    path=path,
+                    path_rank=pr,
+                    rank=pr,
+                    is_rank_placeholder=True,
+                    skip_reason=V2_PLACEHOLDER_SKIP,
+                ))
+                next_id += 1
+                added += 1
+                changed = True
+        if changed:
+            _save_day(date_str, trades, "stock_v2")
+        return {"ok": True, "added": added, "date": date_str, "n": len(trades)}
 
 
 def upsert_from_stock_py(records: list[dict], auto_enrich: bool = True, replace_by_rank: bool = True, program: str = DEFAULT_PROGRAM) -> dict:
@@ -1278,6 +1363,16 @@ def upsert_from_stock_py(records: list[dict], auto_enrich: bool = True, replace_
                     existing["slot"] = slot_v
                 if notes_v is not None:
                     existing["notes"] = notes_v
+                if r.get("score") not in (None, ""):
+                    existing["score"] = r.get("score")
+                if r.get("score_label"):
+                    existing["score_label"] = r.get("score_label")
+                if r.get("above_threshold") is not None:
+                    existing["above_threshold"] = r.get("above_threshold")
+                if r.get("buy_price") not in (None, "", 0):
+                    existing["buy_price"] = r.get("buy_price")
+                    if r.get("buy_price_source"):
+                        existing["buy_price_source"] = r.get("buy_price_source")
                 if auto_enrich:
                     enrich_trade_prices(existing, force=False)
                 else:
@@ -1301,6 +1396,16 @@ def upsert_from_stock_py(records: list[dict], auto_enrich: bool = True, replace_
                     trade["slot"] = slot_v
                 if notes_v is not None:
                     trade["notes"] = notes_v
+                if r.get("score") not in (None, ""):
+                    trade["score"] = r.get("score")
+                if r.get("score_label"):
+                    trade["score_label"] = r.get("score_label")
+                if r.get("above_threshold") is not None:
+                    trade["above_threshold"] = r.get("above_threshold")
+                if r.get("buy_price") not in (None, "", 0):
+                    trade["buy_price"] = r.get("buy_price")
+                    if r.get("buy_price_source"):
+                        trade["buy_price_source"] = r.get("buy_price_source")
                 next_id += 1
                 if auto_enrich:
                     enrich_trade_prices(trade, force=False)
@@ -1376,15 +1481,12 @@ def api_get_trades():
     date_to = request.args.get("date_to", "").strip()
     rank = request.args.get("rank", "").strip()
     program = request.args.get("program", DEFAULT_PROGRAM).strip()
-    if program not in VALID_PROGRAMS:
+    if program not in VALID_PROGRAMS and program not in LOOKUP_PROGRAMS:
         program = DEFAULT_PROGRAM
     with _data_lock:
         trades = _load_all_trades(program)
-    # 最新日期在上
-    trades.sort(key=lambda x: (str(x.get("date") or ""), int(x.get("id") or 0)), reverse=True)
-    trades = _apply_date_scope(
-        trades, month=month, date_filter=date_filter, date_from=date_from, date_to=date_to
-    )
+    # 本金链按当前名次/路径的全部历史滚动，再按月份截取，避免月初被截成 10 万。
+    trades = [dict(t) for t in trades]
     if rank:
         try:
             r = int(rank)
@@ -1394,9 +1496,7 @@ def api_get_trades():
     else:
         ranks_set = _parse_rank_set(request.args.get("ranks", ""))
         if ranks_set:
-            # 合计看板：只留全局第一名+第二名，排除仅 board_rank 的主板/创业板记录
             trades = [t for t in trades if int(t.get("rank") or 0) in ranks_set]
-    # Stock V2 第二层：路径 A=一进二 / B=稳定版；名次用 path_rank
     path_filter = request.args.get("path", "").strip().upper()
     path_rank_filter = request.args.get("path_rank", "").strip()
     if path_filter in ("A", "B"):
@@ -1407,23 +1507,18 @@ def api_get_trades():
                 trades = [t for t in trades if int(t.get("path_rank") or 0) == pr]
             except ValueError:
                 pass
-    if keyword:
-        kw = keyword.lower()
-        trades = [
-            t for t in trades
-            if kw in str(t.get("stock_code", "")).lower()
-            or kw in str(t.get("stock_name", "")).lower()
-        ]
-    # 板块过滤（主板 / 创业板 …）：字段缺失时回退到代码判定（唯一事实来源）
     board_filter = request.args.get("board", "").strip()
     board_rank_filter = request.args.get("board_rank", "").strip()
     if board_filter:
+        trades = [
+            t for t in trades
+            if not t.get("is_board_placeholder") and not t.get("is_rank_placeholder")
+        ]
         def _eff_board(t):
             b = t.get("board")
             if not b:
                 b = stock_meta.board_of_code(t.get("stock_code", ""))
             return b or ""
-        # 板块 tab 只展示「该板块自己的 Top2」记录（带 board_rank 的回填记录）
         trades = [t for t in trades if _eff_board(t) == board_filter and t.get("board_rank") is not None]
         if board_rank_filter:
             try:
@@ -1431,6 +1526,21 @@ def api_get_trades():
                 trades = [t for t in trades if int(t.get("board_rank") or 0) == br]
             except ValueError:
                 pass
+    from capital_chain import attach_capital
+    from v3_sell_1335 import attach_1335
+    attach_capital(trades)
+    trades = attach_1335(trades, program, BASE_DIR)
+    trades.sort(key=lambda x: (str(x.get("date") or ""), int(x.get("id") or 0)), reverse=True)
+    trades = _apply_date_scope(
+        trades, month=month, date_filter=date_filter, date_from=date_from, date_to=date_to
+    )
+    if keyword:
+        kw = keyword.lower()
+        trades = [
+            t for t in trades
+            if kw in str(t.get("stock_code", "")).lower()
+            or kw in str(t.get("stock_name", "")).lower()
+        ]
     return _ok(trades)
 
 
@@ -1491,6 +1601,8 @@ def api_create_trade():
     name = str(data.get("stock_name") or "").strip()
     code = str(data.get("stock_code") or "").strip()
     program = str(data.get("program", DEFAULT_PROGRAM)).strip()
+    if program in LOOKUP_PROGRAMS:
+        return _err("涨停池名单只读，不能当交易记录新增")
     if program not in VALID_PROGRAMS:
         program = DEFAULT_PROGRAM
     code, name = _resolve_code_name_for_write(name, code)
@@ -1850,6 +1962,16 @@ def api_sync_from_recommend():
     return _ok(result)
 
 
+@app.route("/api/model-compare", methods=["GET"])
+def api_model_compare():
+    from model_compare import build_compare
+    programs = {}
+    with _data_lock:
+        for prog in VALID_PROGRAMS:
+            programs[prog] = _load_all_trades(prog)
+    return _ok(build_compare(programs))
+
+
 @app.route("/api/stats", methods=["GET"])
 def api_stats():
     month = request.args.get("month", "").strip()  # YYYY-MM
@@ -1858,7 +1980,7 @@ def api_stats():
     date_filter = request.args.get("date", "").strip()
     rank = request.args.get("rank", "").strip()
     program = request.args.get("program", DEFAULT_PROGRAM).strip()
-    if program not in VALID_PROGRAMS:
+    if program not in VALID_PROGRAMS and program not in LOOKUP_PROGRAMS:
         program = DEFAULT_PROGRAM
     with _data_lock:
         trades = _load_all_trades(program)
@@ -1897,7 +2019,14 @@ def api_stats():
             if not b:
                 b = stock_meta.board_of_code(t.get("stock_code", ""))
             return b or ""
-        trades = [t for t in trades if _eff_board_stat(t) == board_filter and t.get("board_rank") is not None]
+        trades = [
+            t for t in trades
+            if _eff_board_stat(t) == board_filter
+            and t.get("board_rank") is not None
+            and not t.get("is_board_placeholder")
+            and not t.get("is_rank_placeholder")
+            and str(t.get("stock_code") or "").strip()
+        ]
         if board_rank_filter:
             try:
                 br = int(board_rank_filter)
@@ -1913,8 +2042,8 @@ def api_stats():
         "sum_pnl_batch_half": 0, "avg_pnl_morning": 0, "avg_pnl_afternoon": 0,
         "avg_pnl_batch": 0, "second_board_count": 0, "second_board_rate": 0,
         "month_pnl_morning_half": 0, "month_pnl_afternoon_half": 0, "month_pnl_batch_half": 0,
-        "max_win_streak": 0, "max_loss_streak": 0,
-        "board_cyb_count": 0, "board_zb_count": 0,
+        "month_d2_pnl_morning": 0, "month_d2_pnl_afternoon": 0,
+        "board_ratio": "0:0",
         "month": month or None,
     }
     if total == 0:
@@ -1945,6 +2074,8 @@ def api_stats():
     month_pnl_morning_half = round(sum(t.get("pnl_morning_half") or 0 for t in trades if t.get("pnl_morning_half") is not None), 2)
     month_pnl_afternoon_half = round(sum(t.get("pnl_afternoon_half") or 0 for t in trades if t.get("pnl_afternoon_half") is not None), 2)
     month_pnl_batch_half = round(sum(t.get("pnl_batch_total_half") or 0 for t in trades if t.get("pnl_batch_total_half") is not None), 2)
+    month_d2_pnl_morning = round(sum(float(t.get("d2_pnl_morning")) for t in trades if t.get("d2_pnl_morning") is not None), 2)
+    month_d2_pnl_afternoon = round(sum(float(t.get("d2_pnl_afternoon")) for t in trades if t.get("d2_pnl_afternoon") is not None), 2)
     # 分批胜率按分批半仓盈亏
     rb = 0
     batch_half_vals = [t.get("pnl_batch_total_half") for t in trades if t.get("pnl_batch_total_half") is not None]
@@ -1963,23 +2094,6 @@ def api_stats():
             board_cyb += 1
         elif b == stock_meta.BOARD_ZHUBAN:
             board_zb += 1
-
-    max_win_streak = max_loss_streak = current_win = current_loss = 0
-    for t in sorted(trades, key=lambda x: (str(x.get("date") or ""), int(x.get("id") or 0))):
-        pnl = t.get("pnl_batch_total")
-        if pnl is None:
-            current_win = current_loss = 0
-            continue
-        if pnl > 0:
-            current_win += 1
-            current_loss = 0
-            max_win_streak = max(max_win_streak, current_win)
-        elif pnl < 0:
-            current_loss += 1
-            current_win = 0
-            max_loss_streak = max(max_loss_streak, current_loss)
-        else:
-            current_win = current_loss = 0
 
     return _ok({
         "total": total,
@@ -2000,10 +2114,9 @@ def api_stats():
         "month_pnl_morning_half": month_pnl_morning_half,
         "month_pnl_afternoon_half": month_pnl_afternoon_half,
         "month_pnl_batch_half": month_pnl_batch_half,
-        "max_win_streak": max_win_streak,
-        "max_loss_streak": max_loss_streak,
-        "board_cyb_count": board_cyb,
-        "board_zb_count": board_zb,
+        "month_d2_pnl_morning": month_d2_pnl_morning,
+        "month_d2_pnl_afternoon": month_d2_pnl_afternoon,
+        "board_ratio": f"{board_zb}:{board_cyb}",
         "month": month or None,
     })
 
@@ -2011,7 +2124,7 @@ def api_stats():
 @app.route("/api/months", methods=["GET"])
 def api_months():
     program = request.args.get("program", DEFAULT_PROGRAM).strip()
-    if program not in VALID_PROGRAMS:
+    if program not in VALID_PROGRAMS and program not in LOOKUP_PROGRAMS:
         program = DEFAULT_PROGRAM
     with _data_lock:
         trades = _load_all_trades(program)
@@ -2030,12 +2143,21 @@ def _empty_board_bucket() -> dict:
         "afternoon_half": 0.0,
         "batch": 0.0,
         "batch_half": 0.0,
+        "d2_morning": 0.0,
+        "d2_afternoon": 0.0,
+        "d2_batch": 0.0,
+        "d2_batch_half": 0.0,
+        "d1_capital_end": None,
+        "d2_capital_end": None,
+        "d1_batch_profit": 0.0,
+        "d2_batch_profit": 0.0,
         "count": 0,
     }
 
 
 def _accumulate_month_buckets(trades: list) -> dict[str, dict]:
     """按买入月汇总全仓 + 半仓盈亏。"""
+    trades = [dict(t) for t in trades]
     by_month: dict[str, dict] = {}
     for t in trades:
         d = str(t.get("date") or "")
@@ -2051,13 +2173,36 @@ def _accumulate_month_buckets(trades: list) -> dict[str, dict]:
             ("pnl_afternoon_half", "afternoon_half"),
             ("pnl_batch_total", "batch"),
             ("pnl_batch_total_half", "batch_half"),
+            ("d2_pnl_morning", "d2_morning"),
+            ("d2_pnl_afternoon", "d2_afternoon"),
         ):
             if t.get(field) is not None:
                 bucket[key] += float(t[field])
+        d2_m = t.get("d2_pnl_morning")
+        d2_a = t.get("d2_pnl_afternoon")
+        if d2_m is not None and d2_a is not None:
+            bucket["d2_batch"] += (float(d2_m) + float(d2_a)) / 2
+            bucket["d2_batch_half"] += (float(d2_m) + float(d2_a)) / 4
+        elif d2_m is not None:
+            bucket["d2_batch"] += float(d2_m) / 2
+            bucket["d2_batch_half"] += float(d2_m) / 4
+        elif d2_a is not None:
+            bucket["d2_batch"] += float(d2_a) / 2
+            bucket["d2_batch_half"] += float(d2_a) / 4
 
-    for bucket in by_month.values():
-        for key in ("morning", "morning_half", "afternoon", "afternoon_half", "batch", "batch_half"):
+    from capital_chain import month_capital_stats
+    caps = month_capital_stats(list(trades))
+    for month, bucket in by_month.items():
+        for key in (
+            "morning", "morning_half", "afternoon", "afternoon_half",
+            "batch", "batch_half", "d2_morning", "d2_afternoon", "d2_batch", "d2_batch_half",
+        ):
             bucket[key] = round(bucket[key], 2)
+        cap = caps.get(month) or {}
+        bucket["d1_capital_end"] = cap.get("d1_capital_end")
+        bucket["d2_capital_end"] = cap.get("d2_capital_end")
+        bucket["d1_batch_profit"] = cap.get("d1_batch_profit") or 0
+        bucket["d2_batch_profit"] = cap.get("d2_batch_profit") or 0
     return by_month
 
 
@@ -2101,6 +2246,9 @@ def _aggregate_board_rank_by_month(program: str, board: str, board_rank: int) ->
         if _eff_board_of_trade(t) == board
         and t.get("board_rank") is not None
         and int(t.get("board_rank") or 0) == board_rank
+        and not t.get("is_board_placeholder")
+        and not t.get("is_rank_placeholder")
+        and str(t.get("stock_code") or "").strip()
     ]
     return _accumulate_month_buckets(trades)
 
@@ -2114,6 +2262,8 @@ def _aggregate_path_rank_by_month(program: str, path: str, path_rank: int) -> di
         t for t in trades
         if _eff_path_of_trade(t) == path
         and int(t.get("path_rank") or 0) == path_rank
+        and not t.get("is_rank_placeholder")
+        and not t.get("is_board_placeholder")
     ]
     return _accumulate_month_buckets(trades)
 
@@ -2314,7 +2464,7 @@ def api_export_csv():
 @app.route("/api/dates", methods=["GET"])
 def api_dates():
     program = request.args.get("program", DEFAULT_PROGRAM).strip()
-    if program not in VALID_PROGRAMS:
+    if program not in VALID_PROGRAMS and program not in LOOKUP_PROGRAMS:
         program = DEFAULT_PROGRAM
     with _data_lock:
         dates = [f[:-5] for f in _list_day_files(program)]
