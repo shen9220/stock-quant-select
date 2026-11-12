@@ -1740,7 +1740,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       { key: "stock_name", label: "名称", sum: false },
       { key: "buy_price", label: "买入价", sum: false },
       { key: "board", label: "板块", sum: false },
-      { key: "d1_capital", label: "当日本金", sum: false, money: true },
+      { key: "d1_capital", label: "总本金", sum: false, money: true },
       { key: "sell_price_935", label: "9:35卖价", sum: false },
       { key: "pnl_morning", label: "早盘盈亏累计", sum: true, pnl: true, sortable: true },
       { key: "pnl_morning_half", label: "早盘半仓", sum: true, pnl: true, sortable: true },
@@ -1749,16 +1749,16 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       { key: "pnl_afternoon_half", label: "午盘半仓", sum: true, pnl: true, sortable: true },
       { key: "pnl_batch_total", label: "分批总盈亏", sum: true, pnl: true, sortable: true },
       { key: "pnl_batch_total_half", label: "分批半仓", sum: true, pnl: true, sortable: true },
-      { key: "d1_batch_profit", label: "D1 分批盈亏利润", sum: true, money: true, signed: true },
-      { key: "d1_capital_end", label: "D1 汇总本金", sum: false, money: true },
-      { key: "d2_capital", label: "D2当日本金", sum: false, money: true },
+      { key: "d1_batch_profit", label: "分批利润", sum: true, money: true, signed: true },
+      { key: "d1_capital_end", label: "收盘本金", sum: false, money: true },
+      { key: "d2_capital", label: "D2总本金", sum: false, money: true },
       { key: "d2_sell_price_935", label: "D2早盘卖价", sum: false },
       { key: "d2_pnl_morning", label: "D2早盘利润", sum: true, pnl: true, sortable: true },
       { key: "d2_sell_price_1315", label: "D2午盘卖价", sum: false },
       { key: "d2_pnl_afternoon", label: "D2午盘利润", sum: true, pnl: true, sortable: true },
-      { key: "d2_batch_profit", label: "D2 分批盈亏利润", sum: true, money: true, signed: true },
-      { key: "d2_batch_half_profit", label: "D2 分批半仓盈亏利润", sum: true, money: true, signed: true },
-      { key: "d2_capital_end", label: "D2 汇总本金", sum: false, money: true },
+      { key: "d2_batch_profit", label: "D2分批利润", sum: true, money: true, signed: true },
+      { key: "d2_batch_half_profit", label: "D2分批利润", sum: true, money: true, signed: true },
+      { key: "d2_capital_end", label: "D2收盘本金", sum: false, money: true },
       { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
       { key: "hold_days", label: "持有天数", sum: false, sortable: true },
       { key: "is_second_board", label: "二板", sum: false },
@@ -3359,6 +3359,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         const vals = list.map(t => t[c.key]).filter(v => v != null && v !== "");
         if (!vals.length) return `<td>—</td>`;
         const s = round2(vals.reduce((a, b) => a + Number(b), 0));
+        if (c.money) return `<td>${fmtMoney(s, !!c.signed)}</td>`;
         return `<td class="${pnlClass(s)}">${(s > 0 ? "+" : "") + s}%</td>`;
       }).join("");
     }
@@ -3385,21 +3386,31 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       const total = (amHalf || 0) + (pmHalf || 0);
       return { half: total / 2, total };
     }
+    function legacySlotProfit(capital, pct) {
+      if (pct == null || !Number.isFinite(capital)) return null;
+      const half = Math.round(capital * 50) / 100;
+      const slot = Math.round(half * 50) / 100;
+      return round2(slot * pct / 100);
+    }
     function legacyMetrics(t) {
       const buy = t.buy_price;
       const am = legacyPct(t.sell_price_935, buy);
       const pm = legacyPct(t.sell_price_1335, buy);
       const pair = legacyHalfPair(am, pm);
       const capital = Number(t.d1_capital);
-      const base = Number.isFinite(capital) && capital > 0 ? capital : 100000;
-      const profit = pair.half == null ? null : pair.half / 100 * (base / 2);
+      const base = Number.isFinite(capital) && capital > 0 ? capital : null;
+      const profit = (am == null && pm == null) || base == null
+        ? null
+        : round2((legacySlotProfit(base, am) || 0) + (legacySlotProfit(base, pm) || 0));
       const d2buy = t.d2_buy_price;
       const d2am = legacyPct(t.d2_sell_price_935, d2buy);
       const d2pm = legacyPct(t.d2_sell_price_1335, d2buy);
       const d2pair = legacyHalfPair(d2am, d2pm);
       const d2capital = Number(t.d2_capital);
-      const d2base = Number.isFinite(d2capital) && d2capital > 0 ? d2capital : base;
-      const d2profit = d2pair.half == null ? null : d2pair.half / 100 * (d2base / 2);
+      const d2base = Number.isFinite(d2capital) && d2capital > 0 ? d2capital : null;
+      const d2profit = (d2am == null && d2pm == null) || d2base == null
+        ? null
+        : round2((legacySlotProfit(d2base, d2am) || 0) + (legacySlotProfit(d2base, d2pm) || 0));
       return {
         pnl_morning: am == null ? null : round2(am),
         pnl_afternoon: pm == null ? null : round2(pm),
