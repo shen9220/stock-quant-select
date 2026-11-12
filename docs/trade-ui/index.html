@@ -1757,7 +1757,6 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       { key: "d2_sell_price_1315", label: "D2午盘卖价", sum: false },
       { key: "d2_pnl_afternoon", label: "D2午盘利润", sum: true, pnl: true, sortable: true },
       { key: "d2_batch_profit", label: "D2分批利润", sum: true, money: true, signed: true },
-      { key: "d2_batch_half_profit", label: "D2分批利润", sum: true, money: true, signed: true },
       { key: "d2_capital_end", label: "D2收盘本金", sum: false, money: true },
       { key: "sell_date", label: "卖出日期", sum: false, sortable: true },
       { key: "hold_days", label: "持有天数", sum: false, sortable: true },
@@ -3403,6 +3402,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
     }
 
     function legacyPct(sell, buy) {
+      if (sell == null || sell === "" || buy == null || buy === "") return null;
       const s = Number(sell), b = Number(buy);
       if (!Number.isFinite(s) || !Number.isFinite(b) || b === 0) return null;
       return (s - b) / b * 100;
