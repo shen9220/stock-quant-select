@@ -498,6 +498,7 @@
     .prog-tab:hover { transform: translateY(-1px); filter: brightness(.97); }
     .prog-tab.prog-stock { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
     .prog-tab.prog-stock_v2 { background: #ffe4e6; color: #be123c; border-color: #fda4af; }
+    .prog-tab.prog-llm { background: #e0e7ff; color: #3730a3; border-color: #a5b4fc; }
     .prog-tab.prog-stock_updata { background: #ccfbf1; color: #0f766e; border-color: #5eead4; }
     .prog-tab.prog-slow { background: #ffedd5; color: #c2410c; border-color: #fdba74; }
     .prog-tab.prog-up { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
@@ -523,6 +524,10 @@
     .prog-tab.prog-stock_v2.active {
       background: linear-gradient(135deg, #fb7185, #be123c);
       box-shadow: 0 8px 16px rgba(190, 18, 60, .32);
+    }
+    .prog-tab.prog-llm.active {
+      background: linear-gradient(135deg, #6366f1, #3730a3);
+      box-shadow: 0 8px 16px rgba(55, 48, 163, .32);
     }
     .sub-tabs {
       display: none; gap: 10px; justify-content: center; flex-wrap: wrap;
@@ -885,6 +890,7 @@
     html[data-skin="night"] .nav-l4 .nav-row-label { color: #fde68a; }
     html[data-skin="night"] .prog-tab.prog-stock { background: #1e3a5f; color: #bfdbfe; border-color: #3b82f6; }
     html[data-skin="night"] .prog-tab.prog-stock_v2 { background: #4c0519; color: #fecdd3; border-color: #fb7185; }
+    html[data-skin="night"] .prog-tab.prog-llm { background: #1e1b4b; color: #c7d2fe; border-color: #818cf8; }
     html[data-skin="night"] .prog-tab.prog-stock_updata { background: #134e4a; color: #99f6e4; border-color: #2dd4bf; }
     html[data-skin="night"] .prog-tab.prog-slow { background: #7c2d12; color: #ffedd5; border-color: #fb923c; }
     html[data-skin="night"] .prog-tab.prog-up { background: #064e3b; color: #a7f3d0; border-color: #34d399; }
@@ -1373,6 +1379,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         <div class="prog-tabs" id="familyTabs">
           <button class="prog-tab prog-stock active" id="progStock" type="button" onclick="setFamily('stock_v1')">Stock-V1</button>
           <button class="prog-tab prog-stock_v2" id="progStockV2" type="button" onclick="setFamily('stock_v2')">Stock-V2</button>
+          <button class="prog-tab prog-llm" id="progLlm" type="button" onclick="setFamily('llm')">DeepSeek</button>
           <button class="prog-tab prog-stock_updata" id="progStockUpdata" type="button" onclick="setFamily('stock_updata')">Stock-V1（水下）</button>
           <button class="prog-tab prog-slow" id="progSlow" type="button" onclick="setFamily('slow')">Stock（低价）</button>
           <button class="prog-tab prog-up" id="progUp" type="button" onclick="setFamily('up')">Up</button>
@@ -1647,7 +1654,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
     let calViewYm = ""; // 左月 YYYY-MM
     // 真实数据程序（定时任务/收盘补全仍只用这些，与展示 lane 解耦）
     const PROGRAMS = ["stock", "stock_v2", "slow", "slow_v2", "up", "stock_updata"];
-    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", slow: "Stock（低价）V1", slow_v2: "Stock（低价）V2", up: "Up", stock_updata: "Stock-V1（水下）" };
+    const PROGRAM_LABEL = { stock: "Stock-V1", stock_v2: "Stock-V2", llm_input: "DeepSeek", slow: "Stock（低价）V1", slow_v2: "Stock（低价）V2", up: "Up", stock_updata: "Stock-V1（水下）" };
     // 四层导航：L1 family → L2 sub → L3 viewMode → L4 rank
     const FAMILIES = {
       stock_v1: {
@@ -1659,6 +1666,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         ],
         defaultSub: "all",
       },
+      llm: { program: "llm_input", label: "DeepSeek", tabClass: "prog-llm", subs: [], defaultSub: "" },
       stock_v2: {
         program: "stock_v2", label: "Stock-V2", tabClass: "prog-stock_v2",
         subs: [
@@ -1787,6 +1795,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         return "stock";
       }
       if (currentFamily === "stock_v2") return "stock_v2";
+      if (currentFamily === "llm") return "llm_input";
       if (currentFamily === "stock_updata") return "stock_updata";
       if (currentFamily === "slow") return currentSub === "v2" ? "slow_v2" : "slow";
       if (currentFamily === "up") return "up";
@@ -1829,6 +1838,8 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       if (elUpdata) elUpdata.classList.toggle("active", currentFamily === "stock_updata");
       const elV2 = document.getElementById("progStockV2");
       if (elV2) elV2.classList.toggle("active", currentFamily === "stock_v2");
+      const elLlm = document.getElementById("progLlm");
+      if (elLlm) elLlm.classList.toggle("active", currentFamily === "llm");
       const elZt = document.getElementById("progZtPool");
       if (elZt) elZt.classList.toggle("active", currentFamily === "zt_pool");
       renderSubTabs();
