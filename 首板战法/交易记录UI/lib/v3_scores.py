@@ -18,6 +18,7 @@ _FILES = {
     'slow_v2': r'\d{8}_slow_v2\.md',
     'up': r'\d{8}_up_recommendations\.md',
     'stock_v2': r'\d{4}-\d{2}-\d{2}_recommendations\.(?:json|md)',
+    'llm_input': r'llm_input_no_score_file',
 }
 _CACHE = {}
 _LOCK = threading.RLock()

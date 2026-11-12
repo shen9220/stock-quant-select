@@ -46,6 +46,17 @@ class OfflineTests(unittest.TestCase):
 
 
 class PushTests(unittest.TestCase):
+    def test_transient_index_lock_is_retried(self):
+        original,calls=self.runner();adds=[]
+        def run(args,**kwargs):
+            if args[:2]==['status','--porcelain']:return self.cp(' M docs/trade-ui/data/masked.json')
+            if args[0]=='add':
+                adds.append(1)
+                if len(adds)==1:return subprocess.CompletedProcess([],128,'','index.lock exists')
+            return original(args,**kwargs)
+        with patch.object(pages_sync,'pages_git_push_enabled',return_value=True),patch.object(pages_sync,'_run_git',side_effect=run),patch.object(pages_sync.time,'sleep'):
+            result=pages_sync._git_push_pages()
+        self.assertTrue(result['pushed']);self.assertEqual(len(adds),2)
     def test_sync_supervisor_terminates_timed_out_worker(self):
         script=Path(__file__).with_name('sync_trade_ui_pages.py')
         spec=importlib.util.spec_from_file_location('sync_supervisor_test',script)

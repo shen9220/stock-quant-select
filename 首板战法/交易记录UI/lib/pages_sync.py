@@ -139,10 +139,15 @@ def _git_push_pages() -> dict[str, Any]:
     st=_run_git(['status','--porcelain','--',*paths])
     if st.returncode:return {'pushed':False,'error':'git status failed'}
     if st.stdout.strip():
-        added=_run_git(['add','--',*paths])
-        if added.returncode:return {'pushed':False,'error':'git add failed'}
+        for attempt in range(5):
+            added=_run_git(['add','--',*paths])
+            if not added.returncode:break
+            if 'index.lock' not in added.stderr:break
+            time.sleep(1)
+        if added.returncode:return {'pushed':False,'error':(added.stderr or 'git add failed')[:500]}
         commit=_run_git(['commit','-m',f"chore(pages): sync trade-ui snapshot {time.strftime('%Y-%m-%d %H:%M:%S')}"])
-        if commit.returncode:return {'pushed':False,'error':(commit.stderr or commit.stdout)[:400]}
+        if commit.returncode and 'nothing to commit' not in (commit.stdout+commit.stderr).lower():
+            return {'pushed':False,'error':(commit.stderr or commit.stdout)[:400]}
     remote=_run_git(['remote','get-url','origin'])
     if remote.returncode:return {'pushed':False,'error':'origin missing'}
     url=_https_remote(remote.stdout.strip())

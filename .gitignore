@@ -53,6 +53,9 @@ credentials.json
 API_KEY.md
 github_upload_config.txt
 
+# 大模型输入会话地址只留本机运行目录
+首板战法/大模型输入/session.json
+
 # 日志文件
 *.log
 logs/

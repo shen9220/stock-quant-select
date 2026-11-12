@@ -27,6 +27,11 @@ PROGRAM_REL_DIRS: dict[str, str] = {
 STOCK_V2_ROOT = os.path.join(ROOT, PROGRAM_REL_DIRS["stock_v2"])
 PROGRAMS = tuple(PROGRAM_REL_DIRS.keys())
 
+# 只给看板展示。不放进 PROGRAMS，收盘补全和通知不会去跑它。
+DISPLAY_ONLY_DIRS: dict[str, str] = {
+    "llm_input": "大模型输入",
+}
+
 # Pages / git 仓库根（docs/trade-ui 仍在代码仓内）
 CODE_REPO_ROOT = os.path.abspath(os.path.join(ROOT, "..", "stock-quant-select"))
 
@@ -41,9 +46,10 @@ def _ensure_dir(path: str) -> str:
 
 
 def program_dir(program: str) -> str:
-    if program not in PROGRAM_REL_DIRS:
+    rel = PROGRAM_REL_DIRS.get(program) or DISPLAY_ONLY_DIRS.get(program)
+    if not rel:
         raise ValueError(f"unknown program: {program}")
-    return os.path.join(ROOT, PROGRAM_REL_DIRS[program])
+    return os.path.join(ROOT, rel)
 
 
 def program_script(program: str) -> str:

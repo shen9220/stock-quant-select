@@ -17,7 +17,8 @@ from v3_period_stats import monthly_stats
 from v3_scores import ResultScores, attach_scores
 
 MODELS = [
-    dict(id='original', program='stock'), dict(id='main', program='stock', board='主板'),
+    dict(id='original', program='stock'), dict(id='llm', program='llm_input'),
+    dict(id='main', program='stock', board='主板'),
     dict(id='cyb', program='stock', board='创业板'), dict(id='under', program='stock_updata'),
     dict(id='low', program='slow'), dict(id='stable', program='stock_v2', path='B'),
     dict(id='advance', program='stock_v2', path='A'), dict(id='low2', program='slow_v2'),

@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "date": "2026-11-12",
+    "program": "llm_input",
+    "stock_code": "002463",
+    "stock_name": "沪电股份",
+    "board": "主板",
+    "rank": 1,
+    "source": "deepseek-chat",
+    "notes": "2026-11-12 今日推荐 第一名"
+  },
+  {
+    "id": 2,
+    "date": "2026-11-12",
+    "program": "llm_input",
+    "stock_code": "603228",
+    "stock_name": "景旺电子",
+    "board": "主板",
+    "rank": 2,
+    "source": "deepseek-chat",
+    "notes": "2026-11-12 今日推荐 第二名"
+  }
+]
