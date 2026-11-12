@@ -2261,53 +2261,81 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       };
     }
 
-    function pagesAttachCapital(list) {
-      const by = {};
-      list.forEach(t => {
-        const day = String(t.date || "").slice(0, 10);
-        if (day.length === 10) (by[day] || (by[day] = [])).push(t);
+    function pagesDay(v) {
+      const s = String(v || "").slice(0, 10);
+      return s.length === 10 ? s : "";
+    }
+    function pagesUsable(t) {
+      return !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim() && !String(t.skip_reason || "").includes("买不进");
+    }
+    function pagesAttachOneChain(list, kind) {
+      const days = new Set();
+      const buys = {};
+      const sellAm = {};
+      const sellPm = {};
+      list.forEach((t, i) => {
+        const buyDay = kind === "d1" ? pagesDay(t.date) : pagesDay(t.d2_buy_date);
+        const am = kind === "d1" ? legacyPct(t.sell_price_935, t.buy_price) : legacyPct(t.d2_sell_price_935, t.d2_buy_price);
+        const pm = kind === "d1" ? legacyPct(t.sell_price_1335, t.buy_price) : legacyPct(t.d2_sell_price_1335, t.d2_buy_price);
+        const amDay = kind === "d1" ? (pagesDay(t.sell_date_935) || pagesDay(t.sell_date)) : (pagesDay(t.d2_sell_date_935) || pagesDay(t.d2_sell_date));
+        const pmDay = kind === "d1"
+          ? (pagesDay(t.sell_date_1335) || pagesDay(t.sell_date))
+          : (pagesDay(t.d2_sell_date_1335) || pagesDay(t.d2_sell_date_1315) || pagesDay(t.d2_sell_date));
+        if (buyDay) {
+          days.add(buyDay);
+          (buys[buyDay] || (buys[buyDay] = [])).push(i);
+        }
+        if (!pagesUsable(t)) return;
+        if (am != null && amDay) {
+          days.add(amDay);
+          (sellAm[amDay] || (sellAm[amDay] = [])).push([i, am]);
+        }
+        if (pm != null && pmDay) {
+          days.add(pmDay);
+          (sellPm[pmDay] || (sellPm[pmDay] = [])).push([i, pm]);
+        }
       });
+      const alloc = {};
+      const rowProfit = {};
+      const dayOpen = {};
+      const dayEnd = {};
       let capital = 100000;
-      Object.keys(by).sort().forEach(day => {
-        const rows = by[day];
-        let dayProfit = 0;
+      Array.from(days).sort().forEach(day => {
+        const opened = round2(capital);
+        dayOpen[day] = opened;
+        (buys[day] || []).forEach(i => {
+          if (pagesUsable(list[i])) alloc[i] = round2(opened * 0.5);
+        });
+        let pnl = 0;
         let touched = false;
-        rows.forEach(t => {
-          t.d1_capital = Math.round(capital * 100) / 100;
-          const half = t.pnl_batch_total_half;
-          const usable = !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim() && !String(t.skip_reason || "").includes("买不进");
-          if (usable && half != null && half !== "") {
-            const profit = Math.round(capital * Number(half)) / 100;
-            t.d1_batch_profit = Math.round(profit * 100) / 100;
-            dayProfit += t.d1_batch_profit;
+        [sellAm[day] || [], sellPm[day] || []].forEach(bucket => {
+          bucket.forEach(([i, pct]) => {
+            if (alloc[i] == null) return;
+            const part = legacySlotProfit(opened && alloc[i] ? alloc[i] * 2 : opened, pct);
+            if (part == null) return;
+            rowProfit[i] = round2((rowProfit[i] || 0) + part);
+            pnl += part;
             touched = true;
-          } else {
-            t.d1_batch_profit = null;
-          }
+          });
         });
-        const end = Math.round((capital + (touched ? dayProfit : 0)) * 100) / 100;
-        rows.forEach(t => {
-          t.d1_capital_end = end;
-          const d2Open = t.d2_pnl_morning, d2Close = t.d2_pnl_afternoon;
-          let d2Half = null;
-          if (d2Open != null && d2Close != null) d2Half = (Number(d2Open) + Number(d2Close)) / 4;
-          else if (d2Open != null) d2Half = Number(d2Open) / 4;
-          else if (d2Close != null) d2Half = Number(d2Close) / 4;
-          t.d2_capital = end;
-          const usable = !t.is_rank_placeholder && !t.is_board_placeholder && String(t.stock_code || "").trim();
-          if (usable && d2Half != null) {
-            const p = Math.round(end * d2Half) / 100;
-            t.d2_batch_profit = Math.round(p * 100) / 100;
-            t.d2_batch_half_profit = t.d2_batch_profit;
-            t.d2_capital_end = Math.round((end + t.d2_batch_profit) * 100) / 100;
-          } else {
-            t.d2_batch_profit = null;
-            t.d2_batch_half_profit = null;
-            t.d2_capital_end = end;
-          }
-        });
-        if (touched) capital = end;
+        const closed = touched ? round2(opened + pnl) : opened;
+        dayEnd[day] = closed;
+        capital = closed;
       });
+      const openKey = kind === "d1" ? "d1_capital" : "d2_capital";
+      const endKey = kind === "d1" ? "d1_capital_end" : "d2_capital_end";
+      const profitKey = kind === "d1" ? "d1_batch_profit" : "d2_batch_profit";
+      list.forEach((t, i) => {
+        const buyDay = kind === "d1" ? pagesDay(t.date) : pagesDay(t.d2_buy_date);
+        t[openKey] = buyDay && dayOpen[buyDay] != null ? dayOpen[buyDay] : null;
+        t[endKey] = buyDay && dayEnd[buyDay] != null ? dayEnd[buyDay] : null;
+        t[profitKey] = rowProfit[i] == null ? null : rowProfit[i];
+        if (kind === "d2") t.d2_batch_half_profit = t[profitKey];
+      });
+    }
+    function pagesAttachCapital(list) {
+      pagesAttachOneChain(list, "d1");
+      pagesAttachOneChain(list, "d2");
       return list;
     }
 
@@ -3405,7 +3433,6 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
       const d2buy = t.d2_buy_price;
       const d2am = legacyPct(t.d2_sell_price_935, d2buy);
       const d2pm = legacyPct(t.d2_sell_price_1335, d2buy);
-      const d2pair = legacyHalfPair(d2am, d2pm);
       const d2capital = Number(t.d2_capital);
       const d2base = Number.isFinite(d2capital) && d2capital > 0 ? d2capital : null;
       const d2profit = (d2am == null && d2pm == null) || d2base == null
@@ -3422,6 +3449,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         d2_pnl_morning: d2am == null ? null : round2(d2am),
         d2_pnl_afternoon: d2pm == null ? null : round2(d2pm),
         d2_batch_profit: d2profit == null ? null : round2(d2profit),
+        d2_batch_half_profit: d2profit == null ? null : round2(d2profit),
       };
     }
     function cellHtml(t, c) {
