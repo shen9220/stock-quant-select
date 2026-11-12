@@ -2311,7 +2311,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
         [sellAm[day] || [], sellPm[day] || []].forEach(bucket => {
           bucket.forEach(([i, pct]) => {
             if (alloc[i] == null) return;
-            const part = legacySlotProfit(opened && alloc[i] ? alloc[i] * 2 : opened, pct);
+            const part = round2(round2(alloc[i] / 2) * pct / 100);
             if (part == null) return;
             rowProfit[i] = round2((rowProfit[i] || 0) + part);
             pnl += part;
@@ -4082,7 +4082,7 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
 const V3 = (() => {
   const models = [
     {id:'original',name:'V1 原始',program:'stock',tier:0},
-    {id:'llm',name:'大模型输入',program:'llm_input',tier:0},
+    {id:'llm',name:'DeepSeek',program:'llm_input',tier:0},
     {id:'main',name:'V1 主板',program:'stock',board:'主板',tier:1},
     {id:'cyb',name:'V1 创业板',program:'stock',board:'创业板',tier:1},
     {id:'under',name:'水下',program:'stock_updata',tier:2},
