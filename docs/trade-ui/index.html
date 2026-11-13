@@ -1634,7 +1634,10 @@ html[data-skin="night"] #v3Root .model-group .model-nav.active{background:var(--
     window.__PAGES_MODE__ = /github\.io$/i.test(location.hostname)
       || /(?:\?|&)pages=1(?:&|$)/.test(location.search)
       || /\/stock-quant-select\/trade-ui\/?/.test(location.pathname);
-    if (window.__PAGES_MODE__) document.documentElement.classList.add("pages-mode");
+    if (window.__PAGES_MODE__) {
+      document.documentElement.classList.add("pages-mode");
+      document.documentElement.dataset.ui = "legacy";
+    }
     window.__PAGES_FULL__ = null;
     window.__PAGES_SNAPSHOT__ = null;
     window.__PAGES_MASKED__ = null;
