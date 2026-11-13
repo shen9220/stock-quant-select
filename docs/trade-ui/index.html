@@ -1516,13 +1516,11 @@ html[data-skin="night"] #v3Root .weight-plain{color:#f1f5f9!important}
 /* Field explanations and income/holdings beside the capital snapshot. */
 #v3Root .detail-trade-block .trade-identity .stock,#v3Root .detail-trade-block .trade-identity .name-link{color:#dc2626!important}
 html[data-skin="night"] #v3Root .detail-trade-block .trade-identity .stock,html[data-skin="night"] #v3Root .detail-trade-block .trade-identity .name-link{color:#ff7777!important}
-#v3Root .compound-table col:nth-child(3){width:300px}
-#v3Root .compound-table col:nth-child(4){width:350px}
-#v3Root .compound-table col:nth-child(5){width:370px}
-#v3Root .compound-table col:nth-child(6),#v3Root .compound-table col:nth-child(7){width:280px}
-#v3Root table.compound-table{min-width:2040px}
+#v3Root .compound-table col:nth-child(n+2):nth-child(-n+7){width:252px}
+#v3Root table.compound-table{min-width:1696px}
 #v3Root .detail-metric dt{white-space:normal}
-#v3Root .field-note{display:inline-flex;vertical-align:middle;align-items:center;margin-left:5px;padding:1px 4px;border:1px solid #ccd7e9;border-radius:4px;background:#f4f7fc;color:#526887;font-family:inherit;cursor:pointer;white-space:nowrap;font-size:10px;line-height:1.5;font-weight:500}
+#v3Root .field-note{display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;width:20px;height:20px;margin-left:3px;padding:0;border:0;border-radius:50%;background:transparent;color:#72839c;font-family:inherit;cursor:pointer;flex-shrink:0}
+#v3Root .field-note svg{display:block;flex-shrink:0}
 #v3Root .field-note:hover{background:#e6eefb;color:#244fa2}
 #v3Root .field-note:focus-visible{outline:2px solid #3769ed;outline-offset:2px}
 #v3Root .trade-identity .field-note{flex-shrink:0}
@@ -1532,10 +1530,10 @@ html[data-skin="night"] #v3Root .detail-trade-block .trade-identity .stock,html[
 #v3Root .field-help-top h3{margin:0;font-size:18px}
 #v3Root .field-help-dialog p{line-height:1.9;font-size:14px;margin:20px 0;white-space:pre-line}
 #v3Root .field-help-source{border-top:1px solid #d7e0ee;padding-top:14px;font-size:12px;line-height:1.8;color:#64748b}
-html[data-skin="night"] #v3Root .field-note{background:#14202f;border-color:#3e506b;color:#c3d5ed}
+html[data-skin="night"] #v3Root .field-note{background:transparent;color:#a9bdd8}
 html[data-skin="night"] #v3Root .field-help-dialog{background:#101823;border-color:#3e506b;color:#e2e8f0}
 html[data-skin="night"] #v3Root .field-help-source{color:#b1c1d5;border-color:#3e506b}
-@media(max-width:640px){ #v3Root .field-help-dialog{padding:18px}#v3Root .field-note{padding:3px 5px}}
+@media(max-width:640px){ #v3Root .field-help-dialog{padding:18px}#v3Root .field-note{width:24px;height:24px}}
 
 </style>
 </head>
@@ -2693,11 +2691,13 @@ html[data-skin="night"] #v3Root .field-help-source{color:#b1c1d5;border-color:#3
         const rank = params.get('rank') || '1';
         const mode = params.get('mode') || 'D1';
         const key = `${model}:${rank}:${mode}`;
-        let ledger = (pagesActiveSnapshot().ledgers || {})[key];
-        if (!ledger || ledger.version !== 'doc-delta-v1') {
-          ledger = await __pagesFetchJson(`data/ledgers/${model}_${rank}_${mode}.json`);
+        const loggedIn = !!window.__PAGES_FULL__;
+        let ledger = loggedIn ? (pagesActiveSnapshot().ledgers || {})[key] : null;
+        if (!loggedIn) {
+          ledger = await __pagesFetchJson(`data/ledgers/${model}_${rank}_${mode}.json?v=20261113c`);
+          if (!ledger || ledger.masked !== true) throw new Error('公开数据未脱敏，已停止加载');
         }
-        if (!ledger || ledger.version !== 'doc-delta-v1') throw new Error('静态账本版本需要更新，请刷新页面');
+        if (!ledger || ledger.version !== 'doc-delta-v1') throw new Error(loggedIn ? '登录数据缺少该模型账本，请重新登录' : '静态账本版本需要更新，请刷新页面');
         return path.endsWith('/ledger-summary') ? {...ledger, rows:[]} : ledger;
       }
       if (path === "/api/trades" || path.endsWith("/api/trades")) {
@@ -4392,8 +4392,8 @@ const V3 = (() => {
     if(n<=100) return 'pnl-bg-r2';
     return 'pnl-bg-r3';
   }
-  const money=v=>num(v)===null?'—':Number(v).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const pct=v=>num(v)===null?'—':`${v>0?'+':''}${(Math.sign(Number(v))*Math.round((Math.abs(Number(v))+1e-10)*100)/100).toFixed(2)}%`;
+  const money=v=>(typeof masked==='function'&&masked())||num(v)===null?'—':Number(v).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const pct=v=>(typeof masked==='function'&&masked())||num(v)===null?'—':`${v>0?'+':''}${(Math.sign(Number(v))*Math.round((Math.abs(Number(v))+1e-10)*100)/100).toFixed(2)}%`;
   const unsignedPct=v=>num(v)===null?'—':`${(Math.round((Math.abs(Number(v))+1e-10)*100)/100).toFixed(2)}%`;
   const fmt=(v,isPct=false)=>`<span class="${color(v)}">${isPct?pct(v):money(v)}</span>`;
   function assetNote(marks=[],fallback=''){
@@ -4401,6 +4401,7 @@ const V3 = (() => {
     return dates.length?'收盘估值 · '+dates.join(' / '):fallback;
   }
   function assetMoney(value,marks=[]){
+    if(typeof masked==='function'&&masked()) return '—';
     const stale=marks.filter(m=>m.stale&&m.date);
     const detail=stale.map(m=>`${m.stock_code} · ${m.date} 收盘 ${money(m.price)}${m.shares?' × '+m.shares+'股':''}`).join('；');
     return money(value)+(stale.length?`<div class="stock-sub asset-note" title="${esc(detail)}">${esc(assetNote(stale))}</div>`:'');
@@ -4551,7 +4552,7 @@ const V3 = (() => {
   "13:35 利润": "当前筛选期间实际卖出日落在期间内的13:35批次利润之和。附收益率按对应卖出日组合期初资产去重合计作为分母；不含未卖浮盈或早盘卖出。单位：元。",
   "latest": "当前筛选范围内最近的有效买入标的；当天推荐已落盘但尚未确认成交时显示选股和待确认状态，不据此虚构买入金额。"
 };
-  function fieldNote(key,label){return fieldHelp[key]?`<button type="button" class="field-note" data-key="${esc(key)}" data-label="${esc(label)}" aria-label="${esc(label)}字段说明" aria-haspopup="dialog" onclick="event.stopPropagation();V3.explain(this.dataset.key,this.dataset.label)">备注</button>`:'';}
+  function fieldNote(key,label){return fieldHelp[key]?`<button type="button" class="field-note" data-key="${esc(key)}" data-label="${esc(label)}" aria-label="${esc(label)}字段说明" aria-haspopup="dialog" onclick="event.stopPropagation();V3.explain(this.dataset.key,this.dataset.label)"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.8v4.8"/><circle cx="10" cy="13.7" r=".8" fill="currentColor" stroke="none"/></svg></button>`:'';}
   function explain(key,label){
     if(!fieldHelp[key])return;
     let dialog=document.getElementById('v3FieldHelp');
@@ -4586,7 +4587,7 @@ const V3 = (() => {
       `<div class="detail-actions">${operations(r)}</div>`
     ];
   }
-  function stock(t){const c=esc(t.stock_code||'—'),n=esc(t.stock_name||'空占位');const url=baiduFinanceUrl(t.stock_code);return `<span class="code">${c}</span><span class="stock">${url?`<a class="name-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${n}</a>`:n}</span>`;}
+  function stock(t){if(masked())return '<span class="code">******</span><span class="stock">***</span>';const c=esc(t.stock_code||'—'),n=esc(t.stock_name||'空占位');const url=baiduFinanceUrl(t.stock_code);return `<span class="code">${c}</span><span class="stock">${url?`<a class="name-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${n}</a>`:n}</span>`;}
   function price(t,key){
     if(masked())return '<span class="chip">已脱敏</span>';
     if(key==='open_price')return `<span title="${esc(t.open_price_date||t.signal_date||t.date)} · D0 开盘价${num(t.open_price)===null?'，行情缺失':''}">${money(t.open_price)}</span>`;
@@ -4599,10 +4600,10 @@ const V3 = (() => {
     return `<span title="${key==='buy'?'买入日开盘价':esc(`${sold?sold+' ':''}${time} 实际模拟成交价`)}">${money(t[key])}</span>${sold?`<div class="stock-sub">${esc(sold)}</div>`:''}`;
   }
   function scoreValue(t){const label=String(t.score_label??'').trim(),value=t.score;return model().program==='stock_v2'&&label?label:(value!==null&&value!==undefined&&String(value).trim()!==''?value:(label?label.split(/[（(]/)[0]:'—'));}
-  function score(t){const value=scoreValue(t);return value==='—'?'<span class="muted" title="没有对应的原始评分记录">—</span>':esc(value);}
+  function score(t){if(masked())return '<span class="muted">***</span>';const value=scoreValue(t);return value==='—'?'<span class="muted" title="没有对应的原始评分记录">—</span>':esc(value);}
   function operations(t){if(raw.filter(r=>Number(r.id)===Number(t.id)).length>1)return '<span class="muted" title="原始记录ID重复，旧写接口无法唯一定位；已禁止误改其他日期">ID重复</span>';return window.__PAGES_MODE__?'—':`<button class="smallbtn" onclick="V3.edit(${Number(t.id)})">编辑</button>`;}
   function latestBuy(list,today=beijingToday()){return list.filter(r=>!placeholder(r)&&r.date<=today&&(r.executed||r.date===today)).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.id)-Number(a.id))[0];}
-  function boardTag(board){return `<span class="board-label ${board==='主板'?'board-main':board==='创业板'?'board-growth':'board-neutral'}">${esc(board||'—')}</span>`;}
+  function boardTag(board){if(masked())return '<span class="board-label board-neutral">***</span>';return `<span class="board-label ${board==='主板'?'board-main':board==='创业板'?'board-growth':'board-neutral'}">${esc(board||'—')}</span>`;}
   function nameLink(t){const url=baiduFinanceUrl(t.stock_code);return url?`<a class="name-link" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(t.stock_name||'—')}</a>`:esc(t.stock_name||'—');}
   function periodControls(target){const from=target==='history'?String(state.yearFrom):state.compareFrom,to=target==='history'?String(state.yearTo):state.compareTo;return `<div class="filters">${target==='compare'?`<button class="month-trigger" aria-label="对比月份" onclick="V3.openPicker('single','from','compare')">▦ ${from===to?from:'选择月份'}</button><button class="month-trigger" onclick="V3.openGrid('year','compare')">选择年份 ▾</button>`:''}<button class="month-trigger" aria-label="${target}开始" onclick="V3.openPicker('range','from','${target}')">起 ${from} ⌄</button><span class="range-dash">—</span><button class="month-trigger" aria-label="${target}结束" onclick="V3.openPicker('range','to','${target}')">止 ${to} ⌄</button></div>`;}
   function latestCard(latest){return `<div class="card latest-card"><div class="label">${latest&&!latest.executed?'今日选股':'最近买入标的'}${fieldNote('latest','最近标的')}</div><div class="value">${masked()?'登录后查看':latest?nameLink(latest):'暂无买入记录'}</div><div class="latest-meta">${masked()?'<span class="muted">已脱敏</span>':latest?`${boardTag(latest.board)}<span class="buy-date">· ${esc(latest.date)}</span>${!latest.executed?'<span class="muted"> · 成交待确认</span>':''}`:'<span class="muted">筛选范围内暂无有效记录</span>'}</div></div>`;}
@@ -4725,11 +4726,12 @@ const V3 = (() => {
       }).join('');
       navigationKey=key;
     }
-    ['trade','history','compare','pool'].forEach(view=>{const button=$('v3nav'+view),active=state.view===view;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
-    $('v3ModelLabel').textContent=model().name;
-    $('v3ModelTier').textContent=tiers[model().tier].split(' · ')[0];
+    ['trade','history','compare','pool'].forEach(view=>{const button=$('v3nav'+view);if(!button)return;const active=state.view===view;button.classList.toggle('active',active);if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+    const modelLabel=$('v3ModelLabel'),modelTier=$('v3ModelTier'),header=$('v3Header');
+    if(modelLabel)modelLabel.textContent=model().name;
+    if(modelTier)modelTier.textContent=tiers[model().tier].split(' · ')[0];
     const tools=$('v3Maintenance');if(tools)tools.hidden=state.view!=='trade'||!!window.__PAGES_MODE__;
-    $('v3Header').classList.toggle('has-maintenance',state.view==='trade'&&!window.__PAGES_MODE__);
+    if(header)header.classList.toggle('has-maintenance',state.view==='trade'&&!window.__PAGES_MODE__);
   }
   function selectTier(tier){
     const selected=model().tier===tier?model():models.find(m=>m.tier===tier);if(!selected)return;
@@ -4744,6 +4746,7 @@ const V3 = (() => {
     target?.focus({preventScroll:true});
   }
   function render(){
+    if(!$('v3App')||!$('v3Title'))return;
     const m=model();
     renderNavigation();
     $('v3Title').textContent=state.view==='trade'?`${m.name} · ${state.mode} 交易明细`:state.view==='history'?`历史月表 · ${m.name} · ${state.mode}`:state.view==='compare'?`模型对比 · 四档全模型 · ${state.mode}`:'涨停池 · 首次涨停查阅';
@@ -4756,11 +4759,12 @@ const V3 = (() => {
     $('v3Auth').hidden=!window.__PAGES_MODE__;
   }
   async function load(force=false){
-    const ticket=++seq; $('v3Status').textContent='正在加载真实记录…';
+    const ticket=++seq; if($('v3Status'))$('v3Status').textContent='正在加载真实记录…';
     if (typeof setLoading === 'function') setLoading(true, '数据加载中，请稍候');
     // Clear previous context immediately so old model contents cannot masquerade as new.
-    raw=[];rows=[];comparison=state.view==='compare'?models.flatMap(m=>[1,2].map(rank=>({m,rank,list:null,loading:true,error:null}))):[];render();
+    raw=[];rows=[];comparison=state.view==='compare'?models.flatMap(m=>[1,2].map(rank=>({m,rank,list:null,loading:true,error:null}))):[];
     try{
+      render();
       if(window.__PAGES_MODE__&&!window.__PAGES_SNAPSHOT__)await __pagesBoot();
       if(state.view==='compare'){await Promise.allSettled(comparison.map(entry=>loadComparisonEntry(entry,ticket,state.mode,force)));if(ticket!==seq)return false;}
       else if(state.view==='pool'){
@@ -4775,9 +4779,9 @@ const V3 = (() => {
         if(data.marks_refreshing)setTimeout(()=>refreshLedgerMarks(ticket,state.mode),3000);
       }
       if(ticket!==seq)return false;
-      $('v3Status').textContent='数据已加载';
+      if($('v3Status'))$('v3Status').textContent='数据已加载';
       render(); scheduleNodeRefresh(); return true;
-    }catch(e){if(ticket!==seq)return false;$('v3Status').textContent='加载失败';$('v3App').innerHTML=`<section class="panel empty-state"><p class="error">${esc(e.message||'数据加载失败')}</p><button class="btn" onclick="V3.load()">重试</button></section>`;return false;}
+    }catch(e){if(ticket!==seq)return false;if($('v3Status'))$('v3Status').textContent='加载失败';if($('v3App'))$('v3App').innerHTML=`<section class="panel empty-state"><p class="error">${esc(e.message||'数据加载失败')}</p><button class="btn" onclick="V3.load()">重试</button></section>`;document.getElementById('pagesBootMask')?.classList.add('done');return false;}
     finally { if (typeof markPageDataReady === 'function') markPageDataReady(); if (typeof setLoading === 'function') setLoading(false); }
   }
   function scheduleNodeRefresh(){
@@ -4990,11 +4994,12 @@ V3.init();
         } catch (e) {
           const el = document.getElementById("pagesBootMask");
           if (el) el.classList.add("done");
-          document.getElementById("v3Status").textContent = "镜像数据加载失败，可重试或登录";
-          return;
+          const status = document.getElementById("v3Status");
+          if (status) status.textContent = "镜像数据加载失败，可重试或登录";
         }
       }
-      await V3.load();
+      try { await V3.load(); }
+      finally { document.getElementById("pagesBootMask")?.classList.add("done"); document.getElementById("loadingMask")?.classList.remove("show"); }
     })();
   </script>
 </body>
