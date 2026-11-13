@@ -1496,6 +1496,7 @@ html[data-skin="night"] #v3Root .latest-card .name-link{color:#f1f5f9}
   #v3Root .detail-filter-dates{grid-column:1/-1}
   #v3Root .detail-filter-dates .month-controls{justify-content:flex-end}
 }
+#v3Root .unbought-reason{color:#dc2626!important;font-weight:700;background:transparent!important}
 #v3Root .weight-plain{color:#111!important;font-weight:700;background:transparent!important}
 html[data-skin="night"] #v3Root .weight-plain{color:#f1f5f9!important}
 @media(max-width:850px){
@@ -1516,9 +1517,7 @@ html[data-skin="night"] #v3Root .weight-plain{color:#f1f5f9!important}
 /* Field explanations and income/holdings beside the capital snapshot. */
 #v3Root .detail-trade-block .trade-identity .stock,#v3Root .detail-trade-block .trade-identity .name-link{color:#dc2626!important}
 html[data-skin="night"] #v3Root .detail-trade-block .trade-identity .stock,html[data-skin="night"] #v3Root .detail-trade-block .trade-identity .name-link{color:#ff7777!important}
-#v3Root .compound-table col:nth-child(n+2):nth-child(-n+7){width:252px}
-#v3Root table.compound-table{min-width:1696px}
-#v3Root .detail-metric dt{white-space:normal}
+#v3Root .detail-metric dt{white-space:nowrap}
 #v3Root .field-note{display:inline-flex;vertical-align:middle;align-items:center;justify-content:center;width:20px;height:20px;margin-left:3px;padding:0;border:0;border-radius:50%;background:transparent;color:#72839c;font-family:inherit;cursor:pointer;flex-shrink:0}
 #v3Root .field-note svg{display:block;flex-shrink:0}
 #v3Root .field-note:hover{background:#e6eefb;color:#244fa2}
@@ -1540,10 +1539,15 @@ html[data-skin="night"] #v3Root .field-help-source{color:#b1c1d5;border-color:#3
 #v3Root .compound-table thead th,#v3Root .compound-table thead th.session-cell,#v3Root .compound-table thead th:first-child,#v3Root .compound-table thead th:last-child{background:#e5e7eb!important;color:#111!important}
 #v3Root .panel{border-radius:18px;overflow:hidden}
 #v3Root .tablewrap,#v3Root .compound-tablewrap{border-radius:18px}
+#v3Root table.compound-table{min-width:2040px}
+#v3Root .compound-table col:nth-child(3),#v3Root .compound-table col:nth-child(4){width:236px}
 #v3Root .compound-table thead th:first-child{border-top-left-radius:18px}
 #v3Root .compound-table thead th:last-child{border-top-right-radius:18px}
 #v3Root .compound-table tbody tr:last-child td:first-child{border-bottom-left-radius:18px}
 #v3Root .compound-table tbody tr:last-child td:last-child{border-bottom-right-radius:18px}
+#v3Root table.compound-table{min-width:1860px}
+#v3Root .compound-table col:nth-child(6),#v3Root .compound-table col:nth-child(7),#v3Root .compound-table col:nth-child(8){width:236px}
+#v3Root .compound-table col:nth-child(9){width:76px}
 html[data-skin="night"] #v3Root .compound-table thead th,html[data-skin="night"] #v3Root .compound-table thead th.session-cell,html[data-skin="night"] #v3Root .compound-table thead th:first-child,html[data-skin="night"] #v3Root .compound-table thead th:last-child{background:#3f3f46!important;color:#f4f4f5!important}
 html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color:#fdba74}
 
@@ -4381,8 +4385,8 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 const V3 = (() => {
   const models = [
     {id:'original',name:'V1 原始',program:'stock',tier:0},
-    {id:'v3',name:'V3 质量',program:'stock_v3',tier:0},
     {id:'llm',name:'DeepSeek',program:'llm_input',tier:0},
+    {id:'v3',name:'V3 质量',program:'stock_v3',tier:0},
     {id:'main',name:'V1 主板',program:'stock',board:'主板',tier:1},
     {id:'cyb',name:'V1 创业板',program:'stock',board:'创业板',tier:1},
     {id:'under',name:'水下',program:'stock_updata',tier:2},
@@ -4510,7 +4514,7 @@ const V3 = (() => {
   function hero(title,desc,pill){return `<section class="hero"><div><h2>${title}</h2><p>${desc}</p></div><span class="pill">${pill}</span></section>`;}
   function notice(){return '';}
 
-  const sessionColumns={trade:{identity:[1],capital:[2],close:[3],holding:[4],morning:[5],afternoon:[6]},history:{morning:[2,3,4],afternoon:[5,6,7],batch:[8,9,10,11,12],close:[13,14,15]},compare:{morning:[4,5,6],afternoon:[7,8,9],batch:[10,11,12,13,14],close:[15]}};
+  const sessionColumns={trade:{identity:[1],capital:[2],next:[3],holding:[4],close:[5],morning:[6],afternoon:[7]},history:{morning:[2,3,4],afternoon:[5,6,7],batch:[8,9,10,11,12],close:[13,14,15]},compare:{morning:[4,5,6],afternoon:[7,8,9],batch:[10,11,12,13,14],close:[15]}};
   function sessionClass(index){const groups=sessionColumns[state.view];if(!groups)return '';for(const [group,indexes] of Object.entries(groups)){if(indexes.includes(index))return `session-cell session-${group}${index===indexes[0]?' session-start':''}${index===indexes.at(-1)?' session-end':''}`;}return '';}
   function tableLegend(){return ''; }
   function table(headers,body,summary='',mobile=false){
@@ -4523,9 +4527,9 @@ const V3 = (() => {
     const klass=typeof extra==='string'?extra:'';
     return `<td class="${sessionClass(index)} ${klass}">${value}</td>`;
   }
-  const columns=['date','stock_name','capital','positionWeight','positionDayProfit','am','pm',null];
-  const detailSortLabels=['买入日期','股票名称','期初总资产','个股仓位','单票当天收益利润','9:35卖价','13:35卖价'];
-  const detailHeaders=['日期信息','基础与买入','资金快照','当日持仓信息','当日收益与收盘','9:35 卖出','13:35 卖出','操作'];
+  const columns=['date','stock_name','buyAmount','buyDayCash','positionWeight','positionDayProfit','am','pm',null];
+  const detailSortLabels=['买入日期','股票名称','当日未持仓市值','次日收盘现金','个股仓位','单票当天收益利润','9:35卖价','13:35卖价'];
+  const detailHeaders=['日期信息','基础与买入','当日资金快照','次日资金快照','当日收益与收盘','次日收益与收盘','9:35 卖出','13:35 卖出','操作'];
   const fieldHelp = {
   "date": "本笔交易的实际买入日期。D1 按信号日买入，D2 顺延至下一交易日买入；不把原始信号日与实际买入日混用。列表按买入日期筛选。",
   "stock_name": "本笔交易对应的股票名称与证券代码，取当前模型、名次及实际标的记录；如发生停牌替补，展示最终标的。名称链接可打开股票行情页。红色名称仅作界面强调，不表示上涨或盈利。",
@@ -4535,7 +4539,9 @@ const V3 = (() => {
   "shares": "本笔实际买入数量，界面沿用规范的“手”单位。买入持仓金额＝买入开盘价×买入手数，直接相乘，不再额外乘 100。数量按既定整手规则和真实现金约束确定；未买入为 0。",
   "initial_buy_cost": "本笔初始买入成本＝实际买入开盘价×实际买入手数。单位：元。卖出后仍保留原始买入成本，不变成剩余成本或卖出回款；原“累计买入支付”重复展示已删除。",
   "capital": "本笔买入日的组合期初总资产，取前一交易日收盘总资产；独立本金账期首日取初始本金。包含现金、持仓估值及停牌冻结持仓。单位：元；日内不因卖出而重复累加。",
-  "prevCloseCash": "昨日收盘现金：前一交易日收盘时，这一本账里的现金。今天买入前的当前未持仓市值承接这个数。账期第一天没有昨日，显示初始现金。单位：元。",
+  "prevCloseCash": "昨日收盘现金：前一交易日收盘时，这一本账里的现金。单位：元。",
+  "prevClosePosition": "昨日收盘持仓市值：期初总资产－昨日收盘现金。和昨日收盘现金相加，等于期初总资产。单位：元。",
+  "daySellProceeds": "当日卖出回款：当天已经卖出、回到现金的金额。当日收盘现金＝当前未持仓市值－当日持仓资金＋当日卖出回款。单位：元。",
   "buyAmount": "当前未持仓市值：这一笔买入前，账户里还没变成持仓、并且已经解锁的现金。包括此前剩下的现金，也包括已经解锁、可以再买的卖出回款。未卖持仓、停牌冻结持仓、还锁着的回款都不算。正常等于昨日收盘现金。单位：元。",
   "buyBudget": "按已确认口径：可买额度＝（期初总资产－停牌冻结持仓）×50%。实际买入同时受已解锁现金和整手规则限制。它是买入额度，不等于账户全部现金。此处沿用历史规范与样例，覆盖 V2 第4.2节的冲突表述。",
   "dayBuyCost": "本笔在买入日实际支付的买入持仓金额＝买入开盘价×买入手数。仅记录该笔新买入成本，不等于账户全部持仓估值；未买入为 0。单位：元。",
@@ -4594,7 +4600,57 @@ const V3 = (() => {
   }
   const quantity=v=>num(v)===null?'—':Number(v).toLocaleString('zh-CN')+' 手';
   const positionState=r=>({HOLDING:'持仓中',FROZEN_SUSPENDED:'停牌冻结',SOLD:'已卖出',SKIPPED:'未买入'}[r.positionState]||(!r.executed?'未买入':'待确认'));
+  function unboughtReason(r){
+    const text=String(r.status||r.skip_reason||'').trim();
+    return text && text!=='未买入' ? text : '未买入原因未记录';
+  }
   const positionMark=r=>r.positionState==='HOLDING'?'holding':r.positionState==='SOLD'?'sold':r.positionState==='FROZEN_SUSPENDED'?'frozen':'skipped';
+  function nextTrade(r){
+    return (rows||[]).filter(x=>x.date>r.date).sort((a,b)=>a.date.localeCompare(b.date))[0]||null;
+  }
+  function daySellProceeds(r){
+    if(!r||num(r.buyDayCash)==null||num(r.buyAmount)==null)return null;
+    return r.buyDayCash-r.buyAmount+(r.executed?Number(r.initial_buy_cost)||0:0);
+  }
+  function dayBook(date){
+    return date ? rows.ledger?.daily_stats?.[date] : null;
+  }
+  function dayClosePosition(book){
+    if(!book||num(book.ending_equity)==null||num(book.cash)==null)return null;
+    return book.ending_equity-book.cash;
+  }
+  function daySellProfit(date){
+    const profit=(rows||[]).flatMap(item=>item.events||[]).filter(e=>e.type==='sell'&&e.date===date).reduce((sum,e)=>sum+Number(e.profit||0),0);
+    return profit;
+  }
+  function daySellReturn(date, book){
+    const profit=daySellProfit(date);
+    if(!book||num(book.opening_equity)==null||!book.opening_equity)return null;
+    return profit/book.opening_equity*100;
+  }
+  function closeSnap(date){
+    const book=dayBook(date);
+    if(!book)return '<div class="stock-sub">这一天没有收盘账</div>';
+    const sellProfit=daySellProfit(date);
+    const sellRate=daySellReturn(date, book);
+    return `<div class="position-asof">${esc(date)}</div>`+detailMetrics([
+      ['卖出利润',fmt(sellProfit),'daySellProfit',true,'这一天账户卖出利润，对应同一天资金列的卖出回款'],
+      ['卖出收益率',fmt(sellRate,true),'daySellReturn',false,'卖出利润÷当日期初总资产×100%。和当天收益率用同一个分母',color(sellProfit)],
+      ['收盘持仓市值',money(dayClosePosition(book)),'closePosition',false,'收盘现金＋收盘持仓市值＝收盘总资产'],
+      ['收盘总资产',money(book.ending_equity),'ending',true],
+      ['当天收益利润',fmt(book.daily_profit),'dailyProfit',true,'收盘总资产－期初总资产'],
+      ['当天收益率',fmt(book.daily_return_pct,true),'dailyRate',false,'当天收益利润÷期初总资产',color(book.daily_profit)],
+    ]);
+  }
+  function fundSnap(r){
+    if(!r)return '<div class="stock-sub">没有下一天</div>';
+    return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
+      ['未持仓市值',money(r.buyAmount),'buyAmount',false,'这一天买入前已解锁现金'],
+      ['持仓资金',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'这一天实际买入'],
+      ['卖出回款',money(daySellProceeds(r)),'daySellProceeds',false,'这一天卖出回到现金的金额'],
+      ['收盘现金',money(r.buyDayCash),'buyDayCash',true,'未持仓市值－持仓资金＋卖出回款'],
+    ]);
+  }
   function detailValues(r,status){
     const sale=(slot,label)=>detailMetrics([
       [label+'卖价',price(r,slot),slot],
@@ -4606,9 +4662,10 @@ const V3 = (() => {
     return [
       `<span class="field-label"><time class="detail-date" datetime="${esc(r.date)}">${esc(r.date)}</time>${fieldNote("date","买入日")}</span><div class="stock-sub">买入日 · ${state.mode}</div>`,
       `<div class="detail-trade-block"><div class="trade-identity">${stock(r)}${fieldNote("stock_name","股票代码与名称")}</div>${detailMetrics([['分值',score(r),'score'],['板块',boardTag(r.board),'board'],['买入开盘价',price(r,'buy'),'buy'],['买入手数',quantity(r.executed?r.shares:0),'shares'],['买入持仓金额',money(r.initial_buy_cost),'initial_buy_cost']])}${status}</div>`,
-      detailMetrics([['期初总资产',assetMoney(r.capital,r.capital_marks),'capital',true],['昨日收盘现金',money(r.prevCloseCash),'prevCloseCash',false,'前一交易日收盘现金。今天的当前未持仓市值承接这个数'],['当前未持仓市值',money(r.buyAmount),'buyAmount',false,'买入前可用且已解锁现金，不含持仓或锁定回款。正常等于昨日收盘现金'],['当日可买资金',money(r.buyBudget),'buyBudget',true,'已确认：（期初总资产－停牌冻结持仓）×50%，实际买入另受可用现金限制'],['当日持仓资金',money(r.executed?r.initial_buy_cost:0),'dayBuyCost'],['当日剩余可用现金',money(r.buyDayCash),'buyDayCash',false,'买入日快照的全部账户现金＝总资产－所有持仓金额和利润']]),
-      `<div class="position-asof">${fieldLabel("positionState","持仓状态",`<span class="position-state ${positionMark(r)}">${positionState(r)}</span>`)}${fieldLabel("positionDate","持仓日期",esc(r.positionDate||cutoffDay()))}</div>`+detailMetrics([['单票累计卖出盈亏利润',fmt(r.cumulativeProfit),'cumulativeProfit',true],['单票累计卖出盈亏收益',fmt(r.cumulativeReturnPct,true),'cumulativeReturnPct'],['持仓 / 可用',`${quantity(r.holdingShares)} / ${quantity(r.availableShares)}`,'holdingShares',false,'当日买入可卖0；T+1为尚未卖出的剩余手数；停牌冻结为0'],['成本 / 合并现价',`${money(r.buy)} / ${money(r.mergedSellPrice)}`,'costCurrent',false,'成本为实际买入价；分时现价见9:35与13:35卖出列，合并价仅按真实卖出手数加权'],['单票当日盈亏收益率',fmt(r.positionDayReturnPct,true),'positionDayReturnPct',false,'当日单票利润 ÷ 前日该票持仓金额和利润；新买入以当日买入支付为分母'],['持仓金额和利润',money(r.positionValue),'positionValue'],['个股仓位',`<span class="weight-plain">${unsignedPct(r.positionWeight)}</span>`,'positionWeight',false,'只计算当前还持有的仓位。没持有为 0。只展示百分比，不加正负号，不上红绿底色']]),
-      `<div class="position-asof">${fieldLabel("positionDate","收益日期与状态",`${esc(r.positionDate||cutoffDay())} · ${esc(dayStatus(r.positionDayStatus))}`)}</div>`+detailMetrics([['合并卖出均价',money(r.mergedSellPrice),'mergedSellPrice',false,'按实际卖出手数加权，仅作价格展示'],['早午盘盈亏总收益率',fmt(r.sessionReturnPct,true),'sessionReturnPct',false,'早午盘实际利润 ÷ 已卖批次成本 ×100%'],['早午盘盈亏总利润',fmt(r.sessionProfit),'sessionProfit',true],['单票当天收益利润',fmt(r.positionDayProfit),'positionDayProfit',true],['单票当天收益贡献率',fmt(r.positionDayContributionPct,true),'positionDayContributionPct',false,'单票当日增量 ÷ 组合期初总资产 ×100%'],['组合期初总资产',money(r.positionDayOpening),'positionDayOpening'],['收盘总资产',money(r.positionCloseEquity),'positionCloseEquity',true,'收盘后确认，盘中留空；组合当天收益在上方摘要统一展示']]),
+      fundSnap(r),
+      fundSnap(nextTrade(r)),
+      closeSnap(r.date),
+      closeSnap(nextTrade(r)?.date),
       sale('am','9:35 '),sale('pm','13:35 '),
       `<div class="detail-actions">${operations(r)}</div>`
     ];
@@ -4618,7 +4675,7 @@ const V3 = (() => {
     if(masked())return '<span class="chip">已脱敏</span>';
     if(key==='open_price')return `<span title="${esc(t.open_price_date||t.signal_date||t.date)} · D0 开盘价${num(t.open_price)===null?'，行情缺失':''}">${money(t.open_price)}</span>`;
     if(placeholder(t))return '<span class="chip">空占位</span>';
-    if(!t.executed)return key==='buy'&&t.buy?`<span title="${esc(t.status)}">${money(t.buy)}</span>`:`<span class="position-state skipped" title="${esc(t.status)}">未买入</span>`;
+    if(!t.executed)return key==='buy'&&t.buy?`<span title="${esc(unboughtReason(t))}">${money(t.buy)}</span>`:'<span class="muted">—</span>';
     const prefix=state.mode==='D2'?'d2_':'',suffix=key==='am'?'935':'1335';
     if(t[key]===null){const label=t.remainingShares===0?'该时点未结算':t[key+'_status']==='未安排'?'尚未卖出':t[key+'_status']||'持仓中 / 缺价';return `<span class="muted" title="${esc(label)}${key==='pm'?'；不以13:15替代':''}">—<span class="stock-sub">${esc(label)}</span></span>`;}
     const sold=key==='buy'?'':t[key+'_sell_date']||'';
@@ -4670,11 +4727,11 @@ const V3 = (() => {
     const visible=sorted.slice((state.page-1)*per,state.page*per);
     const heads=detailHeaders;
     const sumrow='';
-    const status=r=>`<div class="stock-sub trade-note" data-unbought="${!r.executed}" title="${esc(r.status)} · 信号D0 ${esc(r.signal_date)} · 计划卖出 ${esc(r.planned_sell_date||'—')} · 初始${r.shares}手 / 剩余${r.remainingShares}手 · 剩余持仓 ${money(r.remaining_position_value)} · 已实现 ${money(r.realized_profit_total)} · 浮动 ${money(r.unrealized_profit)}"><span class="field-label"><span class="field-label-text">${!r.executed?'<span class="position-state skipped">未买入</span>':`${esc(r.status)}${r.fund_id?' · '+r.fund_id:''}${r.substituted_from?' · 停牌替补':''}`}</span>${fieldNote("status","交易状态")}</span></div>`;
+    const status=r=>`<div class="stock-sub trade-note" data-unbought="${!r.executed}" title="${esc(r.status)} · 信号D0 ${esc(r.signal_date)} · 计划卖出 ${esc(r.planned_sell_date||'—')} · 初始${r.shares}手 / 剩余${r.remainingShares}手 · 剩余持仓 ${money(r.remaining_position_value)} · 已实现 ${money(r.realized_profit_total)} · 浮动 ${money(r.unrealized_profit)}"><span class="field-label"><span class="field-label-text">${!r.executed?`<span class="unbought-reason">${esc(unboughtReason(r))}</span>`:`${esc(r.status)}${r.fund_id?' · '+r.fund_id:''}${r.substituted_from?' · 停牌替补':''}`}</span>${fieldNote("status","交易状态")}</span></div>`;
     const values=r=>detailValues(r,status(r));
     html+=table(heads,visible.map(r=>'<tr>'+values(r).map(cell).join('')+'</tr>').join(''),sumrow,true);
     html+=``;
-    html+=`<div class="mobilecards detail-mobilecards">${visible.map(r=>{const grouped=values(r);return `<article class="mobiletrade detail-mobiletrade"><div class="detail-mobile-date">${grouped[0]}</div><div class="detail-mobile-groups">${grouped.slice(1,7).map((value,i)=>`<section class="detail-mobile-group ${sessionClass(i+1)}"><h4>${heads[i+1]}</h4>${value}</section>`).join('')}</div><div class="detail-mobile-actions"><span>操作</span>${grouped[7]}</div></article>`;}).join('')||'<div class="empty-state">该范围暂无记录</div>'}</div>`;
+    html+=`<div class="mobilecards detail-mobilecards">${visible.map(r=>{const grouped=values(r);return `<article class="mobiletrade detail-mobiletrade"><div class="detail-mobile-date">${grouped[0]}</div><div class="detail-mobile-groups">${grouped.slice(1,8).map((value,i)=>`<section class="detail-mobile-group ${sessionClass(i+1)}"><h4>${heads[i+1]}</h4>${value}</section>`).join('')}</div><div class="detail-mobile-actions"><span>操作</span>${grouped[8]}</div></article>`;}).join('')||'<div class="empty-state">该范围暂无记录</div>'}</div>`;
     html+=`<div class="bottom"><span class="notice">共 ${a.length} 条 · 第 ${state.page} / ${pages} 页</span><div class="filters">${[['首页',1],['上一页',state.page-1],['下一页',state.page+1],['末页',pages]].map(([label,n],i)=>`<button class="btn" ${i<2?state.page<=1?'disabled':'':state.page>=pages?'disabled':''} onclick="V3.page(${n})">${label}</button>`).join('')}</div></div><div class="footnote">V2：资金快照对应买入日，持仓与当天收益对应所选截止日。卖出利润＝实际回款－分摊成本；价格收益率沿用价差百分数。单票当天收益扣除昨日持仓，组合收益在上方统一展示。可买资金按非冻结总资产50%，实际买入受现金限制；额度余款不是现金。自动更新：早盘推荐落盘、10:00、14:00、15:00。时点之间只读本机账本。当前总资产、当前可用现金、总市值用同一日期，总资产＝现金＋总市值。三个数都在早盘落盘、10:00、14:00、15:05 写入账本。</div></section>`;
     return html;
   }
