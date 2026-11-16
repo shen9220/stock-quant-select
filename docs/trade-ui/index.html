@@ -4733,6 +4733,7 @@ const V3 = (() => {
     if(left===0&&am>0&&!Number(row.pmShares||0))return `早盘卖出${name} ${hands(am)}，午盘不安排`;
     if(left===0&&pm>0&&!Number(row.amShares||0))return `早盘不安排，午盘卖出${name} ${hands(pm)}`;
     const bits=[];
+    if(am===0&&!amWait&&(pm>0||pmWait))bits.push('早盘这一天没卖');
     if(am>0)bits.push(`早盘卖出${name} ${hands(am)}`);
     else if(amWait)bits.push(amOn?`早盘${name}${blockPhrase(why)}`:`${name}早盘尚未到`);
     if(pm>0)bits.push(`午盘卖出${name} ${hands(pm)}`);
