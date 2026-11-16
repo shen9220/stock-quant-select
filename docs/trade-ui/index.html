@@ -1489,7 +1489,7 @@ html[data-skin="night"] #v3Root .latest-card .name-link{color:#f1f5f9}
 #v3Root .detail-heading{margin-bottom:14px}
 #v3Root .detail-heading-line{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px 20px}
 #v3Root .detail-heading-line>.hint{flex:1 1 280px;margin:0}
-#v3Root .day-record{flex:1 1 360px;max-width:560px;margin-left:auto;padding:10px 14px;border:1px solid #d7e0ee;border-radius:12px;background:#f7f9fc;color:#1e293b}
+#v3Root .day-record{position:static;inset:auto;flex:1 1 320px;width:auto;max-width:520px;height:auto;margin-left:auto;overflow:visible;z-index:auto;transform:none;padding:10px 14px;border:1px solid #d7e0ee;border-radius:12px;background:#f7f9fc;color:#1e293b}
 #v3Root .day-record p{margin:0;font-size:13px;line-height:1.7}
 #v3Root .day-record b{font-weight:700}
 html[data-skin="night"] #v3Root .day-record{background:#172033;border-color:#3e506b;color:#e2e8f0}
@@ -1566,6 +1566,9 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .detail-trade-block .trade-identity{align-items:center}
 #v3Root .position-asof>.field-label{flex-shrink:0}
 #v3Root .position-asof{align-items:center;gap:8px}
+#v3Root .main{margin-left:0;width:100%}
+#v3Root .day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;overflow:visible;z-index:1;transform:none}
+#v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
 
 </style>
 </head>
@@ -4541,59 +4544,61 @@ const V3 = (() => {
   "stock_name": "代码和名称。停牌替补时显示实际买入的票。",
   "score": "信号日评分。没有记录显示 —，不借别的票的分。",
   "board": "板块。不参与金额计算。",
-  "buy": "买入日开盘价，也是成本价。单位：元。",
+  "buy": "买入日开盘价，也是成本价。",
   "shares": "实际买入手数。金额＝价格×手数。未买入为 0。",
-  "initial_buy_cost": "买入开盘价×买入手数。卖出后仍保留这笔成本。单位：元。",
-  "capital": "买入日的期初总资产，取前一交易日收盘总资产。单位：元。",
-  "prevCloseCash": "前一交易日收盘现金。单位：元。",
-  "prevClosePosition": "期初总资产－昨日收盘现金。两者相加等于期初总资产。单位：元。",
-  "daySellProceeds": "这一天卖出回到现金的金额。收盘现金＝未持仓市值－持仓资金＋卖出回款。单位：元。",
-  "buyAmount": "买入前已解锁的现金。正常等于昨天收盘现金。没卖完的回款还锁着，所以可能更少。单位：元。",
-  "buyBudget": "可买上限＝（期初总资产－停牌冻结）×50%。还要受现金和整手限制。不是账户全部现金。单位：元。",
-  "dayBuyCost": "这一天实际买入金额＝开盘价×手数。未买入为 0。单位：元。",
-  "buyDayCash": "这一天收盘现金＝未持仓市值－持仓资金＋卖出回款。下一天能买的钱从已解锁部分接。单位：元。",
-  "daySellProfit": "这一天已卖出的利润合计＝回款－分摊成本。不含还持有的浮动盈亏。单位：元。",
+  "initial_buy_cost": "买入开盘价×买入手数。卖出后仍保留这笔成本。",
+  "capital": "买入日的期初总资产，取前一交易日收盘总资产。",
+  "prevCloseCash": "前一交易日收盘现金。",
+  "prevClosePosition": "期初总资产－昨日收盘现金。两者相加等于期初总资产。",
+  "daySellProceeds": "这一天卖出回到现金的金额。收盘现金＝未持仓市值－持仓资金＋卖出回款。",
+  "buyAmount": "买入前已解锁的现金。正常等于昨天收盘现金。没卖完的回款还锁着，所以可能更少。",
+  "buyBudget": "可买上限＝（期初总资产－停牌冻结）×50%。还要受现金和整手限制。不是账户全部现金。",
+  "dayBuyCost": "这一天实际买入金额＝开盘价×手数。未买入为 0。",
+  "buyDayCash": "这一天收盘现金＝未持仓市值－持仓资金＋卖出回款。下一天能买的钱从已解锁部分接。",
+  "daySellProfit": "这一天已卖出的利润合计＝回款－分摊成本。不含还持有的浮动盈亏。",
   "daySellReturn": "卖出利润÷当日期初总资产×100%。和当天收益率用同一个分母。",
-  "closePosition": "收盘时还持有的市值。收盘现金＋收盘持仓市值＝收盘总资产。单位：元。",
-  "ending": "收盘总资产＝期初总资产＋当天收益利润。单位：元。",
-  "dailyProfit": "当天收益利润＝收盘总资产－期初总资产。单位：元。",
+  "closePosition": "收盘时还持有的市值。收盘现金＋收盘持仓市值＝收盘总资产。",
+  "ending": "收盘总资产＝期初总资产＋当天收益利润。",
+  "dailyProfit": "当天收益利润＝收盘总资产－期初总资产。",
   "dailyRate": "当天收益利润÷期初总资产×100%。",
-  "mergedSellPrice": "已卖出的手数加权均价。只展示，不重算利润。没卖出显示 —。单位：元。",
+  "mergedSellPrice": "已卖出的手数加权均价。只展示，不重算利润。没卖出显示 —。",
   "sessionReturnPct": "（9:35利润＋13:35利润）÷已卖成本×100%。没卖出显示 —。",
-  "sessionProfit": "9:35利润＋13:35利润。只算已经卖出的批次。单位：元。",
-  "positionDayProfit": "这一天这只票的盈亏增量。停牌日记 0，缺估值留空。单位：元。",
+  "sessionProfit": "9:35利润＋13:35利润。只算已经卖出的批次。",
+  "positionDayProfit": "这一天这只票的盈亏增量。停牌日记 0，缺估值留空。",
   "positionDayContributionPct": "单票当天收益利润÷组合期初总资产×100%。",
-  "positionDayOpening": "收益日的期初总资产，取前一交易日收盘。同日各票共用。单位：元。",
-  "positionCloseEquity": "收益日收盘总资产＝期初＋当天收益利润。盘中留空。单位：元。",
-  "cumulativeProfit": "累计回款＋剩余持仓市值－买入成本。含还没卖出的浮动盈亏。单位：元。",
+  "positionDayOpening": "收益日的期初总资产，取前一交易日收盘。同日各票共用。",
+  "positionCloseEquity": "收益日收盘总资产＝期初＋当天收益利润。盘中留空。",
+  "cumulativeProfit": "累计回款＋剩余持仓市值－买入成本。含还没卖出的浮动盈亏。",
   "cumulativeReturnPct": "累计盈亏金额÷买入成本×100%。成本为 0 时不计算。",
   "holdingShares": "左为剩余手数，右为还能卖的手数。当天新买入可卖为 0，停牌可卖为 0。",
-  "costCurrent": "左为买入价，右为已卖出的加权均价。单位：元。",
+  "costCurrent": "左为买入价，右为已卖出的加权均价。",
   "positionDayReturnPct": "单票当天收益利润÷这只票昨收市值×100%。新买入用买入金额做分母。",
-  "positionValue": "剩余持仓市值。全部卖出为 0，缺估值留空。单位：元。",
+  "positionValue": "剩余持仓市值。全部卖出为 0，缺估值留空。",
   "positionWeight": "剩余市值÷组合总资产×100%。只表示占比，不是收益率。",
   "positionState": "持仓中、停牌冻结、已卖出或未买入。颜色只区分状态。",
   "positionDate": "持仓和收益对应的交易日。周末不另造收益。",
   "status": "已买入、未买入或顺延原因。不参与金额相加。",
-  "am": "9:35 实际卖出价。没卖出留空。单位：元。",
+  "am": "9:35 实际卖出价。没卖出留空。",
   "amSoldShares": "9:35 已卖手数。涨跌停或还没到点的不算。",
   "amMarketChangePct": "卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润。",
   "amSellReturnPct": "这一批利润÷卖出日组合期初总资产×100%。",
-  "amSellProfit": "这一批回款－这一批分摊成本。单位：元。",
-  "pm": "13:35 实际卖出价。没卖出留空。单位：元。",
+  "amSellProfit": "这一批回款－这一批分摊成本。",
+  "pm": "13:35 实际卖出价。没卖出留空。",
   "pmSoldShares": "13:35 已卖手数。涨跌停或还没到点的不算。",
   "pmMarketChangePct": "卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润。",
   "pmSellReturnPct": "这一批利润÷卖出日组合期初总资产×100%。",
-  "pmSellProfit": "这一批回款－这一批分摊成本。单位：元。",
-  "当前总资产": "可用现金＋总市值。同一天的数。单位：元。",
-  "当前可用现金": "还没变成持仓的现金。和当天买入行的收盘现金是同一个数。不是买入额度。单位：元。",
-  "总市值": "还持有的市值，含浮动盈亏，不含现金。单位：元。",
-  "当月累计卖出利润": "本月 9:35 和 13:35 已卖利润之和。不含浮动盈亏。单位：元。",
-  "当天收益利润": "当前总资产－当日期初总资产。收益率用当日期初做分母。单位：元。",
-  "当天期初总资产": "前一交易日收盘总资产，是当天收益的分母。单位：元。",
-  "9:35累计卖出利润": "本月 9:35 已卖利润之和。不含 13:35，不含浮动盈亏。单位：元。",
-  "13:35累计卖出利润": "本月 13:35 已卖利润之和。不含 9:35，不含浮动盈亏。单位：元。",
-  "latest": "筛选范围内最近一笔买入。还没确认成交时不编买入金额。"
+  "pmSellProfit": "这一批回款－这一批分摊成本。",
+  "当前总资产": "可用现金＋总市值。同一天的数。",
+  "当前可用现金": "还没变成持仓的现金。和当天买入行的收盘现金是同一个数。不是买入额度。",
+  "总市值": "还持有的市值，含浮动盈亏，不含现金。",
+  "当月累计卖出利润": "本月 9:35 和 13:35 已卖利润之和。不含浮动盈亏。",
+  "当天收益利润": "当前总资产－当日期初总资产。收益率用当日期初做分母。",
+  "当天期初总资产": "前一交易日收盘总资产，是当天收益的分母。",
+  "9:35累计卖出利润": "本月 9:35 已卖利润之和。不含 13:35，不含浮动盈亏。",
+  "13:35累计卖出利润": "本月 13:35 已卖利润之和。不含 9:35，不含浮动盈亏。",
+  "latest": "筛选范围内最近一笔买入。还没确认成交时不编买入金额。",
+  "preEquity": "开盘前的总资产，等于开盘前现金加开盘前市值。和顶部当天期初总资产同一口径。市值固定用开盘前的数，当天不再改。",
+  "postEquity": "持仓市值加未持仓现金。和顶部当前总资产同一口径。盘后按当天四次账本滚动：早盘落盘、10:00、14:00、15:05。较盘前就是这段利润变化。"
 };
   function fieldLabel(key,label,content=esc(label)){return `<span class="field-label"><span class="field-label-text">${content}</span>${fieldNote(key,label)}</span>`;}
   function fieldNote(key,label){return fieldHelp[key]?`<button type="button" class="field-note" data-key="${esc(key)}" data-label="${esc(label)}" aria-label="${esc(label)}字段说明" aria-haspopup="dialog" onclick="event.stopPropagation();V3.explain(this.dataset.key,this.dataset.label)"><svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.8v4.8"/><circle cx="10" cy="13.7" r=".8" fill="currentColor" stroke="none"/></svg></button>`:'';}
@@ -4602,7 +4607,7 @@ const V3 = (() => {
     let dialog=document.getElementById('v3FieldHelp');
     if(!dialog){dialog=document.createElement('dialog');dialog.id='v3FieldHelp';dialog.className='field-help-dialog';document.getElementById('v3Root').appendChild(dialog);dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});}
     dialog.setAttribute('aria-labelledby','v3FieldHelpTitle');
-    dialog.innerHTML=`<div class="field-help-top"><h3 id="v3FieldHelpTitle">${esc(label)}</h3><button type="button" class="btn" autofocus aria-label="关闭字段说明" onclick="this.closest('dialog').close()">关闭</button></div><p>${esc(fieldHelp[key])}</p><div class="field-help-source">金额单位：元。比例是百分数。— 表示没有数，不是 0。</div>`;
+    dialog.innerHTML=`<div class="field-help-top"><h3 id="v3FieldHelpTitle">${esc(label)}</h3><button type="button" class="btn" autofocus aria-label="关闭字段说明" onclick="this.closest('dialog').close()">关闭</button></div><p>${esc(fieldHelp[key])}</p><div class="field-help-source">比例是百分数。— 表示没有数，不是 0。</div>`;
     dialog.showModal();
   }
   function detailMetrics(items){return `<dl class="detail-metrics">${items.map(([label,value,key='',primary=false,title='',tone=''])=>`<div class="detail-metric${primary?' metric-primary':''}"${key?` data-field="${esc(key)}"`:''}${title?` title="${esc(title)}"`:''}${tone?` data-tone="${tone}"`:''}><dt>${fieldLabel(key,label)}</dt><dd>${value}</dd></div>`).join('')}</dl>`;}
@@ -4654,14 +4659,40 @@ const V3 = (() => {
       ['当天收益率',fmt(book.daily_return_pct,true),'dailyRate',false,'当天收益利润÷期初总资产',color(book.daily_profit)],
     ]);
   }
+  function preEquity(book){return book?num(book.opening_equity):null;}
+  function postEquity(book){
+    if(!book)return null;
+    const cash=num(book.cash),market=num(book.position_value);
+    if(cash!==null&&market!==null)return cents(cash+market);
+    return num(book.ending_equity);
+  }
+  function pointMoves(date){
+    const book=dayBook(date);
+    if(!book)return '';
+    const open=preEquity(book);
+    const snaps=(rows.ledger?.snapshots||[]).filter(s=>s.date===date&&s.period===book.period);
+    return [['早盘','09:30'],['10:00','10:00'],['14:00','14:00'],['收盘','close']].map(([label,time])=>{
+      const snap=snaps.find(s=>s.time===time);
+      const equity=snap?num(snap.reference_equity??snap.equity):null;
+      if(equity===null||open===null)return `${label} —`;
+      const delta=cents(equity-open);
+      return `${label} ${delta>0?'+':''}${money(delta)}`;
+    }).join(' · ');
+  }
   function fundSnap(r){
     if(!r)return '<div class="stock-sub">没有下一天</div>';
+    const book=dayBook(r.date),open=preEquity(book),post=postEquity(book);
+    const delta=open!==null&&post!==null?cents(post-open):null;
+    const path=pointMoves(r.date);
+    const postValue=`${money(post)}${delta===null?'':`<span class="equity-path">较盘前 ${delta>0?'+':''}${money(delta)}</span>`}`;
     return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
+      ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前市值，和顶部当天期初总资产同一口径。市值用开盘前的数'],
       ['未持仓市值',money(r.buyAmount),'buyAmount',false,'这一天买入前已解锁现金'],
       ['持仓资金',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'这一天实际买入'],
       ['卖出回款',money(daySellProceeds(r)),'daySellProceeds',false,'这一天卖出回到现金的金额'],
-      ['收盘现金',money(r.buyDayCash),'buyDayCash',true,'未持仓市值－持仓资金＋卖出回款'],
-    ]);
+      ['收盘现金',money(r.buyDayCash),'buyDayCash',false,'未持仓市值－持仓资金＋卖出回款'],
+      ['盘后当前总资产',postValue,'postEquity',true,path||'持仓市值＋未持仓现金，和顶部当前总资产同一口径'],
+    ])+(path?`<div class="equity-path">${esc(path)}</div>`:'');
   }
   function detailValues(r,status){
     const sale=(slot,label)=>detailMetrics([
@@ -4669,7 +4700,7 @@ const V3 = (() => {
       [label+'卖出手数',quantity(r[slot+'SoldShares']),slot+'SoldShares'],
       [label+'卖出盈亏率',fmt(r[slot+'MarketChangePct'],true),slot+'MarketChangePct',false,'卖出时股价相对卖出日前收盘价的涨跌幅，仅记录行情，不参与利润计算',color(r[slot+'MarketChangePct'])],
       [label+'卖出收益率',fmt(r[slot+'SellReturnPct'],true),slot+'SellReturnPct',false,'真实卖出利润 ÷ 卖出日组合期初总资产 × 100%',color(r[slot+'SellProfit'])],
-      [label+'卖出利润',fmt(r[slot+'SellProfit']),slot+'SellProfit',true,'已卖回款减实际卖出手数对应成本，单位：元',color(r[slot+'SellProfit'])]
+      [label+'卖出利润',fmt(r[slot+'SellProfit']),slot+'SellProfit',true,'已卖回款减实际卖出手数对应成本',color(r[slot+'SellProfit'])]
     ]);
     return [
       `<span class="field-label"><time class="detail-date" datetime="${esc(r.date)}">${esc(r.date)}</time>${fieldNote("date","买入日")}</span><div class="stock-sub">买入日 · ${state.mode}</div>`,
@@ -4773,7 +4804,7 @@ const V3 = (() => {
     const sells=rows.filter(r=>r.executed&&(soldShares(r,day)>0||legWaiting(r,day,'am')||legWaiting(r,day,'pm'))).map(r=>sellLine(r,day)).filter(Boolean);
     const title=(rows.ledger?.as_of||'').slice(0,10)===day?'今日记录':`${day} 记录`;
     const text=[buyLine(day),...sells,`截止当前可用现金 ${money(cash)}`,affordLine(day,cash)].join('，');
-    return `<aside class="day-record" aria-label="${esc(title)}"><p><b>${esc(title)}：</b>${esc(text)}</p></aside>`;
+    return `<div class="day-record" role="note" aria-label="${esc(title)}"><p><b>${esc(title)}：</b>${esc(text)}</p></div>`;
   }
   function trade(){
     const a=scoped(rows),t=totals(a),latest=latestBuy(a),from=state.from||state.month,to=state.to||state.month;
