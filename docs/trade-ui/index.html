@@ -1573,6 +1573,7 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .detail-heading>.day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none;align-self:center}
 #v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
 #v3Root .fund-split{height:1px;margin:6px 0;background:var(--line,#e5e7eb)}
+#v3Root .fund-split-tight{margin:3px 0 2px}
 #v3Root .fund-chain{display:flex;flex-direction:column;gap:0}
 #v3Root .fund-line{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:10px;line-height:1.35}
 #v3Root .fund-name{color:var(--detail-label);font-size:11px;font-weight:400}
@@ -4756,11 +4757,11 @@ const V3 = (() => {
     ])+'<div class="fund-split"></div><div class="fund-chain">'+
       chain('未持仓市值',cashOpen,'buyAmount','买入前现金。正推起点')+op('−')+
       chain('持仓市值',bought,'dayBuyCost','今天新买成本。从现金减去')+op('+')+
-      chain('卖出市值',sold,'daySellProceeds','今天卖出回到现金')+op('=')+
+      chain('卖出市值',sold,'daySellProceeds','今天卖出回到现金')+'<div class="fund-split fund-split-tight"></div>'+op('=')+
       chain('收盘现金',cashClose,'buyDayCash','未持仓市值−持仓市值+卖出市值')+op('+')+
-      chain('收盘持仓市值',holdClose,'closeHold','收盘还持有的市值')+op('=')+
+      chain('收盘持仓市值',holdClose,'closeHold','收盘还持有的市值')+'<div class="fund-split fund-split-tight"></div>'+op('=')+
       chain('盘后当前总资产',post,'postEquity','收盘现金+收盘持仓市值')+
-    '</div><div class="fund-split"></div>'+detailMetrics([
+    '</div>'+detailMetrics([
       ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'（盘后当前总资产－盘前当前总资产）÷盘前当前总资产×100%',color(delta)],
     ])+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
   }
