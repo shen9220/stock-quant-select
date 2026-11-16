@@ -4754,8 +4754,7 @@ const V3 = (() => {
       ['收盘持仓市值',money(holdClose),'closePosition',false,'收盘还持有的市值。倒推：盘后总资产－收盘现金'],
       ['盘后当前总资产',money(post),'postEquity',true,'收盘现金＋收盘持仓市值'],
     ])+'<div class="fund-split"></div>'+detailMetrics([
-      ['较盘前',delta===null?'—':fmt(delta),'preDelta',false,'盘后当前总资产－盘前当前总资产',color(delta)],
-      ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'较盘前÷盘前当前总资产×100%',color(delta)],
+      ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'（盘后当前总资产－盘前当前总资产）÷盘前当前总资产×100%',color(delta)],
     ])+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
   }
   function detailValues(r,status){
