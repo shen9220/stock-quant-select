@@ -1573,7 +1573,6 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .detail-heading>.day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none;align-self:center}
 #v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
 #v3Root .fund-split{height:1px;margin:6px 0;background:var(--line,#e5e7eb)}
-#v3Root .fund-compare{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;font-weight:650}
 #v3Root .equity-rate{display:block;margin-top:2px;font-size:11px;font-weight:700}
 #v3Root .sell-date-late{color:#8e1528!important;font-weight:700}
 #v3Root .detail-metric[data-field="closePosition"]{padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--line)}
@@ -4736,11 +4735,15 @@ const V3 = (() => {
     return `<div class="position-asof">${esc(r.date)}</div><div class="fund-layout">`+detailMetrics([
       ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前市值'],
     ])+'<div class="fund-split"></div>'+detailMetrics([
-      ['持仓市值',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'和原持仓资金同一口径，这一天实际买入'],
-      ['未持仓市值',money(r.buyAmount),'buyAmount',false,'这一天买入前已解锁现金'],
-      ['卖出市值',money(daySellProceeds(r)),'daySellProceeds',false,'这一天卖出回到现金的金额，原卖出回款'],
-      ['盘后当前总资产',money(post),'postEquity',true,'持仓市值＋未持仓现金'],
-    ])+`<div class="fund-split"></div><div class="fund-compare"><div>较盘前 ${delta===null?'—':(delta>0?'+':'')+money(delta)}</div><div>收益率 ${assetRate===null?'—':fmt(assetRate,true)}</div></div>`+(path?`<div class="equity-path">${esc(path)}</div>`:'')+'</div>';
+      ['持仓市值',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'这一天实际买入的成本。原持仓资金，公式不变'],
+      ['未持仓市值',money(r.buyAmount),'buyAmount',false,'买入前已解锁现金。不是收盘现金'],
+      ['卖出市值',money(daySellProceeds(r)),'daySellProceeds',false,'卖出回到现金的金额。收盘现金＝未持仓市值－持仓市值＋卖出市值'],
+      ['盘后当前总资产',money(post),'postEquity',true,'收盘现金＋收盘还持有的市值。不是持仓市值加未持仓市值'],
+    ])+'<div class="fund-split"></div>'+detailMetrics([
+      ['较盘前',delta===null?'—':fmt(delta),'preDelta',false,'盘后当前总资产－盘前当前总资产',color(delta)],
+      ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'较盘前÷盘前当前总资产×100%',color(delta)],
+      ['时点',path||'—','pointMoves',false,'相对盘前的变动。只保留早盘和收盘'],
+    ])+'</div>';
   }
   function detailValues(r,status){
     const sale=(slot,label)=>detailMetrics([
