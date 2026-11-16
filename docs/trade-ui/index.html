@@ -1486,13 +1486,16 @@ html[data-skin="night"] #v3Root .latest-card .name-link{color:#f1f5f9}
 
 /* Keep the trade mode and rank centered in the detail filter bar. */
 #v3Root .detail-paneltop{display:block}
-#v3Root .detail-heading{margin-bottom:14px}
-#v3Root .detail-title-row{display:flex;align-items:center;justify-content:space-between;gap:18px}
-#v3Root .detail-title-row h3{margin:0;flex:0 0 auto;line-height:1.4}
-#v3Root .day-record{position:static;inset:auto;flex:1 1 480px;width:auto;max-width:760px;height:auto;margin:0 0 0 auto;overflow:hidden;z-index:auto;transform:none;padding:3px 12px;border:1px solid #c5ddf6;border-radius:8px;background:#d7ebfb;color:#8e1528;align-self:center}
-#v3Root .day-record p{margin:0;font-size:12px;font-weight:700;line-height:1.35;color:#8e1528;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-#v3Root .day-record b{font-weight:700;color:#8e1528}
-html[data-skin="night"] #v3Root .day-record,html[data-skin="night"] #v3Root .day-record p,html[data-skin="night"] #v3Root .day-record b{background:#d7ebfb;border-color:#c5ddf6;color:#8e1528}
+#v3Root .detail-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}
+#v3Root .detail-heading-copy{flex:0 1 auto;min-width:0}
+#v3Root .detail-heading-copy h3{margin:0;line-height:1.4}
+#v3Root .detail-heading-copy .hint{margin:4px 0 0}
+#v3Root .day-record{position:static;inset:auto;flex:1 1 480px;width:auto;max-width:760px;height:auto;margin:0 0 0 auto;overflow:hidden;z-index:auto;transform:none;padding:4px 12px;border:1px solid #c5ddf6;border-radius:8px;background:#d7ebfb;color:var(--text);align-self:center}
+#v3Root .day-record p{margin:0;font-size:12px;font-weight:400;line-height:1.35;color:var(--text);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#v3Root .day-record-label{font-weight:700;color:#8e1528}
+html[data-skin="night"] #v3Root .day-record{background:#d7ebfb;border-color:#c5ddf6;color:#192b45}
+html[data-skin="night"] #v3Root .day-record p{color:#192b45}
+html[data-skin="night"] #v3Root .day-record-label{color:#8e1528}
 #v3Root .detail-filters{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:16px;width:100%}
 #v3Root .detail-filter-search{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
 #v3Root .detail-switches{justify-content:center;gap:12px;justify-self:center;flex-wrap:nowrap}
@@ -1567,7 +1570,7 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .position-asof>.field-label{flex-shrink:0}
 #v3Root .position-asof{align-items:center;gap:8px}
 #v3Root .main{margin-left:0;width:100%}
-#v3Root .detail-title-row .day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none}
+#v3Root .detail-heading>.day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none;align-self:center}
 #v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
 
 </style>
@@ -4805,7 +4808,8 @@ const V3 = (() => {
     const sells=rows.filter(r=>r.executed&&(soldShares(r,day)>0||legWaiting(r,day,'am')||legWaiting(r,day,'pm'))).map(r=>sellLine(r,day)).filter(Boolean);
     const title=(rows.ledger?.as_of||'').slice(0,10)===day?'今日记录':`${day} 记录`;
     const text=[buyLine(day),...sells,`截止当前可用现金 ${money(cash)}`,affordLine(day,cash)].join('，');
-    return `<div class="day-record" role="note" aria-label="${esc(title)}"><p><b>${esc(title)}：</b>${esc(text)}</p></div>`;
+    const label=title==='今日记录'?`<b class="day-record-label">今日记录：</b>`:`<b>${esc(title)}：</b>`;
+    return `<div class="day-record" role="note" aria-label="${esc(title)}"><p>${label}<span class="day-record-text">${esc(text)}</span></p></div>`;
   }
   function trade(){
     const a=scoped(rows),t=totals(a),latest=latestBuy(a),from=state.from||state.month,to=state.to||state.month;
@@ -4823,7 +4827,7 @@ const V3 = (() => {
     html+=card('9:35累计卖出利润',fmt(stats.amSellProfit),'收益率分母为本月期初总资产','#d95770',stats.amCardReturnPct);
     html+=card('13:35累计卖出利润',fmt(stats.pmSellProfit),'收益率分母为本月期初总资产','#19a78e',stats.pmCardReturnPct)+'</div>';
     html+=dailyPerformance(rows,cutoffDay());
-    html+=`<section class="panel"><div class="paneltop detail-paneltop"><div class="detail-heading"><div class="detail-title-row"><h3>逐笔交易明细 · V2 · ${state.mode}</h3>${dayRecordCard(cutoffDay())}</div><div class="hint">按买入日筛选 · 持仓与当天收益截至 ${cutoffDay()} · 手数直接乘价格 · 金额：元</div></div><div class="filters detail-filters"><div class="detail-filter-search"><input class="field trade-search" aria-label="搜索代码或名称" placeholder="搜索代码 / 名称" value="${esc(state.keyword)}" onchange="V3.set('keyword',this.value)">${!window.__PAGES_MODE__?'<button class="btn primary" onclick="V3.edit()">＋ 新增</button>':''}</div><div class="actions detail-switches" role="group" aria-label="交易模式与名次">${modeTabs()}${rankTabs()}</div><div class="detail-filter-dates">${monthControls()}</div></div></div>`;
+    html+=`<section class="panel"><div class="paneltop detail-paneltop"><div class="detail-heading"><div class="detail-heading-copy"><h3>逐笔交易明细 · V2 · ${state.mode}</h3><div class="hint">按买入日筛选 · 持仓与当天收益截至 ${cutoffDay()} · 手数直接乘价格 · 金额：元</div></div>${dayRecordCard(cutoffDay())}</div><div class="filters detail-filters"><div class="detail-filter-search"><input class="field trade-search" aria-label="搜索代码或名称" placeholder="搜索代码 / 名称" value="${esc(state.keyword)}" onchange="V3.set('keyword',this.value)">${!window.__PAGES_MODE__?'<button class="btn primary" onclick="V3.edit()">＋ 新增</button>':''}</div><div class="actions detail-switches" role="group" aria-label="交易模式与名次">${modeTabs()}${rankTabs()}</div><div class="detail-filter-dates">${monthControls()}</div></div></div>`;
     const multi=state.from&&state.from!==state.to,per=multi?state.per:Math.max(1,a.length),pages=Math.max(1,Math.ceil(a.length/per));state.page=Math.min(state.page,pages);
     const sorted=[...a].sort((a,b)=>{const x=a[state.sort],y=b[state.sort];if(x==null)return 1;if(y==null)return -1;return state.dir*(typeof x==='number'?x-y:String(x).localeCompare(String(y)));});
     const visible=sorted.slice((state.page-1)*per,state.page*per);
