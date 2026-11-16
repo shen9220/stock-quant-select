@@ -1573,6 +1573,12 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .detail-heading>.day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none;align-self:center}
 #v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
 #v3Root .fund-split{height:1px;margin:6px 0;background:var(--line,#e5e7eb)}
+#v3Root .move-pair{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:8px;font-size:12px;font-weight:550;font-variant-numeric:tabular-nums}
+#v3Root .move-left{text-align:left}
+#v3Root .move-right{margin-left:auto;text-align:right}
+#v3Root .move-label{margin-right:6px;color:var(--detail-label);font-size:11px;font-weight:400}
+#v3Root .num-flat{color:#111}
+html[data-skin="night"] #v3Root .num-flat{color:#f4f4f5}
 #v3Root .equity-rate{display:block;margin-top:2px;font-size:11px;font-weight:700}
 #v3Root .sell-date-late{color:#8e1528!important;font-weight:700}
 #v3Root .detail-metric[data-field="closePosition"]{padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--line)}
@@ -4686,9 +4692,8 @@ const V3 = (() => {
       ['当天收益率',fmt(dayRate,true),'dayRate',false,'当天利润÷盘前当前总资产×100%',color(dayProfit)],
       ['当天卖出利润',fmt(sellProfit),'stockDaySellProfit',true,'这只票当天 9:35 与 13:35 卖出利润之和。当天没卖出为 0',color(sellProfit)],
       ['当天卖出收益率',fmt(sellRate,true),'stockDaySellRate',false,'当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0',color(sellProfit)],
-      ['当天收盘总资产',money(closeEquity),'ending',true,'持仓市值＋未持仓金额。不再另加当天利润'],
-      ['收盘当天利润',fmt(dayProfit),'closeDayProfit',true,'收盘总资产－盘前当前总资产，和当天利润同一个数',color(dayProfit)],
-      ['收盘当天收益率',fmt(dayRate,true),'closeDayRate',false,'收盘当天利润÷盘前当前总资产×100%',color(dayProfit)],
+    ])+'<div class="fund-split"></div>'+detailMetrics([
+      ['当天收盘总资产',money(closeEquity),'ending',true,'收盘现金＋收盘持仓市值。不再另加当天利润'],
     ]);
   }
   function stockRecord(r){
@@ -4712,38 +4717,46 @@ const V3 = (() => {
     if(cash!==null&&market!==null)return cents(cash+market);
     return num(book.ending_equity);
   }
-  function pointMoves(date){
+  function pointDelta(date, time){
     const book=dayBook(date);
-    if(!book)return '';
-    const open=preEquity(book);
+    if(!book)return null;
+    const open=cents(preEquity(book));
     const snaps=(rows.ledger?.snapshots||[]).filter(s=>s.date===date&&s.period===book.period);
-    return [['早盘','09:30'],['收盘','close']].map(([label,time])=>{
-      const snap=snaps.find(s=>s.time===time);
-      const equity=snap?cents(snap.reference_equity??snap.equity):null;
-      const base=cents(open);
-      if(equity===null||base===null)return `${label} —`;
-      const delta=cents(equity-base);
-      return `${label}${delta>0?'+':''}${money(delta)}`;
-    }).join('·');
+    const snap=snaps.find(s=>s.time===time);
+    const equity=snap?cents(snap.reference_equity??snap.equity):null;
+    if(equity===null||open===null)return null;
+    return cents(equity-open);
+  }
+  function signedNum(v){
+    if(num(v)===null)return '<span class="num-flat">—</span>';
+    const n=Number(v);
+    const cls=n>0?'red':n<0?'green':'num-flat';
+    const text=n>0?'+'+money(n):money(n);
+    return `<span class="${cls}">${text}</span>`;
   }
   function fundSnap(r){
     if(!r)return '<div class="stock-sub">没有这一天</div>';
     const book=dayBook(r.date),open=preEquity(book),post=postEquity(book);
+    const cashOpen=num(r.buyAmount);
+    const bought=r.executed?num(r.initial_buy_cost)||0:0;
+    const sold=daySellProceeds(r);
+    const cashClose=num(r.buyDayCash);
+    const holdClose=book?dayClosePosition(book):null;
     const delta=open!==null&&post!==null?cents(post-open):null;
-    const path=pointMoves(r.date);
     const assetRate=open&&post!==null?(post-open)/open*100:null;
     return `<div class="position-asof">${esc(r.date)}</div><div class="fund-layout">`+detailMetrics([
-      ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前市值'],
+      ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前持仓市值'],
     ])+'<div class="fund-split"></div>'+detailMetrics([
-      ['持仓市值',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'这一天实际买入的成本。原持仓资金，公式不变'],
-      ['未持仓市值',money(r.buyAmount),'buyAmount',false,'买入前已解锁现金。不是收盘现金'],
-      ['卖出市值',money(daySellProceeds(r)),'daySellProceeds',false,'卖出回到现金的金额。收盘现金＝未持仓市值－持仓市值＋卖出市值'],
-      ['盘后当前总资产',money(post),'postEquity',true,'收盘现金＋收盘还持有的市值。不是持仓市值加未持仓市值'],
+      ['未持仓市值',money(cashOpen),'buyAmount',false,'买入前现金。正推起点'],
+      ['持仓市值',money(bought),'dayBuyCost',false,'今天新买成本。从现金减去'],
+      ['卖出市值',money(sold),'daySellProceeds',false,'今天卖出回到现金。加回收盘现金'],
+      ['收盘现金',money(cashClose),'buyDayCash',false,'未持仓市值－持仓市值＋卖出市值'],
+      ['收盘持仓市值',money(holdClose),'closePosition',false,'收盘还持有的市值。倒推：盘后总资产－收盘现金'],
+      ['盘后当前总资产',money(post),'postEquity',true,'收盘现金＋收盘持仓市值'],
     ])+'<div class="fund-split"></div>'+detailMetrics([
       ['较盘前',delta===null?'—':fmt(delta),'preDelta',false,'盘后当前总资产－盘前当前总资产',color(delta)],
       ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'较盘前÷盘前当前总资产×100%',color(delta)],
-      ['时点',path||'—','pointMoves',false,'相对盘前的变动。只保留早盘和收盘'],
-    ])+'</div>';
+    ])+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
   }
   function detailValues(r,status){
     const sale=(slot,label)=>detailMetrics([
