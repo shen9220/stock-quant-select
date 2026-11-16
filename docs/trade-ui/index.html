@@ -4673,9 +4673,10 @@ const V3 = (() => {
     const snaps=(rows.ledger?.snapshots||[]).filter(s=>s.date===date&&s.period===book.period);
     return [['早盘','09:30'],['10:00','10:00'],['14:00','14:00'],['收盘','close']].map(([label,time])=>{
       const snap=snaps.find(s=>s.time===time);
-      const equity=snap?num(snap.reference_equity??snap.equity):null;
-      if(equity===null||open===null)return `${label} —`;
-      const delta=cents(equity-open);
+      const equity=snap?cents(snap.reference_equity??snap.equity):null;
+      const base=cents(open);
+      if(equity===null||base===null)return `${label} —`;
+      const delta=cents(equity-base);
       return `${label} ${delta>0?'+':''}${money(delta)}`;
     }).join(' · ');
   }
