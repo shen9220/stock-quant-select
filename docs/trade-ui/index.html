@@ -4437,8 +4437,8 @@ const V3 = (() => {
   const model=()=>models.find(m=>m.id===state.model);
   const placeholder=t=>!!(t.is_board_placeholder||t.is_rank_placeholder||!String(t.stock_code||'').trim());
   const noBuy=t=>placeholder(t)||num(t.buy_price)===null||Number(t.buy_price)<=0||/买不进|没买|不可买/.test(t.skip_reason||'');
-  const capitalBase=date=>date<'2026-01-01'?null:date<'2026-11-01'?100000:40000;
-  const period=date=>date<'2026-01-01'?'unknown':date<'2026-11-01'?'2026-first':'2026-second';
+  const capitalBase=date=>date<'2025-01-01'?null:date<'2026-11-01'?100000:40000;
+  const period=date=>date<'2025-01-01'?'unknown':date<'2026-01-01'?'2025':date<'2026-11-01'?'2026-first':'2026-second';
   function calculate(payload,mode){
     if(!payload||Array.isArray(payload)||payload.mode!==mode||payload.version!=='doc-delta-v1')throw new Error('缺少当前模式的模板资金账本，请刷新页面');
     const list=payload.rows||[];
@@ -4759,9 +4759,9 @@ const V3 = (() => {
     return snap?{...snap,equity:'reference_equity'in snap?snap.reference_equity:snap.equity,position_value:'reference_position_value'in snap?snap.reference_position_value:snap.position_value}:{equity:capitalBase(day),cash:capitalBase(day),position_value:0,date:null};
   }
   function assetSnapshot(list,month,before=false){
-    if(masked()||month<'2026-01'||month>now)return null;
+    if(masked()||month<'2025-01'||month>now)return null;
     const boundary=month+'-01',p=period(boundary),snapshots=list.ledger?.snapshots||[];
-    if(before&&(month==='2026-01'||month==='2026-11'))return {equity:capitalBase(boundary),valuation_marks:[]};
+    if(before&&(month==='2025-01'||month==='2026-01'||month==='2026-11'))return {equity:capitalBase(boundary),valuation_marks:[]};
     const selected=snapshots.filter(r=>r.period===p&&(before?r.date<boundary:r.date.slice(0,7)<=month)),s=selected.at(-1);
     return s?{...s,equity:'reference_equity'in s?s.reference_equity:s.equity,position_value:'reference_position_value'in s?s.reference_position_value:s.position_value,valuation_marks:s.reference_marks??s.valuation_marks}:{equity:capitalBase(boundary),valuation_marks:[]};
   }
