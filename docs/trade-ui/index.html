@@ -1572,6 +1572,8 @@ html[data-skin="night"] #v3Root .position-state.skipped{background:#3b2410;color
 #v3Root .main{margin-left:0;width:100%}
 #v3Root .detail-heading>.day-record{position:static;left:auto;right:auto;top:auto;bottom:auto;width:auto;height:auto;max-width:760px;overflow:hidden;z-index:1;transform:none;align-self:center}
 #v3Root .equity-path{display:block;max-width:none;margin-top:3px;color:var(--sub);font-size:10px;font-weight:400;line-height:1.45;white-space:normal}
+#v3Root .fund-split{height:1px;margin:6px 0;background:var(--line,#e5e7eb)}
+#v3Root .fund-compare{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;font-weight:650}
 #v3Root .equity-rate{display:block;margin-top:2px;font-size:11px;font-weight:700}
 #v3Root .sell-date-late{color:#8e1528!important;font-weight:700}
 #v3Root .detail-metric[data-field="closePosition"]{padding-bottom:8px;margin-bottom:2px;border-bottom:1px solid var(--line)}
@@ -4534,7 +4536,7 @@ const V3 = (() => {
   function hero(title,desc,pill){return `<section class="hero"><div><h2>${title}</h2><p>${desc}</p></div><span class="pill">${pill}</span></section>`;}
   function notice(){return '';}
 
-  const sessionColumns={trade:{identity:[1],capital:[2],next:[3],holding:[4],close:[5],morning:[6],afternoon:[7]},history:{morning:[2,3,4],afternoon:[5,6,7],batch:[8,9,10,11,12],close:[13,14,15]},compare:{morning:[4,5,6],afternoon:[7,8,9],batch:[10,11,12,13,14],close:[15]}};
+  const sessionColumns={trade:{identity:[1],capital:[2],close:[3],stock:[4],morning:[5],afternoon:[6]},history:{morning:[2,3,4],afternoon:[5,6,7],batch:[8,9,10,11,12],close:[13,14,15]},compare:{morning:[4,5,6],afternoon:[7,8,9],batch:[10,11,12,13,14],close:[15]}};
   function sessionClass(index){const groups=sessionColumns[state.view];if(!groups)return '';for(const [group,indexes] of Object.entries(groups)){if(indexes.includes(index))return `session-cell session-${group}${index===indexes[0]?' session-start':''}${index===indexes.at(-1)?' session-end':''}`;}return '';}
   function tableLegend(){return ''; }
   function table(headers,body,summary='',mobile=false){
@@ -4547,9 +4549,9 @@ const V3 = (() => {
     const klass=typeof extra==='string'?extra:'';
     return `<td class="${sessionClass(index)} ${klass}">${value}</td>`;
   }
-  const columns=['date','stock_name','buyAmount','buyDayCash','positionWeight','positionDayProfit','am','pm',null];
-  const detailSortLabels=['买入日期','股票名称','当日未持仓市值','次日收盘现金','个股仓位','单票当天收益利润','9:35卖价','13:35卖价'];
-  const detailHeaders=['日期信息','基础与买入','当日资金快照','次日资金快照','当日收益与收盘','次日收益与收盘','9:35 卖出','13:35 卖出','操作'];
+  const columns=['date','stock_name','buyAmount','positionDayProfit','stockDayProfit','am','pm',null];
+  const detailSortLabels=['买入日期','股票名称','当日未持仓市值','当天收益利润','单票当天利润','9:35卖价','13:35卖价'];
+  const detailHeaders=['日期信息','基础与买入','当日资金快照','当日收益与收盘','单票收益记录','9:35 卖出','13:35 卖出','操作'];
   const fieldHelp = {
   "date": "这一行的买入日。列表按买入日筛选。",
   "stock_name": "代码和名称。停牌替补时显示实际买入的票。",
@@ -4566,8 +4568,16 @@ const V3 = (() => {
   "buyBudget": "可买上限＝（期初总资产－停牌冻结）×50%。还要受现金和整手限制。不是账户全部现金。",
   "dayBuyCost": "这一天实际买入金额＝开盘价×手数。未买入为 0。",
   "buyDayCash": "这一天收盘现金＝未持仓市值－持仓资金＋卖出回款。下一天能买的钱从已解锁部分接。",
-  "daySellProfit": "这一天已卖出的利润合计＝回款－分摊成本。不含还持有的浮动盈亏。",
-  "daySellReturn": "卖出利润÷当日期初总资产×100%。和当天收益率用同一个分母。",
+  "dayProfit": "当天利润＝当天所有持仓盈亏＋卖出后盈亏利润。分母是盘前当前总资产。",
+  "dayRate": "当天收益率＝当天利润÷盘前当前总资产×100%。",
+  "stockDaySellProfit": "这一行这只票当天卖掉的利润＝9:35卖出利润＋13:35卖出利润。当天没卖出为 0。",
+  "stockDaySellRate": "当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0。",
+  "closeDayProfit": "收盘当天利润＝收盘总资产－盘前当前总资产。和当天利润同一个数。",
+  "closeDayRate": "收盘当天收益率＝收盘当天利润÷盘前当前总资产×100%。",
+  "stockDayProfit": "买入日这只票的持仓盈亏，用买入持仓金额计算。",
+  "stockDayRate": "单票当天利润÷买入持仓金额×100%。",
+  "stockSellProfit": "卖出日 9:35 与 13:35 利润之和，用买入持仓金额计算。还没卖出为 0。",
+  "stockSellRate": "单票卖出利润÷买入持仓金额×100%。",
   "closePosition": "收盘时还持有的市值。收盘现金＋收盘持仓市值＝收盘总资产。",
   "ending": "收盘总资产＝期初总资产＋当天收益利润。",
   "dailyProfit": "当天收益利润＝收盘总资产－期初总资产。",
@@ -4590,7 +4600,7 @@ const V3 = (() => {
   "positionDate": "持仓和收益对应的交易日。周末不另造收益。",
   "status": "已买入、未买入或顺延原因。不参与金额相加。",
   "am": "9:35 实际卖出价。没卖出留空。",
-  "amSoldShares": "9:35 已卖手数。按持仓一半，不能整百均分时，卖出日开盘相对买入价大于等于 0 早盘多 100 手，小于 0 少 100 手。涨跌停或还没到点的不算。",
+  "amSoldShares": "9:35 已卖手数。看这一分钟相对昨收的分时涨跌幅。小于 0% 卖 (总手数-100)/2，大于等于 0% 再加 100 手。不跟买入价比，不看开盘价。涨跌停或还没到点的不算。",
   "amMarketChangePct": "卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润。",
   "amSellReturnPct": "这一批利润÷卖出日组合期初总资产×100%。",
   "amSellProfit": "这一批回款－这一批分摊成本。",
@@ -4657,18 +4667,43 @@ const V3 = (() => {
     if(!book||num(book.opening_equity)==null||!book.opening_equity)return null;
     return profit/book.opening_equity*100;
   }
-  function closeSnap(date){
-    const book=dayBook(date);
+  function stockDaySellProfit(r){
+    if(!r||!r.executed)return 0;
+    return (r.events||[]).filter(e=>e.type==='sell'&&e.date===r.date).reduce((sum,e)=>sum+Number(e.profit||0),0);
+  }
+  function closeSnap(r){
+    const book=dayBook(r.date);
     if(!book)return '<div class="stock-sub">这一天没有收盘账</div>';
-    const sellProfit=daySellProfit(date);
-    const sellRate=daySellReturn(date, book);
-    return `<div class="position-asof">${esc(date)}</div>`+detailMetrics([
-      ['卖出利润',fmt(sellProfit),'daySellProfit',true,'这一天账户卖出利润，对应同一天资金列的卖出回款'],
-      ['卖出收益率',fmt(sellRate,true),'daySellReturn',false,'卖出利润÷当日期初总资产×100%。和当天收益率用同一个分母',color(sellProfit)],
-      ['收盘持仓市值',money(dayClosePosition(book)),'closePosition',false,'收盘现金＋收盘持仓市值＝收盘总资产'],
-      ['收盘总资产',money(book.ending_equity),'ending',true],
-      ['当天收益利润',fmt(book.daily_profit),'dailyProfit',true,'收盘总资产－期初总资产'],
-      ['当天收益率',fmt(book.daily_return_pct,true),'dailyRate',false,'当天收益利润÷期初总资产',color(book.daily_profit)],
+    const open=preEquity(book);
+    const hold=dayClosePosition(book);
+    const cash=num(book.cash);
+    const closeEquity=hold!==null&&cash!==null?cents(hold+cash):num(book.ending_equity);
+    const dayProfit=num(book.daily_profit);
+    const dayRate=open?dayProfit/open*100:num(book.daily_return_pct);
+    const sellProfit=stockDaySellProfit(r);
+    const sellRate=open?sellProfit/open*100:0;
+    return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
+      ['当天利润',fmt(dayProfit),'dayProfit',true,'当天所有持仓盈亏＋卖出后盈亏利润。用盘前当前总资产做分母',color(dayProfit)],
+      ['当天收益率',fmt(dayRate,true),'dayRate',false,'当天利润÷盘前当前总资产×100%',color(dayProfit)],
+      ['当天卖出利润',fmt(sellProfit),'stockDaySellProfit',true,'这只票当天 9:35 与 13:35 卖出利润之和。当天没卖出为 0',color(sellProfit)],
+      ['当天卖出收益率',fmt(sellRate,true),'stockDaySellRate',false,'当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0',color(sellProfit)],
+      ['当天收盘总资产',money(closeEquity),'ending',true,'持仓市值＋未持仓金额。不再另加当天利润'],
+      ['收盘当天利润',fmt(dayProfit),'closeDayProfit',true,'收盘总资产－盘前当前总资产，和当天利润同一个数',color(dayProfit)],
+      ['收盘当天收益率',fmt(dayRate,true),'closeDayRate',false,'收盘当天利润÷盘前当前总资产×100%',color(dayProfit)],
+    ]);
+  }
+  function stockRecord(r){
+    const cost=num(r.initial_buy_cost);
+    const buyDay=r.v2_days&&r.v2_days[r.date];
+    const dayProfit=!r.executed?null:(buyDay&&num(buyDay.positionDayProfit)!==null?Number(buyDay.positionDayProfit):0);
+    const dayRate=cost&&dayProfit!==null?dayProfit/cost*100:null;
+    const sellProfit=!r.executed?null:(r.events||[]).filter(e=>e.type==='sell').reduce((sum,e)=>sum+Number(e.profit||0),0);
+    const sellRate=cost&&sellProfit!==null?sellProfit/cost*100:null;
+    return detailMetrics([
+      ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，用买入持仓金额计算',color(dayProfit)],
+      ['单票当天收益率',fmt(dayRate,true),'stockDayRate',false,'单票当天利润÷买入持仓金额×100%',color(dayProfit)],
+      ['单票卖出利润',fmt(sellProfit),'stockSellProfit',true,'卖出日 9:35 与 13:35 利润之和，用买入持仓金额计算',color(sellProfit)],
+      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'单票卖出利润÷买入持仓金额×100%',color(sellProfit)],
     ]);
   }
   function preEquity(book){return book?num(book.opening_equity):null;}
@@ -4683,33 +4718,29 @@ const V3 = (() => {
     if(!book)return '';
     const open=preEquity(book);
     const snaps=(rows.ledger?.snapshots||[]).filter(s=>s.date===date&&s.period===book.period);
-    return [['早盘','09:30'],['10:00','10:00'],['14:00','14:00'],['收盘','close']].map(([label,time])=>{
+    return [['早盘','09:30'],['收盘','close']].map(([label,time])=>{
       const snap=snaps.find(s=>s.time===time);
       const equity=snap?cents(snap.reference_equity??snap.equity):null;
       const base=cents(open);
       if(equity===null||base===null)return `${label} —`;
       const delta=cents(equity-base);
-      return `${label} ${delta>0?'+':''}${money(delta)}`;
-    }).join(' · ');
+      return `${label}${delta>0?'+':''}${money(delta)}`;
+    }).join('·');
   }
   function fundSnap(r){
-    if(!r)return '<div class="stock-sub">没有下一天</div>';
+    if(!r)return '<div class="stock-sub">没有这一天</div>';
     const book=dayBook(r.date),open=preEquity(book),post=postEquity(book);
     const delta=open!==null&&post!==null?cents(post-open):null;
     const path=pointMoves(r.date);
-    const closeEquity=book&&num(book.ending_equity)!==null?num(book.ending_equity):post;
-    const assetRate=open&&closeEquity!==null?(closeEquity-open)/open*100:null;
-    const postValue=`${money(post)}${delta===null?'':`<span class="equity-path">较盘前 ${delta>0?'+':''}${money(delta)}</span>`}`;
-    const currentValue=`${money(closeEquity)}${assetRate===null?'':`<span class="equity-rate">${fmt(assetRate,true)}</span>`}`;
-    return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
-      ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前市值，和顶部当天期初总资产同一口径。市值用开盘前的数'],
+    const assetRate=open&&post!==null?(post-open)/open*100:null;
+    return `<div class="position-asof">${esc(r.date)}</div><div class="fund-layout">`+detailMetrics([
+      ['盘前当前总资产',money(open),'preEquity',true,'开盘前现金＋开盘前市值'],
+    ])+'<div class="fund-split"></div>'+detailMetrics([
+      ['持仓市值',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'和原持仓资金同一口径，这一天实际买入'],
       ['未持仓市值',money(r.buyAmount),'buyAmount',false,'这一天买入前已解锁现金'],
-      ['持仓资金',money(r.executed?r.initial_buy_cost:0),'dayBuyCost',false,'这一天实际买入'],
-      ['卖出回款',money(daySellProceeds(r)),'daySellProceeds',false,'这一天卖出回到现金的金额'],
-      ['收盘现金',money(r.buyDayCash),'buyDayCash',false,'未持仓市值－持仓资金＋卖出回款'],
-      ['盘后当前总资产',postValue,'postEquity',true,path||'持仓市值＋未持仓现金，和顶部当前总资产同一口径'],
-      ['当前总资产',currentValue,'currentEquity',true,'和收盘总资产是同一个数。涨红跌绿'],
-    ])+(path?`<div class="equity-path">${esc(path)}</div>`:'');
+      ['卖出市值',money(daySellProceeds(r)),'daySellProceeds',false,'这一天卖出回到现金的金额，原卖出回款'],
+      ['盘后当前总资产',money(post),'postEquity',true,'持仓市值＋未持仓现金'],
+    ])+`<div class="fund-split"></div><div class="fund-compare"><div>较盘前 ${delta===null?'—':(delta>0?'+':'')+money(delta)}</div><div>收益率 ${assetRate===null?'—':fmt(assetRate,true)}</div></div>`+(path?`<div class="equity-path">${esc(path)}</div>`:'')+'</div>';
   }
   function detailValues(r,status){
     const sale=(slot,label)=>detailMetrics([
@@ -4721,11 +4752,10 @@ const V3 = (() => {
     ]);
     return [
       `<span class="field-label"><time class="detail-date" datetime="${esc(r.date)}">${esc(r.date)}</time>${fieldNote("date","买入日")}</span><div class="stock-sub">买入日 · ${state.mode}</div>`,
-      `<div class="detail-trade-block"><div class="trade-identity">${stock(r)}${fieldNote("stock_name","股票代码与名称")}</div>${detailMetrics([['分值',score(r),'score'],['板块',boardTag(r.board),'board'],['买入开盘价',price(r,'buy'),'buy'],['买入手数',quantity(r.executed?r.shares:0),'shares'],['买入持仓金额',money(r.initial_buy_cost),'initial_buy_cost']])}${status}</div>`,
+      `<div class="detail-trade-block"><div class="trade-identity">${stock(r)}${fieldNote("stock_name","股票代码与名称")}</div>${detailMetrics([['分值',score(r),'score'],['板块',boardTag(r.board),'board'],['买入开盘价',price(r,'buy'),'buy'],['买入手数',quantity(r.executed?r.shares:0),'shares']])}${status}</div>`,
       fundSnap(r),
-      fundSnap(nextTrade(r)),
-      closeSnap(r.date),
-      closeSnap(nextTrade(r)?.date),
+      closeSnap(r),
+      stockRecord(r),
       sale('am','9:35 '),sale('pm','13:35 '),
       `<div class="detail-actions">${operations(r)}</div>`
     ];
