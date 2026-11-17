@@ -4587,8 +4587,8 @@ const V3 = (() => {
   "closeDayRate": "收盘当天收益率＝收盘当天利润÷盘前当前总资产×100%。",
   "stockDayProfit": "买入日这只票的持仓盈亏，用买入持仓金额计算。",
   "stockDayRate": "单票当天利润÷买入持仓金额×100%。",
-  "stockSellProfit": "卖出日 9:35 与 13:35 利润之和，用买入持仓金额计算。还没卖出为 0。",
-  "stockSellRate": "单票卖出利润÷买入持仓金额×100%。",
+  "stockSellProfit": "单票卖出利润＝9:35卖出利润＋13:35卖出利润。",
+  "stockSellRate": "单票卖出收益率＝9:35卖出总资金收益率＋13:35卖出总资金收益率。",
   "closePosition": "收盘时还持有的市值。收盘现金＋收盘持仓市值＝收盘总资产。",
   "ending": "收盘总资产＝期初总资产＋当天收益利润。",
   "dailyProfit": "当天收益利润＝收盘总资产－期初总资产。",
@@ -4617,8 +4617,8 @@ const V3 = (() => {
   "amSellProfit": "这一批回款－这一批分摊成本。",
   "pm": "13:35 实际卖出价。没卖出留空。",
   "pmSoldShares": "13:35 已卖手数，是早盘卖完后的剩余。涨跌停或还没到点的不算。",
-  "pmMarketChangePct": "卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润。",
-  "pmSellReturnPct": "这一批利润÷卖出日组合期初总资产×100%。",
+  "pmMarketChangePct": "13:35卖出收益率。卖出价相对卖出日前收盘价的涨跌幅，只记行情，不进利润。",
+  "pmSellReturnPct": "13:35卖出总资金收益率。这一批利润÷卖出日盘前当前总资产×100%。",
   "pmSellProfit": "这一批回款－这一批分摊成本。",
   "当前总资产": "可用现金＋总市值。同一天的数。",
   "当前可用现金": "还没变成持仓的现金。和当天买入行的收盘现金是同一个数。不是买入额度。",
@@ -4707,13 +4707,15 @@ const V3 = (() => {
     const buyDay=r.v2_days&&r.v2_days[r.date];
     const dayProfit=!r.executed?null:(buyDay&&num(buyDay.positionDayProfit)!==null?Number(buyDay.positionDayProfit):0);
     const dayRate=cost&&dayProfit!==null?dayProfit/cost*100:null;
-    const sellProfit=!r.executed?null:(r.events||[]).filter(e=>e.type==='sell').reduce((sum,e)=>sum+Number(e.profit||0),0);
-    const sellRate=cost&&sellProfit!==null?sellProfit/cost*100:null;
+    const amProfit=num(r.amSellProfit), pmProfit=num(r.pmSellProfit);
+    const sellProfit=!r.executed?null:(amProfit===null&&pmProfit===null?0:(amProfit||0)+(pmProfit||0));
+    const amRate=num(r.amSellReturnPct), pmRate=num(r.pmSellReturnPct);
+    const sellRate=!r.executed?null:(amRate===null&&pmRate===null?0:(amRate||0)+(pmRate||0));
     return detailMetrics([
       ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，用买入持仓金额计算',color(dayProfit)],
       ['单票当天收益率',fmt(dayRate,true),'stockDayRate',false,'单票当天利润÷买入持仓金额×100%',color(dayProfit)],
-      ['单票卖出利润',fmt(sellProfit),'stockSellProfit',true,'卖出日 9:35 与 13:35 利润之和，用买入持仓金额计算',color(sellProfit)],
-      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'单票卖出利润÷买入持仓金额×100%',color(sellProfit)],
+      ['单票卖出利润',fmt(sellProfit),'stockSellProfit',true,'9:35卖出利润＋13:35卖出利润',color(sellProfit)],
+      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出总资金收益率＋13:35卖出总资金收益率',color(sellProfit)],
     ]);
   }
   function preEquity(book){return book?num(book.opening_equity):null;}
@@ -4769,9 +4771,9 @@ const V3 = (() => {
     const sale=(slot,label)=>detailMetrics([
       [label+'卖价',price(r,slot),slot],
       [label+'卖出手数',quantity(r[slot+'SoldShares']),slot+'SoldShares'],
-      [label+'卖出盈亏率',fmt(r[slot+'MarketChangePct'],true),slot+'MarketChangePct',false,'卖出时股价相对卖出日前收盘价的涨跌幅，仅记录行情，不参与利润计算',color(r[slot+'MarketChangePct'])],
-      [label+'卖出收益率',fmt(r[slot+'SellReturnPct'],true),slot+'SellReturnPct',false,'真实卖出利润 ÷ 卖出日组合期初总资产 × 100%',color(r[slot+'SellProfit'])],
-      [label+'卖出利润',fmt(r[slot+'SellProfit']),slot+'SellProfit',true,'已卖回款减实际卖出手数对应成本',color(r[slot+'SellProfit'])]
+      [label+'卖出收益率',fmt(r[slot+'MarketChangePct'],true),slot+'MarketChangePct',false,'卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润',color(r[slot+'MarketChangePct'])],
+      [label+'卖出利润',fmt(r[slot+'SellProfit']),slot+'SellProfit',true,'这一批回款减这一批成本。单票卖出利润是两边相加',color(r[slot+'SellProfit'])],
+      [label+'卖出总资金收益率',fmt(r[slot+'SellReturnPct'],true),slot+'SellReturnPct',false,'这一批利润÷卖出日盘前当前总资产×100%。单票卖出收益率是两边相加',color(r[slot+'SellProfit'])]
     ]);
     return [
       `<span class="field-label"><time class="detail-date" datetime="${esc(r.date)}">${esc(r.date)}</time>${fieldNote("date","买入日")}</span><div class="stock-sub">买入日 · ${state.mode}</div>`,
