@@ -4702,20 +4702,40 @@ const V3 = (() => {
       ['当天收盘总资产',money(closeEquity),'ending',true,'收盘现金＋收盘持仓市值。不再另加当天利润'],
     ]);
   }
+  function slotReturns(r, slot){
+    const profit=num(r[slot+'SellProfit']);
+    const cost=num(r.initial_buy_cost);
+    const sold=num(r[slot+'SoldShares']);
+    const buy=num(r.buy)||num(r.open_price);
+    const lotCost=buy!==null&&sold!==null?buy*sold:null;
+    const sellDay=r[slot+'SellDate']||r[slot+'_sell_date']||r.date;
+    const open=preEquity(dayBook(sellDay));
+    return {
+      profit,
+      lotRate:lotCost&&profit!==null?profit/lotCost*100:null,
+      holdRate:cost&&profit!==null?profit/cost*100:null,
+      totalRate:open&&profit!==null?profit/open*100:null,
+    };
+  }
   function stockRecord(r){
     const cost=num(r.initial_buy_cost);
     const buyDay=r.v2_days&&r.v2_days[r.date];
     const dayProfit=!r.executed?null:(buyDay&&num(buyDay.positionDayProfit)!==null?Number(buyDay.positionDayProfit):0);
     const dayRate=cost&&dayProfit!==null?dayProfit/cost*100:null;
-    const amProfit=num(r.amSellProfit), pmProfit=num(r.pmSellProfit);
-    const sellProfit=!r.executed?null:(amProfit===null&&pmProfit===null?0:(amProfit||0)+(pmProfit||0));
-    const amRate=num(r.amSellReturnPct), pmRate=num(r.pmSellReturnPct);
-    const sellRate=!r.executed?null:(amRate===null&&pmRate===null?0:(amRate||0)+(pmRate||0));
+    const am=slotReturns(r,'am'), pm=slotReturns(r,'pm');
+    const sellProfit=!r.executed?null:(am.profit===null&&pm.profit===null?0:(am.profit||0)+(pm.profit||0));
+    const sellRate=!r.executed?null:(am.holdRate===null&&pm.holdRate===null?0:(am.holdRate||0)+(pm.holdRate||0));
+    const open=preEquity(dayBook(r.date));
+    const dayTotal=open&&dayProfit!==null?dayProfit/open*100:null;
+    const sellTotal=!r.executed?null:(am.totalRate===null&&pm.totalRate===null?0:(am.totalRate||0)+(pm.totalRate||0));
     return detailMetrics([
-      ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，用买入持仓金额计算',color(dayProfit)],
+      ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，分母是买入持仓金额',color(dayProfit)],
       ['单票当天收益率',fmt(dayRate,true),'stockDayRate',false,'单票当天利润÷买入持仓金额×100%',color(dayProfit)],
       ['单票卖出利润',fmt(sellProfit),'stockSellProfit',true,'9:35卖出利润＋13:35卖出利润',color(sellProfit)],
-      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出总资金收益率＋13:35卖出总资金收益率',color(sellProfit)],
+      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出收益率＋13:35卖出收益率。分母都是买入持仓金额',color(sellProfit)],
+    ])+'<div class="fund-split"></div>'+detailMetrics([
+      ['当天总资金收益',fmt(dayTotal,true),'dayTotalRate',false,'单票当天利润÷盘前当前总资产×100%',color(dayProfit)],
+      ['单票总资金收益',fmt(sellTotal,true),'stockTotalRate',false,'单票卖出利润÷卖出日盘前当前总资产×100%。等于两边卖出总资金收益率相加',color(sellProfit)],
     ]);
   }
   function preEquity(book){return book?num(book.opening_equity):null;}
@@ -4768,13 +4788,22 @@ const V3 = (() => {
     ])+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
   }
   function detailValues(r,status){
-    const sale=(slot,label)=>detailMetrics([
-      [label+'卖价',price(r,slot),slot],
-      [label+'卖出手数',quantity(r[slot+'SoldShares']),slot+'SoldShares'],
-      [label+'卖出收益率',fmt(r[slot+'MarketChangePct'],true),slot+'MarketChangePct',false,'卖出价相对卖出日前收盘价的涨跌幅。只记行情，不进利润',color(r[slot+'MarketChangePct'])],
-      [label+'卖出利润',fmt(r[slot+'SellProfit']),slot+'SellProfit',true,'这一批回款减这一批成本。单票卖出利润是两边相加',color(r[slot+'SellProfit'])],
-      [label+'卖出总资金收益率',fmt(r[slot+'SellReturnPct'],true),slot+'SellReturnPct',false,'这一批利润÷卖出日盘前当前总资产×100%。单票卖出收益率是两边相加',color(r[slot+'SellProfit'])]
-    ]);
+    const sale=(slot,label)=>{
+      const got=slotReturns(r,slot);
+      return detailMetrics([
+        [label+'卖价',price(r,slot),slot],
+        [label+'卖出手数',quantity(r[slot+'SoldShares']),slot+'SoldShares'],
+      ])+'<div class="fund-split"></div>'+detailMetrics([
+        [label+'卖出份额利润',fmt(got.profit),'slotLotProfit',true,'（卖价－买入价）×这一批卖出手数',color(got.profit)],
+        [label+'卖出份额收益率',fmt(got.lotRate,true),'slotLotRate',false,'这一批利润÷这一批成本×100%',color(got.profit)],
+      ])+'<div class="fund-split"></div>'+detailMetrics([
+        [label+'卖出利润',fmt(got.profit),'slotHoldProfit',true,'和卖出份额利润同一笔钱',color(got.profit)],
+        [label+'卖出收益率',fmt(got.holdRate,true),'slotHoldRate',false,'这一批利润÷买入持仓金额×100%。单票卖出收益率是两边相加',color(got.profit)],
+      ])+'<div class="fund-split"></div>'+detailMetrics([
+        [label+'卖出总资金利润',fmt(got.profit),'slotTotalProfit',true,'和上面同一笔钱，分母换成总资金',color(got.profit)],
+        [label+'卖出总资金收益率',fmt(got.totalRate,true),'slotTotalRate',false,'这一批利润÷卖出日盘前当前总资产×100%',color(got.profit)],
+      ]);
+    };
     return [
       `<span class="field-label"><time class="detail-date" datetime="${esc(r.date)}">${esc(r.date)}</time>${fieldNote("date","买入日")}</span><div class="stock-sub">买入日 · ${state.mode}</div>`,
       `<div class="detail-trade-block"><div class="trade-identity">${stock(r)}${fieldNote("stock_name","股票代码与名称")}</div>${detailMetrics([['分值',score(r),'score'],['板块',boardTag(r.board),'board'],['买入开盘价',price(r,'buy'),'buy'],['买入手数',quantity(r.executed?r.shares:0),'shares']])}${status}</div>`,
