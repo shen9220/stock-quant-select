@@ -2412,9 +2412,34 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
     }
 
     function pagesProgramTrades(program) {
+      if (window.__PAGES_PASS__ && window.__PAGES_PROGRAMS__ && window.__PAGES_PROGRAMS__[program]) {
+        return window.__PAGES_PROGRAMS__[program].map(t => ({ ...t }));
+      }
       const snap = pagesActiveSnapshot();
       const list = (snap.programs && snap.programs[program]) || [];
       return list.map(t => ({ ...t }));
+    }
+
+    async function __pagesPrivateJson(url) {
+      if (!window.__PAGES_PASS__) throw new Error("请先登录");
+      const enc = await __pagesFetchJson(url, 120000);
+      return __pagesDecrypt(enc, window.__PAGES_PASS__);
+    }
+
+    async function pagesEnsureProgram(program) {
+      if (!window.__PAGES_PASS__) return;
+      window.__PAGES_PROGRAMS__ = window.__PAGES_PROGRAMS__ || {};
+      if (window.__PAGES_PROGRAMS__[program]) return;
+      window.__PAGES_PROGRAMS__[program] = await __pagesPrivateJson("data/private/programs/" + encodeURIComponent(program) + ".json");
+    }
+
+    async function pagesEnsureLedger(model, rank, mode) {
+      const key = model + ":" + rank + ":" + mode;
+      window.__PAGES_LEDGERS__ = window.__PAGES_LEDGERS__ || {};
+      if (window.__PAGES_LEDGERS__[key]) return window.__PAGES_LEDGERS__[key];
+      const ledger = await __pagesPrivateJson("data/private/ledgers/" + model + "_" + rank + "_" + mode + ".json");
+      window.__PAGES_LEDGERS__[key] = ledger;
+      return ledger;
     }
 
     function pagesEffPath(t) {
@@ -2750,9 +2775,11 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         const rank = params.get('rank') || '1';
         const mode = params.get('mode') || 'D1';
         const key = `${model}:${rank}:${mode}`;
-        const loggedIn = !!window.__PAGES_FULL__;
-        let ledger = loggedIn ? (pagesActiveSnapshot().ledgers || {})[key] : null;
-        if (!loggedIn) {
+        const loggedIn = !!window.__PAGES_PASS__;
+        let ledger = null;
+        if (loggedIn) {
+          ledger = await pagesEnsureLedger(model, rank, mode);
+        } else {
           ledger = await __pagesFetchJson(`data/ledgers/${model}_${rank}_${mode}.json?v=20261113c`);
           if (!ledger || ledger.masked !== true) throw new Error('公开数据未脱敏，已停止加载');
         }
@@ -2760,9 +2787,11 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         return path.endsWith('/ledger-summary') ? {...ledger, rows:[]} : ledger;
       }
       if (path === "/api/trades" || path.endsWith("/api/trades")) {
+        await pagesEnsureProgram(program);
         return pagesFilterTrades(pagesProgramTrades(program), params);
       }
       if (path === "/api/stats" || path.endsWith("/api/stats")) {
+        await pagesEnsureProgram(program);
         const filtered = pagesFilterTrades(pagesProgramTrades(program), params);
         return pagesComputeStats(filtered, params.get("month") || "");
       }
@@ -2771,16 +2800,19 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         return __pagesFetchJson("data/compare.json");
       }
       if (path === "/api/months" || path.endsWith("/api/months")) {
+        await pagesEnsureProgram(program);
         const list = pagesProgramTrades(program);
         const months = Array.from(new Set(list.map(t => String(t.date || "").slice(0, 7)).filter(m => program !== "stock" || m >= "2025-01"))).sort().reverse();
         const cur = new Date().toISOString().slice(0, 7);
         return [cur, ...months.filter(m => m !== cur)];
       }
       if (path === "/api/dates" || path.endsWith("/api/dates")) {
+        await pagesEnsureProgram(program);
         const list = pagesProgramTrades(program);
         return Array.from(new Set(list.map(t => String(t.date || "")).filter(Boolean))).sort().reverse();
       }
       if (path === "/api/history-board" || path.endsWith("/api/history-board")) {
+        await pagesEnsureProgram(program);
         return pagesHistoryBoard(
           program,
           params.get("board") || "",
@@ -4354,6 +4386,9 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         __pagesShowTransit("正在退出，切回脱敏视图…");
         setTimeout(() => {
           window.__PAGES_FULL__ = null;
+          window.__PAGES_PASS__ = null;
+          window.__PAGES_LEDGERS__ = null;
+          window.__PAGES_PROGRAMS__ = null;
           window.__PAGES_SNAPSHOT__ = window.__PAGES_MASKED__;
           sessionStorage.removeItem("trade_ui_authed");
           __pagesUpdateAuthUi();
@@ -4389,15 +4424,17 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
       __pagesShowTransit("正在校验并解密数据，手机端可能需几秒…");
       await __pagesPaint();
       try {
-        const enc = await __pagesFetchJson("data/encrypted.json", 180000);
-        __pagesShowTransit("正在解密完整数据…");
-        await __pagesPaint();
-        const full = await __pagesDecrypt(enc, pass);
+        const enc = await __pagesFetchJson("data/auth.json", 20000);
+        const ticket = await __pagesDecrypt(enc, pass);
+        if (!ticket || ticket.ok !== true) throw new Error("密码错误");
         document.getElementById("authModal").classList.remove("show");
-        __pagesShowTransit("登录成功，正在加载看板…");
+        __pagesShowTransit("登录成功，正在加载当前账本…");
         await __pagesPaint();
-        window.__PAGES_FULL__ = full;
-        window.__PAGES_SNAPSHOT__ = full;
+        window.__PAGES_PASS__ = pass;
+        window.__PAGES_LEDGERS__ = {};
+        window.__PAGES_PROGRAMS__ = {};
+        window.__PAGES_FULL__ = { programs: {}, ledgers: {}, index_months: ticket.index_months || {}, exported_at: ticket.exported_at };
+        window.__PAGES_SNAPSHOT__ = window.__PAGES_FULL__;
         sessionStorage.setItem("trade_ui_authed", "1");
         __pagesUpdateAuthUi();
         await loadAll();
