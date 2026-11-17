@@ -4675,7 +4675,7 @@ const V3 = (() => {
   "当前可用现金": "还没变成持仓的现金。和当天买入行的收盘现金是同一个数。不是买入额度。",
   "总市值": "还持有的市值，含浮动盈亏，不含现金。",
   "当月累计卖出利润": "本月 9:35 和 13:35 已卖利润之和。不含浮动盈亏。",
-  "当天收益利润": "当前总资产－当日期初总资产。收益率用当日期初做分母。",
+  "当天收益利润": "当天卖出利润＋持仓利润。早盘用9:30，10:00用9:35，14:00用13:35，15:05用15:00。收益率用当日期初做分母。",
   "当天期初总资产": "前一交易日收盘总资产，是当天收益的分母。",
   "9:35累计卖出利润": "本月 9:35 已卖利润之和。不含 13:35，不含浮动盈亏。",
   "13:35累计卖出利润": "本月 13:35 已卖利润之和。不含 9:35，不含浮动盈亏。",
@@ -4963,7 +4963,7 @@ const V3 = (() => {
     html+='<div class="grid overview-cards">';
     const account=currentAccount(rows,cutoffDay()),day=dayResult(rows,cutoffDay());
     html+=card('当天期初总资产',money(day.opening),`${day.daily?.date||'—'} · 当天收益利润的分母`);
-    html+=card('当天收益利润',fmt(day.profit),`${day.daily?.date||'—'} · 当前总资产－当天期初总资产`,'#e58d39',day.rate);
+    html+=card('当天收益利润',fmt(day.profit),`${day.daily?.date||'—'} · 卖出利润＋持仓利润 · ${day.daily?.valued_at?.slice(11)||'—'}`,'#e58d39',day.rate);
     html+=card('当前总资产',money(account.equity),`${account.date||'—'} · 当前可用现金＋总市值`,'#d88d32');
     html+=card('当前可用现金',money(account.cash),`${account.date||'—'} · 与当日剩余可用现金同一快照`);
     html+=card('总市值',money(account.market),`${account.date||'—'} · 持仓金额和利润 · 四个时点更新`,'#c2410c');
@@ -4982,7 +4982,7 @@ const V3 = (() => {
     html+=table(heads,visible.map(r=>'<tr>'+values(r).map(cell).join('')+'</tr>').join(''),sumrow,true);
     html+=``;
     html+=`<div class="mobilecards detail-mobilecards">${visible.map(r=>{const grouped=values(r);return `<article class="mobiletrade detail-mobiletrade"><div class="detail-mobile-date">${grouped[0]}</div><div class="detail-mobile-groups">${grouped.slice(1,8).map((value,i)=>`<section class="detail-mobile-group ${sessionClass(i+1)}"><h4>${heads[i+1]}</h4>${value}</section>`).join('')}</div><div class="detail-mobile-actions"><span>操作</span>${grouped[8]}</div></article>`;}).join('')||'<div class="empty-state">该范围暂无记录</div>'}</div>`;
-    html+=`<div class="bottom"><span class="notice">共 ${a.length} 条 · 第 ${state.page} / ${pages} 页</span><div class="filters">${[['首页',1],['上一页',state.page-1],['下一页',state.page+1],['末页',pages]].map(([label,n],i)=>`<button class="btn" ${i<2?state.page<=1?'disabled':'':state.page>=pages?'disabled':''} onclick="V3.page(${n})">${label}</button>`).join('')}</div></div><div class="footnote">V2：资金快照对应买入日，持仓与当天收益对应所选截止日。卖出利润＝实际回款－分摊成本；价格收益率沿用价差百分数。单票当天收益扣除昨日持仓，组合收益在上方统一展示。可买资金按非冻结总资产50%，实际买入受现金限制；额度余款不是现金。自动更新：早盘推荐落盘、10:00、14:00、15:00。时点之间只读本机账本。当前总资产、当前可用现金、总市值用同一日期，总资产＝现金＋总市值。三个数都在早盘落盘、10:00、14:00、15:05 写入账本。</div></section>`;
+    html+=`<div class="bottom"><span class="notice">共 ${a.length} 条 · 第 ${state.page} / ${pages} 页</span><div class="filters">${[['首页',1],['上一页',state.page-1],['下一页',state.page+1],['末页',pages]].map(([label,n],i)=>`<button class="btn" ${i<2?state.page<=1?'disabled':'':state.page>=pages?'disabled':''} onclick="V3.page(${n})">${label}</button>`).join('')}</div></div><div class="footnote">V2：资金快照对应买入日，持仓与当天收益对应所选截止日。卖出利润＝实际回款－分摊成本；价格收益率沿用价差百分数。单票当天收益扣除昨日持仓，组合收益在上方统一展示。可买资金按非冻结总资产50%，实际买入受现金限制；额度余款不是现金。自动更新四次：早盘取9:30，10:00取9:35，14:00取13:35，15:05取15:00。当天收益利润＝当天卖出利润＋持仓利润。时点之间只读本机账本。当前总资产、当前可用现金、总市值用同一日期，总资产＝现金＋总市值。</div></section>`;
     return html;
   }
   function cents(v){const n=num(v);return n===null?null:Math.round((n+Number.EPSILON)*100)/100;}
