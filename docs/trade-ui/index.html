@@ -4695,7 +4695,7 @@ const V3 = (() => {
     const sellRate=open?sellProfit/open*100:0;
     return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
       ['当天利润',fmt(dayProfit),'dayProfit',true,'当天所有持仓盈亏＋卖出后盈亏利润。用盘前当前总资产做分母',color(dayProfit)],
-      ['当天收益率',fmt(dayRate,true),'dayRate',false,'当天利润÷盘前当前总资产×100%',color(dayProfit)],
+      ['当天总资金收益率',fmt(dayRate,true),'dayRate',false,'当天利润÷盘前当前总资产×100%',color(dayProfit)],
       ['当天卖出利润',fmt(sellProfit),'stockDaySellProfit',true,'这只票当天 9:35 与 13:35 卖出利润之和。当天没卖出为 0',color(sellProfit)],
       ['当天卖出收益率',fmt(sellRate,true),'stockDaySellRate',false,'当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0',color(sellProfit)],
     ])+'<div class="fund-split"></div>'+detailMetrics([
@@ -4731,11 +4731,10 @@ const V3 = (() => {
     return detailMetrics([
       ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，分母是买入持仓金额',color(dayProfit)],
       ['单票当天收益率',fmt(dayRate,true),'stockDayRate',false,'单票当天利润÷买入持仓金额×100%',color(dayProfit)],
-      ['单票卖出利润',fmt(sellProfit),'stockSellProfit',true,'9:35卖出利润＋13:35卖出利润',color(sellProfit)],
-      ['单票卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出收益率＋13:35卖出收益率。分母都是买入持仓金额',color(sellProfit)],
+      ['单票总卖出利润',fmt(sellProfit),'stockSellProfit',true,'9:35卖出利润＋13:35卖出利润',color(sellProfit)],
+      ['单票持仓卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出收益率＋13:35卖出收益率。分母都是买入持仓金额',color(sellProfit)],
     ])+'<div class="fund-split"></div>'+detailMetrics([
-      ['当天总资金收益',fmt(dayTotal,true),'dayTotalRate',false,'单票当天利润÷盘前当前总资产×100%',color(dayProfit)],
-      ['单票总资金收益',fmt(sellTotal,true),'stockTotalRate',false,'单票卖出利润÷卖出日盘前当前总资产×100%。等于两边卖出总资金收益率相加',color(sellProfit)],
+      ['单票总资金收益',fmt(sellTotal,true),'stockTotalRate',false,'单票卖出利润÷卖出日盘前当前总资产×100%',color(sellProfit)],
     ]);
   }
   function preEquity(book){return book?num(book.opening_equity):null;}
@@ -4783,9 +4782,7 @@ const V3 = (() => {
       chain('收盘现金',cashClose,'buyDayCash','未持仓市值−持仓市值+卖出市值')+op('+')+
       chain('收盘持仓市值',holdClose,'closeHold','收盘还持有的市值')+'<div class="fund-split fund-split-tight"></div>'+op('=')+
       chain('盘后当前总资产',post,'postEquity','收盘现金+收盘持仓市值')+
-    '</div>'+detailMetrics([
-      ['收益率',assetRate===null?'—':fmt(assetRate,true),'assetRate',false,'（盘后当前总资产－盘前当前总资产）÷盘前当前总资产×100%',color(delta)],
-    ])+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
+    '</div>'+`<div class="move-pair"><span class="move-left"><span class="move-label">早盘</span>${signedNum(pointDelta(r.date,'09:30'))}</span><span class="move-right"><span class="move-label">收盘</span>${signedNum(pointDelta(r.date,'close'))}</span></div></div>`;
   }
   function detailValues(r,status){
     const sale=(slot,label)=>{
@@ -4793,15 +4790,13 @@ const V3 = (() => {
       return detailMetrics([
         [label+'卖价',price(r,slot),slot],
         [label+'卖出手数',quantity(r[slot+'SoldShares']),slot+'SoldShares'],
+        [label+'卖出利润',fmt(got.profit),slot+'SellProfit',true,'（卖价－买入价）×这一批卖出手数。份额、持仓、总资金三种收益率共用这一笔金额',color(got.profit)],
       ])+'<div class="fund-split"></div>'+detailMetrics([
-        [label+'卖出份额利润',fmt(got.profit),'slotLotProfit',true,'（卖价－买入价）×这一批卖出手数',color(got.profit)],
-        [label+'卖出份额收益率',fmt(got.lotRate,true),'slotLotRate',false,'这一批利润÷这一批成本×100%',color(got.profit)],
+        [label+'卖出份额收益率',fmt(got.lotRate,true),'slotLotRate',false,'卖出利润÷这一批成本×100%',color(got.profit)],
       ])+'<div class="fund-split"></div>'+detailMetrics([
-        [label+'卖出利润',fmt(got.profit),'slotHoldProfit',true,'和卖出份额利润同一笔钱',color(got.profit)],
-        [label+'卖出收益率',fmt(got.holdRate,true),'slotHoldRate',false,'这一批利润÷买入持仓金额×100%。单票卖出收益率是两边相加',color(got.profit)],
+        [label+'卖出收益率',fmt(got.holdRate,true),'slotHoldRate',false,'卖出利润÷买入持仓金额×100%。单票卖出收益率是两边相加',color(got.profit)],
       ])+'<div class="fund-split"></div>'+detailMetrics([
-        [label+'卖出总资金利润',fmt(got.profit),'slotTotalProfit',true,'和上面同一笔钱，分母换成总资金',color(got.profit)],
-        [label+'卖出总资金收益率',fmt(got.totalRate,true),'slotTotalRate',false,'这一批利润÷卖出日盘前当前总资产×100%',color(got.profit)],
+        [label+'卖出总资金收益率',fmt(got.totalRate,true),'slotTotalRate',false,'卖出利润÷卖出日盘前当前总资产×100%',color(got.profit)],
       ]);
     };
     return [
