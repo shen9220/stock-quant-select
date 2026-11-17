@@ -2423,7 +2423,7 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
     async function __pagesPrivateJson(url) {
       if (!window.__PAGES_PASS__) throw new Error("请先登录");
       const enc = await __pagesFetchJson(url, 120000);
-      return __pagesDecrypt(enc, window.__PAGES_PASS__);
+      return __pagesDecrypt(enc, enc.salt ? window.__PAGES_PASS__ : "");
     }
 
     async function pagesEnsureProgram(program) {
@@ -4316,22 +4316,22 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
       return r.json();
     }
 
-    async function __pagesDecrypt(payload, password) {
+    async function __pagesDeriveKey(password, salt, iterations) {
       const enc = new TextEncoder();
-      const salt = __pagesB64(payload.salt);
+      const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+      return crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt, iterations: iterations || 100000, hash: "SHA-256" },
+        baseKey, { name: "AES-GCM", length: 256 }, false, ["decrypt"]
+      );
+    }
+
+    async function __pagesDecrypt(payload, password) {
       const iv = __pagesB64(payload.iv);
       const tag = __pagesB64(payload.tag);
       const ct = __pagesB64(payload.ct);
+      const key = payload.salt && password ? await __pagesDeriveKey(password, __pagesB64(payload.salt), payload.iter || 100000) : window.__PAGES_KEY__;
       const body = new Uint8Array(ct.length + tag.length);
       body.set(ct, 0); body.set(tag, ct.length);
-      const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
-      const key = await crypto.subtle.deriveKey(
-        { name: "PBKDF2", salt, iterations: payload.iter || 100000, hash: "SHA-256" },
-        baseKey,
-        { name: "AES-GCM", length: 256 },
-        false,
-        ["decrypt"]
-      );
       const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, body);
       if (payload.compression === 'gzip') {
         const stream = new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'));
@@ -4387,6 +4387,7 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         setTimeout(() => {
           window.__PAGES_FULL__ = null;
           window.__PAGES_PASS__ = null;
+          window.__PAGES_KEY__ = null;
           window.__PAGES_LEDGERS__ = null;
           window.__PAGES_PROGRAMS__ = null;
           window.__PAGES_SNAPSHOT__ = window.__PAGES_MASKED__;
@@ -4431,6 +4432,7 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         __pagesShowTransit("登录成功，正在加载当前账本…");
         await __pagesPaint();
         window.__PAGES_PASS__ = pass;
+        window.__PAGES_KEY__ = await __pagesDeriveKey(pass, __pagesB64(enc.salt), enc.iter || 100000);
         window.__PAGES_LEDGERS__ = {};
         window.__PAGES_PROGRAMS__ = {};
         window.__PAGES_FULL__ = { programs: {}, ledgers: {}, index_months: ticket.index_months || {}, exported_at: ticket.exported_at };
