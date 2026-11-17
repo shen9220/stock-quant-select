@@ -4266,18 +4266,30 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
       loadAll();
     });
 
-    async function __pagesFetchJson(url) {
-      const r = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(20000) });
+    function __pagesB64(data) {
+      const clean = String(data || "").replace(/\s/g, "");
+      const size = Math.floor(clean.length * 3 / 4) - (clean.endsWith("==") ? 2 : clean.endsWith("=") ? 1 : 0);
+      const out = new Uint8Array(Math.max(0, size));
+      let offset = 0;
+      for (let i = 0; i < clean.length; i += 524288) {
+        const bin = atob(clean.slice(i, i + 524288));
+        for (let j = 0; j < bin.length; j++) out[offset++] = bin.charCodeAt(j);
+      }
+      return out;
+    }
+
+    async function __pagesFetchJson(url, timeoutMs) {
+      const r = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(timeoutMs || 20000) });
       if (!r.ok) throw new Error("加载失败 " + url + " " + r.status);
       return r.json();
     }
 
     async function __pagesDecrypt(payload, password) {
       const enc = new TextEncoder();
-      const salt = Uint8Array.from(atob(payload.salt), c => c.charCodeAt(0));
-      const iv = Uint8Array.from(atob(payload.iv), c => c.charCodeAt(0));
-      const tag = Uint8Array.from(atob(payload.tag), c => c.charCodeAt(0));
-      const ct = Uint8Array.from(atob(payload.ct), c => c.charCodeAt(0));
+      const salt = __pagesB64(payload.salt);
+      const iv = __pagesB64(payload.iv);
+      const tag = __pagesB64(payload.tag);
+      const ct = __pagesB64(payload.ct);
       const body = new Uint8Array(ct.length + tag.length);
       body.set(ct, 0); body.set(tag, ct.length);
       const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
@@ -4377,7 +4389,7 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
       __pagesShowTransit("正在校验并解密数据，手机端可能需几秒…");
       await __pagesPaint();
       try {
-        const enc = await __pagesFetchJson("data/encrypted.json");
+        const enc = await __pagesFetchJson("data/encrypted.json", 180000);
         __pagesShowTransit("正在解密完整数据…");
         await __pagesPaint();
         const full = await __pagesDecrypt(enc, pass);
@@ -4392,8 +4404,8 @@ html[data-skin="night"] #v3Root .card[data-market="1"] .value{color:#fdba74}
         toast("登录成功 · 已显示完整数据");
       } catch (e) {
         const msg = (e && e.message) ? String(e.message) : "";
-        if (/加载失败|Failed to fetch|NetworkError/i.test(msg)) {
-          err.textContent = "网络异常，请检查网络后重试";
+        if (/加载失败|Failed to fetch|NetworkError|timed out|Timeout|AbortError/i.test(msg)) {
+          err.textContent = "加密数据包下载超时或网络异常，请重试";
         } else {
           err.textContent = "密码错误或解密失败，请重试";
         }
