@@ -4630,13 +4630,13 @@ const V3 = (() => {
   "buyBudget": "可买上限＝（期初总资产－停牌冻结）×50%。还要受现金和整手限制。不是账户全部现金。",
   "dayBuyCost": "这一天实际买入金额＝开盘价×手数。未买入为 0。",
   "buyDayCash": "这一天收盘现金＝未持仓市值－持仓资金＋卖出回款。下一天能买的钱从已解锁部分接。",
-  "dayProfit": "当天利润＝当天所有持仓盈亏＋卖出后盈亏利润。分母是盘前当前总资产。",
+  "dayProfit": "当天利润＝当天每只持仓和卖出的盈亏之和。过夜仓按分钟价减昨收，新买入按分钟价减买入价，都是手数乘价差。四个时点更新。",
   "dayRate": "当天收益率＝当天利润÷盘前当前总资产×100%。",
   "stockDaySellProfit": "这一行这只票当天卖掉的利润＝9:35卖出利润＋13:35卖出利润。当天没卖出为 0。",
   "stockDaySellRate": "当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0。",
   "closeDayProfit": "收盘当天利润＝收盘总资产－盘前当前总资产。和当天利润同一个数。",
   "closeDayRate": "收盘当天收益率＝收盘当天利润÷盘前当前总资产×100%。",
-  "stockDayProfit": "买入日这只票的持仓盈亏，用买入持仓金额计算。",
+  "stockDayProfit": "截止日这只票的盈亏。过夜仓＝剩余手数×（分钟价－昨收），新买入＝剩余手数×（分钟价－买入价）。四个时点各用对应分钟价。价差按元计，不再除以 100。",
   "stockDayRate": "单票当天利润÷买入持仓金额×100%。",
   "stockSellProfit": "单票卖出利润＝9:35卖出利润＋13:35卖出利润。",
   "stockSellRate": "单票卖出收益率＝9:35卖出总资金收益率＋13:35卖出总资金收益率。",
@@ -4733,8 +4733,23 @@ const V3 = (() => {
     if(!r||!r.executed)return 0;
     return (r.events||[]).filter(e=>e.type==='sell'&&e.date===r.date).reduce((sum,e)=>sum+Number(e.profit||0),0);
   }
+  function shownAccountDay(r){
+    const day=cutoffDay();
+    if(day && r.date<=day && dayBook(day)) return day;
+    return r.date;
+  }
+  function shownStockProfit(r){
+    const day=shownAccountDay(r);
+    const hit=r.v2_days&&r.v2_days[day];
+    if(hit && num(hit.positionDayProfit)!==null) return Number(hit.positionDayProfit);
+    if(day===r.date){
+      const buy=r.v2_days&&r.v2_days[r.date];
+      return buy && num(buy.positionDayProfit)!==null ? Number(buy.positionDayProfit) : 0;
+    }
+    return 0;
+  }
   function closeSnap(r){
-    const book=dayBook(r.date);
+    const book=dayBook(shownAccountDay(r));
     if(!book)return '<div class="stock-sub">这一天没有收盘账</div>';
     const open=preEquity(book);
     const hold=dayClosePosition(book);
@@ -4744,8 +4759,8 @@ const V3 = (() => {
     const dayRate=open?dayProfit/open*100:num(book.daily_return_pct);
     const sellProfit=stockDaySellProfit(r);
     const sellRate=open?sellProfit/open*100:0;
-    return `<div class="position-asof">${esc(r.date)}</div>`+detailMetrics([
-      ['当天利润',fmt(dayProfit),'dayProfit',true,'当天所有持仓盈亏＋卖出后盈亏利润。用盘前当前总资产做分母',color(dayProfit)],
+    return `<div class="position-asof">${esc(book.date||r.date)}</div>`+detailMetrics([
+      ['当天利润',fmt(dayProfit),'dayProfit',true,'当天所有持仓盈亏＋卖出盈亏。过夜仓按分钟价减昨收，手数乘价差',color(dayProfit)],
       ['当天总资金收益率',fmt(dayRate,true),'dayRate',false,'当天利润÷盘前当前总资产×100%',color(dayProfit)],
       ['当天卖出利润',fmt(sellProfit),'stockDaySellProfit',true,'这只票当天 9:35 与 13:35 卖出利润之和。当天没卖出为 0',color(sellProfit)],
       ['当天卖出收益率',fmt(sellRate,true),'stockDaySellRate',false,'当天卖出利润÷盘前当前总资产×100%。当天没卖出为 0',color(sellProfit)],
@@ -4770,8 +4785,7 @@ const V3 = (() => {
   }
   function stockRecord(r){
     const cost=num(r.initial_buy_cost);
-    const buyDay=r.v2_days&&r.v2_days[r.date];
-    const dayProfit=!r.executed?null:(buyDay&&num(buyDay.positionDayProfit)!==null?Number(buyDay.positionDayProfit):0);
+    const dayProfit=!r.executed?null:shownStockProfit(r);
     const dayRate=cost&&dayProfit!==null?dayProfit/cost*100:null;
     const am=slotReturns(r,'am'), pm=slotReturns(r,'pm');
     const sellProfit=!r.executed?null:(am.profit===null&&pm.profit===null?0:(am.profit||0)+(pm.profit||0));
@@ -4780,7 +4794,7 @@ const V3 = (() => {
     const dayTotal=open&&dayProfit!==null?dayProfit/open*100:null;
     const sellTotal=!r.executed?null:(am.totalRate===null&&pm.totalRate===null?0:(am.totalRate||0)+(pm.totalRate||0));
     return detailMetrics([
-      ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'买入日持仓盈亏，分母是买入持仓金额',color(dayProfit)],
+      ['单票当天利润',fmt(dayProfit),'stockDayProfit',true,'截止日这只票的盈亏。手数×（分钟价－昨收或买入价）',color(dayProfit)],
       ['单票当天收益率',fmt(dayRate,true),'stockDayRate',false,'单票当天利润÷买入持仓金额×100%',color(dayProfit)],
       ['单票总卖出利润',fmt(sellProfit),'stockSellProfit',true,'9:35卖出利润＋13:35卖出利润',color(sellProfit)],
       ['单票持仓卖出收益率',fmt(sellRate,true),'stockSellRate',false,'9:35卖出收益率＋13:35卖出收益率。分母都是买入持仓金额',color(sellProfit)],
